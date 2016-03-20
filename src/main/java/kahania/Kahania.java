@@ -28,33 +28,50 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.Index;
 
+import kahania.KahaniaCustomException;
+
 public class Kahania implements KahaniaService.Iface{
 
 	
 	//Index names
+	public static final String GENRE_NAME_INDEX = "genre_index_by_name";
+	public static final String LANG_NAME_INDEX = "language_index_by_name";
 	public static final String USER_ID_INDEX = "user_index_by_id";
 	public static final String USER_NAME_INDEX = "user_index_by_uname";
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
+	public static final String LOCK_INDEX = "lock_index";
+	
+	//lock related keys
+	public static final String LockName = "lock_node";
 
 	//user related keys
 	public static final String USER_ID = "user_id";
-	public static final String FULL_NAME = "full_name";
 	public static final String USER_NAME = "user_name";
+	public static final String FULL_NAME = "full_name";
 	public static final String EMAIL = "email";
 	public static final String MOBILE_NUMBER = "mobile_number";
 	public static final String DOB = "dob";
+	public static final String GENDER = "gender";
 	public static final String PRIVILEGE = "privilege";
 	public static final String STATUS = "status";
 	public static final String TIME_CREATED = "time_created";
 	
+	//genre node related keys
+	public static final String GENRE_NAME = "genre_name";
+
+	//language node related keys
+	public static final String LANG_NAME = "language_name";
+	
 	public static final String NODE_TYPE = "node_type";
 	public static final String USER_NODE = "user_node";
+	public static final String GENRE_NODE = "genre_node";
+	public static final String LANG_NODE = "language_node";
 
 	private static GraphDatabaseService graphDb = null;
 	
 	//Relationship names
-	RelationshipType USER_GENERS = DynamicRelationshipType.withName("USER_GENERS");
-	RelationshipType USER_LANGUAGE = DynamicRelationshipType.withName("USER_LANGUAGE");
+	RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
+	RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
 	RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
 	
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
@@ -94,14 +111,28 @@ public class Kahania implements KahaniaService.Iface{
 		node.setProperty(EMAIL,email);
 		node.setProperty(MOBILE_NUMBER,mobile);
 		node.setProperty(DOB,dob);
+		node.setProperty(GENDER,"NA");
 		node.setProperty(PRIVILEGE,privilege);
 		node.setProperty(STATUS,status);
 	    node.setProperty(TIME_CREATED,time_created);
 	    node.setProperty(NODE_TYPE, USER_NODE);
 	    return node;
 	} 
+
+    private Node Genre(String name){
+		Node node = graphDb.createNode();
+		node.setProperty(GENRE_NAME,name);
+	    node.setProperty(NODE_TYPE, GENRE_NODE);
+	    return node;
+	} 
     
-	
+    private Node Language(String name){
+		Node node = graphDb.createNode();
+		node.setProperty(LANG_NAME,name);
+	    node.setProperty(NODE_TYPE, LANG_NODE);
+	    return node;
+	} 
+    	
 	public void startThriftServer()
 	{
 		//starting thrift server		
@@ -207,6 +238,34 @@ public class Kahania implements KahaniaService.Iface{
 	    } );
 	}
 	
+	public void add_neo4j_lock_nodes()
+	{
+		try (Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> lockNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
+				
+			//create lock node
+				if(lockNodeIndex.get(LockName, LockName).getSingle() == null){ //create node if and only if there no locknode with given name
+					Node lockNode = graphDb.createNode();  //creating a node
+					lockNode.setProperty( LockName, LockName ); //attach name to lock node
+					lockNodeIndex.add( lockNode, LockName, LockName ); //attach node to lock node index to retrieve later
+				}
+			
+			tx.success();
+		}
+		catch(Exception e){
+			System.out.println("Exception @ add_neo4j_lock_nodes()");
+			System.out.println("Failed to create lock nodes : " + e.getMessage());}
+		finally{}
+	}
+	
+	private Lock aquireWriteLock(Transaction tx) throws Exception {
+		Index<Node> lockNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
+		Node tobeLockedNode = lockNodeIndex.get( LockName, LockName ).getSingle();
+		if(tobeLockedNode == null)
+	      throw new RuntimeException("Locking node for "+LockName+" not found, unbale to synchronize the call.");
+		return tx.acquireWriteLock(tobeLockedNode);  //lock simultaneous execution of create_comment to avoid duplicate comment creation
+	}
 
 	private boolean isRelationExistsBetween(RelationshipType rel, Node srcNode, Node targetNode)
 	{
@@ -234,64 +293,666 @@ public class Kahania implements KahaniaService.Iface{
 
 	private void createRelation(RelationshipType rel, Node srcNode, Node targetNode)
 	{
-		srcNode.createRelationshipTo(targetNode, rel).setProperty(TIME_CREATED, new Date().getTime());
+		srcNode.createRelationshipTo(targetNode, rel).setProperty(TIME_CREATED, (int)(System.currentTimeMillis()/1000));
 	}
 
+	private void createRelation(RelationshipType rel, Node srcNode, Node targetNode, int time_created)
+	{
+		srcNode.createRelationshipTo(targetNode, rel).setProperty(TIME_CREATED, time_created);
+	}
+
+	@Override
+	public String create_genre(String name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			
+			if(genreName_index.get(GENRE_NAME,name).getSingle()!=null)
+				throw new KahaniaCustomException("Genre already exists with given name : "+name);
+
+			Node genre_node = Genre(name);  // Creating a new genre node
+			if(genre_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating genre with given name");
+
+			//Indexing newly created genre node
+			genreName_index.add(genre_node, GENRE_NAME, name);
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_genre('"+name+"')");
+			System.out.println("Something went wrong, while creating genre from create_genre  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_genre('"+name+"')");
+			System.out.println("Something went wrong, while creating genre from create_genre  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
+	public String edit_genre(String old_name, String new_name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			
+			Node genre_node = genreName_index.get(GENRE_NAME,old_name).getSingle();
+			
+			if(genre_node == null)
+				throw new KahaniaCustomException("Genre node doesnot exists with given name");
+
+			genre_node.setProperty(GENRE_NAME, old_name);
+			//Update indexing for genre node
+			genreName_index.remove(genre_node);
+			genreName_index.add(genre_node, GENRE_NAME, new_name);
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_genre('"+old_name+"','"+new_name+"')");
+			System.out.println("Something went wrong, while editing genre from edit_genre  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_genre('"+old_name+"','"+new_name+"')");
+			System.out.println("Something went wrong, while editing genre from edit_genre  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String delete_genre(String name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			
+			Node genre_node = genreName_index.get(GENRE_NAME,name).getSingle();
+			
+			if(genre_node == null)
+				throw new KahaniaCustomException("Genre node doesnot exists with given name");
+
+			//Remove relationships for genre node
+			for(Relationship rel : genre_node.getRelationships())
+				rel.delete();
+
+			//Remove indexing for genre node
+			genreName_index.remove(genre_node);
+			genre_node.delete();
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ delete_genre('"+name+"')");
+			System.out.println("Something went wrong, while deleting genre from delete_genre  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ delete_genre('"+name+"')");
+			System.out.println("Something went wrong, while deleting genre from delete_genre  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
+	public String list_genres()
+			throws TException {
+		
+		JSONArray res = new JSONArray();
+		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			
+			ResourceIterator<Node> genre_nodes_itr = genreName_index.query(GENRE_NAME,"*").iterator();
+			while(genre_nodes_itr.hasNext())
+				res.put(getJSONForGenre(genre_nodes_itr.next()));
+			
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ list_genres()");
+			System.out.println("Something went wrong, while returning genres  :"+ex.getMessage());
+//			ex.printStackTrace();
+
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ list_genres()");
+			System.out.println("Something went wrong, while returning genres  :"+ex.getMessage());
+			ex.printStackTrace();
+		}
+		
+		return res.toString();
+	}
+
+	@Override
+	public String create_language(String name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			if(langName_index.get(LANG_NAME,name).getSingle()!=null)
+				throw new KahaniaCustomException("Lang already exists with given name : "+name);
+
+			Node lang_node = Language(name);  // Creating a new lang node
+			if(lang_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating language with given name");
+
+			//Indexing newly created lang node
+			langName_index.add(lang_node, LANG_NAME, name);
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_language('"+name+"')");
+			System.out.println("Something went wrong, while creating language from create_language  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_language('"+name+"')");
+			System.out.println("Something went wrong, while creating language from create_language  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
+	public String edit_language(String old_name, String new_name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node lang_node = langName_index.get(LANG_NAME,old_name).getSingle();
+			
+			if(lang_node == null)
+				throw new KahaniaCustomException("Lang node doesnot exists with given name");
+
+			lang_node.setProperty(LANG_NAME, old_name);
+			//Update indexing for lang node
+			langName_index.remove(lang_node);
+			langName_index.add(lang_node, LANG_NAME, new_name);
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_language('"+old_name+"','"+new_name+"')");
+			System.out.println("Something went wrong, while editing language from edit_language  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_language('"+old_name+"','"+new_name+"')");
+			System.out.println("Something went wrong, while editing language from edit_language  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String delete_language(String name)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node lang_node = langName_index.get(LANG_NAME,name).getSingle();
+			
+			if(lang_node == null)
+				throw new KahaniaCustomException("Lang node doesnot exists with given name");
+
+			//Remove relationships for lang node
+			for(Relationship rel : lang_node.getRelationships())
+				rel.delete();
+
+			//Remove indexing for lang node
+			langName_index.remove(lang_node);
+			lang_node.delete();
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ delete_language('"+name+"')");
+			System.out.println("Something went wrong, while deleting language from delete_language  :"+ex.getMessage());
+//			ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ delete_language('"+name+"')");
+			System.out.println("Something went wrong, while deleting language from delete_language  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
+	public String list_languages()
+			throws TException {
+		
+		JSONArray res = new JSONArray();
+		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			ResourceIterator<Node> lang_nodes_itr = langName_index.query(LANG_NAME,"*").iterator();
+			while(lang_nodes_itr.hasNext())
+				res.put(getJSONForLang(lang_nodes_itr.next()));
+			
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ list_languages()");
+			System.out.println("Something went wrong, while returning languages  :"+ex.getMessage());
+//			ex.printStackTrace();
+
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ list_languages()");
+			System.out.println("Something went wrong, while returning languages  :"+ex.getMessage());
+			ex.printStackTrace();
+		}
+		
+		return res.toString();
+	}
 
 	@Override
 	public String create_user(String id, String full_name, String user_name,
-			String email, String mobile_number, String dob, String geners,
+			String email, String mobile_number, String dob, String genres,
 			String languages, int privilege, int status, int time_created)
 			throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
+			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
+			
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			if(userId_index.get(USER_ID,id).getSingle()!=null)
+				throw new KahaniaCustomException("User already exists with given id : "+id);
+			if(userName_index.get(USER_NAME,user_name).getSingle()!=null)
+				throw new KahaniaCustomException("User already exists with given user_name : "+user_name);
+			if(userEmail_index.get(EMAIL,email).getSingle()!=null)
+				throw new KahaniaCustomException("User already exists with given email : "+email);
+
+			Node user_node = User(id, full_name, user_name, email, mobile_number, dob, privilege, status, time_created);  // Creating a new user node
+			if(user_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating user ");
+
+			//create relationships with Genres and Languages
+			for(String genre_name : genres.split(","))
+			{
+				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
+					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
+			}
+			
+			for(String lang_name : languages.split(","))
+			{
+				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
+					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+			}
+			
+			//Indexing newly created user node
+			userId_index.add(user_node, USER_ID, id);
+			userName_index.add(user_node, USER_NAME, user_name);
+			userEmail_index.add(user_node, EMAIL, email);
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_user()");
+			System.out.println("Something went wrong, while creating user from create_user  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_user()");
+			System.out.println("Something went wrong, while creating user from create_user  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	
+	}
 
 	@Override
 	public String edit_user_basic_info(String id, String full_name,
 			String gender, String dob) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User does not exists with given id : "+id);
+			
+			user_node.setProperty(FULL_NAME, full_name);
+			user_node.setProperty(GENDER, gender);
+			user_node.setProperty(DOB, dob);
+			
+			res = "true";
+			tx.success();
 
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_user_basic_info()");
+			System.out.println("Something went wrong, while editing user from edit_user_basic_info  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_user_basic_info()");
+			System.out.println("Something went wrong, while editing user from edit_user_basic_info  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	
+	}
 
 	@Override
 	public String edit_user_contact_details(String id, String email,
 			String mobile_number) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User does not exists with given id : "+id);
+			
+			user_node.setProperty(EMAIL, email);
+			user_node.setProperty(MOBILE_NUMBER, mobile_number);
+			
+			userEmail_index.remove(user_node);
+			userEmail_index.add(user_node, EMAIL, email);
+			
+			res = "true";
+			tx.success();
 
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_user_contact_details()");
+			System.out.println("Something went wrong, while editing user from edit_user_contact_details  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_user_contact_details()");
+			System.out.println("Something went wrong, while editing user from edit_user_contact_details  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
 
 	@Override
 	public String edit_user_security_details(String id, String user_name)
 			throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User does not exists with given id : "+id);
+			
+			user_node.setProperty(USER_NAME, user_name);
+			
+			userName_index.remove(user_node);
+			userName_index.add(user_node, USER_NAME, user_name);
+			
+			res = "true";
+			tx.success();
 
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_user_security_details()");
+			System.out.println("Something went wrong, while editing user from edit_user_security_details  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_user_security_details()");
+			System.out.println("Something went wrong, while editing user from edit_user_security_details  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
 
 	@Override
 	public String edit_user_languages(String id, String languages)
 			throws TException {
-		// TODO Auto-generated method stub
-		return null;
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User does not exists with given id : "+id);
+			
+			for(Relationship rel : user_node.getRelationships(USER_INTERESTED_LANGUAGE))
+				rel.delete();
+
+			for(String lang_name : languages.split(","))
+			{
+				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
+					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+			}
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_user_languages()");
+			System.out.println("Something went wrong, while editing user from edit_user_languages  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_user_languages()");
+			System.out.println("Something went wrong, while editing user from edit_user_languages  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
 	}
 
+	@Override
+	public String edit_user_genres(String id, String genres)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User does not exists with given id : "+id);
+			
+			for(Relationship rel : user_node.getRelationships(USER_INTERESTED_GENRE))
+				rel.delete();
+
+			for(String lang_name : genres.split(","))
+			{
+				if(genreName_index.get(GENRE_NAME, lang_name).getSingle() != null)
+					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, lang_name).getSingle());
+			}
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_user_genres()");
+			System.out.println("Something went wrong, while editing user from edit_user_genres  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_user_genres()");
+			System.out.println("Something went wrong, while editing user from edit_user_genres  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
 
 	@Override
 	public String follow_user(String user_id_1, String user_id_2, int time)
 			throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			Index<Node> userIdIndex = graphDb.index().forNodes(USER_ID_INDEX);
+			Node userOne = userIdIndex.get(USER_ID, user_id_1).getSingle();
+			Node userTwo = userIdIndex.get(USER_ID, user_id_2).getSingle();
 
+			if(userOne == null)
+				throw new KahaniaCustomException("User does not exists with given id : " + user_id_1);
+			if(userTwo == null)
+				throw new KahaniaCustomException("User does not exists with given id : " + user_id_2);
+			
+			if(isRelationExistsBetween(USER_FOLLOW_USER, userOne, userTwo))
+			{
+				deleteRelation(USER_FOLLOW_USER, userOne, userTwo);
+			}			
+			else
+			{
+				createRelation(USER_FOLLOW_USER, userOne, userTwo, time);
+			}
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ follow_user()");
+			System.out.println("Something went wrong, while following user from follow_user  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ follow_user()");
+			System.out.println("Something went wrong, while following user from follow_user  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
 
 	@Override
 	public String deactivate_user(String user_id) throws TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	private JSONObject getJSONForGenre(Node genre)
+	{
+		JSONObject ret = new JSONObject();
+		
+			JSONObject obj = new JSONObject();
+			obj.put("name", genre.getProperty(GENRE_NAME).toString());
+		ret.put("type", "lang");
+		ret.put("Obj",obj);
+		return ret;
+	}
 	
+	private JSONObject getJSONForLang(Node genre)
+	{
+		JSONObject ret = new JSONObject();
+		
+			JSONObject obj = new JSONObject();
+			obj.put("name", genre.getProperty(LANG_NAME).toString());
+		ret.put("type", "lang");
+		ret.put("Obj",obj);
+		return ret;
+	}
 }

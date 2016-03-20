@@ -7,9 +7,7 @@ public class App
 		System.out.println("16th March, 2016 - 08:00 A.M");
 		
 		Kahania kahania = new Kahania();
-//		stumagz.add_neo4j_lock_nodes();
-		try{
-		}catch(Exception e){}
+		kahania.add_neo4j_lock_nodes();
 		kahania.startThriftServer();
 
 		//test(kahania);
