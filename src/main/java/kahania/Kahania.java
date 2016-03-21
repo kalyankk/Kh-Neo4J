@@ -39,6 +39,11 @@ public class Kahania implements KahaniaService.Iface{
 	public static final String USER_ID_INDEX = "user_index_by_id";
 	public static final String USER_NAME_INDEX = "user_index_by_uname";
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
+
+	public static final String SERIES_ID_INDEX = "series_index_by_id";
+	public static final String SERIES_TITLE_ID_INDEX = "series_index_by_title_id";
+	public static final String SERIES_TYPE_INDEX = "series_index_by_type";
+	
 	public static final String LOCK_INDEX = "lock_index";
 	
 	//lock related keys
@@ -62,10 +67,23 @@ public class Kahania implements KahaniaService.Iface{
 	//language node related keys
 	public static final String LANG_NAME = "language_name";
 	
+	//series node related keys
+	public static final String SERIES_ID = "series_id";
+	public static final String SERIES_TITLE = "series_title";
+	public static final String SERIES_TITLE_ID = "series_title_id";
+	public static final String SERIES_TAG_LINE = "series_tag_line";
+	public static final String SERIES_FEAT_IMG = "series_feat_img";
+	public static final String SERIES_KEYWORDS = "series_keywords";
+	public static final String SERIES_COPYRIGHTS = "series_copyrights";
+	public static final String SERIES_DD_IMG = "series_dd_img";
+	public static final String SERIES_DD_SUMMARY = "series_dd_summary";
+	public static final String SERIES_TYPE = "series_type";
+	
 	public static final String NODE_TYPE = "node_type";
 	public static final String USER_NODE = "user_node";
 	public static final String GENRE_NODE = "genre_node";
 	public static final String LANG_NODE = "language_node";
+	public static final String SERIES_NODE = "series_node";
 
 	private static GraphDatabaseService graphDb = null;
 	
@@ -73,6 +91,11 @@ public class Kahania implements KahaniaService.Iface{
 	RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
 	RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
 	RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
+	RelationshipType USER_STARTED_SERIES = DynamicRelationshipType.withName("USER_STARTED_SERIES");
+
+	RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
+	RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
+	
 	
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
@@ -132,7 +155,28 @@ public class Kahania implements KahaniaService.Iface{
 	    node.setProperty(NODE_TYPE, LANG_NODE);
 	    return node;
 	} 
-    	
+
+	private Node Series(String series_id, String title, String title_id,
+			String tag_line, String feature_image, String keywords,
+			String copyrights, String dd_img, String dd_summary,
+			int series_type, int time_created) {
+		Node node = graphDb.createNode();
+		node.setProperty(SERIES_ID, series_id);
+		node.setProperty(SERIES_TITLE, title);
+		node.setProperty(SERIES_TITLE_ID, title_id);
+		node.setProperty(SERIES_TAG_LINE, tag_line);
+		node.setProperty(SERIES_FEAT_IMG, feature_image);
+		node.setProperty(SERIES_KEYWORDS, keywords);
+		node.setProperty(SERIES_COPYRIGHTS, copyrights);
+		node.setProperty(SERIES_DD_IMG, dd_img);
+		node.setProperty(SERIES_DD_SUMMARY, dd_summary);
+		node.setProperty(SERIES_TYPE, series_type);
+		node.setProperty(NODE_TYPE, SERIES_NODE);
+		node.setProperty(TIME_CREATED, time_created);
+		
+		return node;
+	}
+	
 	public void startThriftServer()
 	{
 		//starting thrift server		
@@ -604,7 +648,7 @@ public class Kahania implements KahaniaService.Iface{
 		
 		return res.toString();
 	}
-
+	
 	@Override
 	public String create_user(String id, String full_name, String user_name,
 			String email, String mobile_number, String dob, String genres,
@@ -934,6 +978,7 @@ public class Kahania implements KahaniaService.Iface{
 		return null;
 	}
 
+
 	private JSONObject getJSONForGenre(Node genre)
 	{
 		JSONObject ret = new JSONObject();
@@ -955,4 +1000,175 @@ public class Kahania implements KahaniaService.Iface{
 		ret.put("Obj",obj);
 		return ret;
 	}
+
+	@Override
+	public String create_or_edit_series(String series_id, String user_id,
+			String title, String title_id, String tag_line,
+			String feature_image, String genre, String language,
+			String keywords, String copyrights, String dd_img,
+			String dd_summary, int series_type, int time_created, int is_edit)
+			throws TException {
+		
+		if(is_edit == 0)
+			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created);
+		else if(is_edit == 1)
+			return edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created);
+		else return "false";
+	}
+	
+	private String create_series(String series_id, String user_id,
+			String title, String title_id, String tag_line,
+			String feature_image, String genre, String language,
+			String keywords, String copyrights, String dd_img,
+			String dd_summary, int series_type, int time_created){
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
+			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
+			
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			if(seriesId_index.get(SERIES_ID,series_id).getSingle()!=null)
+				throw new KahaniaCustomException("Series already exists with given id : "+series_id);
+			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id).getSingle()!=null)
+				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
+
+			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created);  // Creating a new series node
+			if(series_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating series ");
+
+			//create relationship with user
+			
+			createRelation(USER_STARTED_SERIES, userNode, series_node);
+			
+			//create relationships with Genres and Languages
+			for(String genre_name : genre.split(","))
+			{
+				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
+					createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
+			}
+			
+			for(String lang_name : language.split(","))
+			{
+				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
+					createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+			}
+			
+			//Indexing newly created series node
+			seriesId_index.add(series_node, SERIES_ID, series_id);
+			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id);
+			seriesType_index.add(series_node, SERIES_TYPE, series_type);
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_series()");
+			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_series()");
+			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+
+	private String edit_series(String series_id, String user_id,
+			String title, String title_id, String tag_line,
+			String feature_image, String genre, String language,
+			String keywords, String copyrights, String dd_img,
+			String dd_summary, int series_type, int time_edited){
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
+			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
+			
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
+			if(series_node == null)
+				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id).getSingle()!=null)
+				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
+
+			//remove existing relationships with Genres and Languages
+			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_GENRE))
+				rel.delete();
+			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_LANGUAGE))
+				rel.delete();
+
+			series_node.setProperty(SERIES_TITLE, title);
+			series_node.setProperty(SERIES_TITLE_ID, title_id);
+			series_node.setProperty(SERIES_TAG_LINE, tag_line);
+			series_node.setProperty(SERIES_FEAT_IMG, feature_image);
+			series_node.setProperty(SERIES_KEYWORDS, keywords);
+			series_node.setProperty(SERIES_COPYRIGHTS, copyrights);
+			series_node.setProperty(SERIES_DD_IMG, dd_img);
+			series_node.setProperty(SERIES_DD_SUMMARY, dd_summary);
+			series_node.setProperty(SERIES_TYPE, series_type);
+			
+			//create relationships with Genres and Languages
+			for(String genre_name : genre.split(","))
+			{
+				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
+					createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
+			}
+			
+			for(String lang_name : language.split(","))
+			{
+				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
+					createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+			}
+			
+			//update indexing for the edited series node
+			seriesTitleId_index.remove(series_node);
+			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id);
+			seriesType_index.remove(series_node);
+			seriesType_index.add(series_node, SERIES_TYPE, series_type);
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_series()");
+			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_series()");
+			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+	
+
 }

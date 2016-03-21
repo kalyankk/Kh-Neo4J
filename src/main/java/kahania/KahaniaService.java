@@ -65,6 +65,8 @@ public class KahaniaService {
 
     public String deactivate_user(String user_id) throws org.apache.thrift.TException;
 
+    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit) throws org.apache.thrift.TException;
+
   }
 
   public interface AsyncIface {
@@ -102,6 +104,8 @@ public class KahaniaService {
     public void follow_user(String user_id_1, String user_id_2, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.follow_user_call> resultHandler) throws org.apache.thrift.TException;
 
     public void deactivate_user(String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.deactivate_user_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -533,6 +537,43 @@ public class KahaniaService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "deactivate_user failed: unknown result");
+    }
+
+    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit) throws org.apache.thrift.TException
+    {
+      send_create_or_edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit);
+      return recv_create_or_edit_series();
+    }
+
+    public void send_create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit) throws org.apache.thrift.TException
+    {
+      create_or_edit_series_args args = new create_or_edit_series_args();
+      args.setSeries_id(series_id);
+      args.setUser_id(user_id);
+      args.setTitle(title);
+      args.setTitle_id(title_id);
+      args.setTag_line(tag_line);
+      args.setFeature_image(feature_image);
+      args.setGenre(genre);
+      args.setLanguage(language);
+      args.setKeywords(keywords);
+      args.setCopyrights(copyrights);
+      args.setDd_img(dd_img);
+      args.setDd_summary(dd_summary);
+      args.setSeries_type(series_type);
+      args.setTime_created(time_created);
+      args.setIs_edit(is_edit);
+      sendBase("create_or_edit_series", args);
+    }
+
+    public String recv_create_or_edit_series() throws org.apache.thrift.TException
+    {
+      create_or_edit_series_result result = new create_or_edit_series_result();
+      receiveBase(result, "create_or_edit_series");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "create_or_edit_series failed: unknown result");
     }
 
   }
@@ -1154,6 +1195,80 @@ public class KahaniaService {
       }
     }
 
+    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      create_or_edit_series_call method_call = new create_or_edit_series_call(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class create_or_edit_series_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String series_id;
+      private String user_id;
+      private String title;
+      private String title_id;
+      private String tag_line;
+      private String feature_image;
+      private String genre;
+      private String language;
+      private String keywords;
+      private String copyrights;
+      private String dd_img;
+      private String dd_summary;
+      private int series_type;
+      private int time_created;
+      private int is_edit;
+      public create_or_edit_series_call(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.series_id = series_id;
+        this.user_id = user_id;
+        this.title = title;
+        this.title_id = title_id;
+        this.tag_line = tag_line;
+        this.feature_image = feature_image;
+        this.genre = genre;
+        this.language = language;
+        this.keywords = keywords;
+        this.copyrights = copyrights;
+        this.dd_img = dd_img;
+        this.dd_summary = dd_summary;
+        this.series_type = series_type;
+        this.time_created = time_created;
+        this.is_edit = is_edit;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("create_or_edit_series", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        create_or_edit_series_args args = new create_or_edit_series_args();
+        args.setSeries_id(series_id);
+        args.setUser_id(user_id);
+        args.setTitle(title);
+        args.setTitle_id(title_id);
+        args.setTag_line(tag_line);
+        args.setFeature_image(feature_image);
+        args.setGenre(genre);
+        args.setLanguage(language);
+        args.setKeywords(keywords);
+        args.setCopyrights(copyrights);
+        args.setDd_img(dd_img);
+        args.setDd_summary(dd_summary);
+        args.setSeries_type(series_type);
+        args.setTime_created(time_created);
+        args.setIs_edit(is_edit);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_create_or_edit_series();
+      }
+    }
+
   }
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
@@ -1184,6 +1299,7 @@ public class KahaniaService {
       processMap.put("edit_user_genres", new edit_user_genres());
       processMap.put("follow_user", new follow_user());
       processMap.put("deactivate_user", new deactivate_user());
+      processMap.put("create_or_edit_series", new create_or_edit_series());
       return processMap;
     }
 
@@ -1455,6 +1571,22 @@ public class KahaniaService {
       protected deactivate_user_result getResult(I iface, deactivate_user_args args) throws org.apache.thrift.TException {
         deactivate_user_result result = new deactivate_user_result();
         result.success = iface.deactivate_user(args.user_id);
+        return result;
+      }
+    }
+
+    private static class create_or_edit_series<I extends Iface> extends org.apache.thrift.ProcessFunction<I, create_or_edit_series_args> {
+      public create_or_edit_series() {
+        super("create_or_edit_series");
+      }
+
+      protected create_or_edit_series_args getEmptyArgsInstance() {
+        return new create_or_edit_series_args();
+      }
+
+      protected create_or_edit_series_result getResult(I iface, create_or_edit_series_args args) throws org.apache.thrift.TException {
+        create_or_edit_series_result result = new create_or_edit_series_result();
+        result.success = iface.create_or_edit_series(args.series_id, args.user_id, args.title, args.title_id, args.tag_line, args.feature_image, args.genre, args.language, args.keywords, args.copyrights, args.dd_img, args.dd_summary, args.series_type, args.time_created, args.is_edit);
         return result;
       }
     }
@@ -8713,6 +8845,8 @@ public class KahaniaService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
@@ -15312,6 +15446,2099 @@ public class KahaniaService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, deactivate_user_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class create_or_edit_series_args implements org.apache.thrift.TBase<create_or_edit_series_args, create_or_edit_series_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_series_args");
+
+    private static final org.apache.thrift.protocol.TField SERIES_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("series_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField TITLE_FIELD_DESC = new org.apache.thrift.protocol.TField("title", org.apache.thrift.protocol.TType.STRING, (short)3);
+    private static final org.apache.thrift.protocol.TField TITLE_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("title_id", org.apache.thrift.protocol.TType.STRING, (short)4);
+    private static final org.apache.thrift.protocol.TField TAG_LINE_FIELD_DESC = new org.apache.thrift.protocol.TField("tag_line", org.apache.thrift.protocol.TType.STRING, (short)5);
+    private static final org.apache.thrift.protocol.TField FEATURE_IMAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("feature_image", org.apache.thrift.protocol.TType.STRING, (short)6);
+    private static final org.apache.thrift.protocol.TField GENRE_FIELD_DESC = new org.apache.thrift.protocol.TField("genre", org.apache.thrift.protocol.TType.STRING, (short)7);
+    private static final org.apache.thrift.protocol.TField LANGUAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("language", org.apache.thrift.protocol.TType.STRING, (short)8);
+    private static final org.apache.thrift.protocol.TField KEYWORDS_FIELD_DESC = new org.apache.thrift.protocol.TField("keywords", org.apache.thrift.protocol.TType.STRING, (short)9);
+    private static final org.apache.thrift.protocol.TField COPYRIGHTS_FIELD_DESC = new org.apache.thrift.protocol.TField("copyrights", org.apache.thrift.protocol.TType.STRING, (short)10);
+    private static final org.apache.thrift.protocol.TField DD_IMG_FIELD_DESC = new org.apache.thrift.protocol.TField("dd_img", org.apache.thrift.protocol.TType.STRING, (short)11);
+    private static final org.apache.thrift.protocol.TField DD_SUMMARY_FIELD_DESC = new org.apache.thrift.protocol.TField("dd_summary", org.apache.thrift.protocol.TType.STRING, (short)12);
+    private static final org.apache.thrift.protocol.TField SERIES_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("series_type", org.apache.thrift.protocol.TType.I32, (short)13);
+    private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)14);
+    private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)15);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new create_or_edit_series_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new create_or_edit_series_argsTupleSchemeFactory());
+    }
+
+    public String series_id; // required
+    public String user_id; // required
+    public String title; // required
+    public String title_id; // required
+    public String tag_line; // required
+    public String feature_image; // required
+    public String genre; // required
+    public String language; // required
+    public String keywords; // required
+    public String copyrights; // required
+    public String dd_img; // required
+    public String dd_summary; // required
+    public int series_type; // required
+    public int time_created; // required
+    public int is_edit; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SERIES_ID((short)1, "series_id"),
+      USER_ID((short)2, "user_id"),
+      TITLE((short)3, "title"),
+      TITLE_ID((short)4, "title_id"),
+      TAG_LINE((short)5, "tag_line"),
+      FEATURE_IMAGE((short)6, "feature_image"),
+      GENRE((short)7, "genre"),
+      LANGUAGE((short)8, "language"),
+      KEYWORDS((short)9, "keywords"),
+      COPYRIGHTS((short)10, "copyrights"),
+      DD_IMG((short)11, "dd_img"),
+      DD_SUMMARY((short)12, "dd_summary"),
+      SERIES_TYPE((short)13, "series_type"),
+      TIME_CREATED((short)14, "time_created"),
+      IS_EDIT((short)15, "is_edit");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // SERIES_ID
+            return SERIES_ID;
+          case 2: // USER_ID
+            return USER_ID;
+          case 3: // TITLE
+            return TITLE;
+          case 4: // TITLE_ID
+            return TITLE_ID;
+          case 5: // TAG_LINE
+            return TAG_LINE;
+          case 6: // FEATURE_IMAGE
+            return FEATURE_IMAGE;
+          case 7: // GENRE
+            return GENRE;
+          case 8: // LANGUAGE
+            return LANGUAGE;
+          case 9: // KEYWORDS
+            return KEYWORDS;
+          case 10: // COPYRIGHTS
+            return COPYRIGHTS;
+          case 11: // DD_IMG
+            return DD_IMG;
+          case 12: // DD_SUMMARY
+            return DD_SUMMARY;
+          case 13: // SERIES_TYPE
+            return SERIES_TYPE;
+          case 14: // TIME_CREATED
+            return TIME_CREATED;
+          case 15: // IS_EDIT
+            return IS_EDIT;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __SERIES_TYPE_ISSET_ID = 0;
+    private static final int __TIME_CREATED_ISSET_ID = 1;
+    private static final int __IS_EDIT_ISSET_ID = 2;
+    private BitSet __isset_bit_vector = new BitSet(3);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SERIES_ID, new org.apache.thrift.meta_data.FieldMetaData("series_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TITLE, new org.apache.thrift.meta_data.FieldMetaData("title", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TITLE_ID, new org.apache.thrift.meta_data.FieldMetaData("title_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TAG_LINE, new org.apache.thrift.meta_data.FieldMetaData("tag_line", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.FEATURE_IMAGE, new org.apache.thrift.meta_data.FieldMetaData("feature_image", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.GENRE, new org.apache.thrift.meta_data.FieldMetaData("genre", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.LANGUAGE, new org.apache.thrift.meta_data.FieldMetaData("language", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.KEYWORDS, new org.apache.thrift.meta_data.FieldMetaData("keywords", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.COPYRIGHTS, new org.apache.thrift.meta_data.FieldMetaData("copyrights", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.DD_IMG, new org.apache.thrift.meta_data.FieldMetaData("dd_img", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.DD_SUMMARY, new org.apache.thrift.meta_data.FieldMetaData("dd_summary", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.SERIES_TYPE, new org.apache.thrift.meta_data.FieldMetaData("series_type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.TIME_CREATED, new org.apache.thrift.meta_data.FieldMetaData("time_created", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_series_args.class, metaDataMap);
+    }
+
+    public create_or_edit_series_args() {
+    }
+
+    public create_or_edit_series_args(
+      String series_id,
+      String user_id,
+      String title,
+      String title_id,
+      String tag_line,
+      String feature_image,
+      String genre,
+      String language,
+      String keywords,
+      String copyrights,
+      String dd_img,
+      String dd_summary,
+      int series_type,
+      int time_created,
+      int is_edit)
+    {
+      this();
+      this.series_id = series_id;
+      this.user_id = user_id;
+      this.title = title;
+      this.title_id = title_id;
+      this.tag_line = tag_line;
+      this.feature_image = feature_image;
+      this.genre = genre;
+      this.language = language;
+      this.keywords = keywords;
+      this.copyrights = copyrights;
+      this.dd_img = dd_img;
+      this.dd_summary = dd_summary;
+      this.series_type = series_type;
+      setSeries_typeIsSet(true);
+      this.time_created = time_created;
+      setTime_createdIsSet(true);
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public create_or_edit_series_args(create_or_edit_series_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetSeries_id()) {
+        this.series_id = other.series_id;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+      if (other.isSetTitle()) {
+        this.title = other.title;
+      }
+      if (other.isSetTitle_id()) {
+        this.title_id = other.title_id;
+      }
+      if (other.isSetTag_line()) {
+        this.tag_line = other.tag_line;
+      }
+      if (other.isSetFeature_image()) {
+        this.feature_image = other.feature_image;
+      }
+      if (other.isSetGenre()) {
+        this.genre = other.genre;
+      }
+      if (other.isSetLanguage()) {
+        this.language = other.language;
+      }
+      if (other.isSetKeywords()) {
+        this.keywords = other.keywords;
+      }
+      if (other.isSetCopyrights()) {
+        this.copyrights = other.copyrights;
+      }
+      if (other.isSetDd_img()) {
+        this.dd_img = other.dd_img;
+      }
+      if (other.isSetDd_summary()) {
+        this.dd_summary = other.dd_summary;
+      }
+      this.series_type = other.series_type;
+      this.time_created = other.time_created;
+      this.is_edit = other.is_edit;
+    }
+
+    public create_or_edit_series_args deepCopy() {
+      return new create_or_edit_series_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.series_id = null;
+      this.user_id = null;
+      this.title = null;
+      this.title_id = null;
+      this.tag_line = null;
+      this.feature_image = null;
+      this.genre = null;
+      this.language = null;
+      this.keywords = null;
+      this.copyrights = null;
+      this.dd_img = null;
+      this.dd_summary = null;
+      setSeries_typeIsSet(false);
+      this.series_type = 0;
+      setTime_createdIsSet(false);
+      this.time_created = 0;
+      setIs_editIsSet(false);
+      this.is_edit = 0;
+    }
+
+    public String getSeries_id() {
+      return this.series_id;
+    }
+
+    public create_or_edit_series_args setSeries_id(String series_id) {
+      this.series_id = series_id;
+      return this;
+    }
+
+    public void unsetSeries_id() {
+      this.series_id = null;
+    }
+
+    /** Returns true if field series_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetSeries_id() {
+      return this.series_id != null;
+    }
+
+    public void setSeries_idIsSet(boolean value) {
+      if (!value) {
+        this.series_id = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public create_or_edit_series_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public String getTitle() {
+      return this.title;
+    }
+
+    public create_or_edit_series_args setTitle(String title) {
+      this.title = title;
+      return this;
+    }
+
+    public void unsetTitle() {
+      this.title = null;
+    }
+
+    /** Returns true if field title is set (has been assigned a value) and false otherwise */
+    public boolean isSetTitle() {
+      return this.title != null;
+    }
+
+    public void setTitleIsSet(boolean value) {
+      if (!value) {
+        this.title = null;
+      }
+    }
+
+    public String getTitle_id() {
+      return this.title_id;
+    }
+
+    public create_or_edit_series_args setTitle_id(String title_id) {
+      this.title_id = title_id;
+      return this;
+    }
+
+    public void unsetTitle_id() {
+      this.title_id = null;
+    }
+
+    /** Returns true if field title_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetTitle_id() {
+      return this.title_id != null;
+    }
+
+    public void setTitle_idIsSet(boolean value) {
+      if (!value) {
+        this.title_id = null;
+      }
+    }
+
+    public String getTag_line() {
+      return this.tag_line;
+    }
+
+    public create_or_edit_series_args setTag_line(String tag_line) {
+      this.tag_line = tag_line;
+      return this;
+    }
+
+    public void unsetTag_line() {
+      this.tag_line = null;
+    }
+
+    /** Returns true if field tag_line is set (has been assigned a value) and false otherwise */
+    public boolean isSetTag_line() {
+      return this.tag_line != null;
+    }
+
+    public void setTag_lineIsSet(boolean value) {
+      if (!value) {
+        this.tag_line = null;
+      }
+    }
+
+    public String getFeature_image() {
+      return this.feature_image;
+    }
+
+    public create_or_edit_series_args setFeature_image(String feature_image) {
+      this.feature_image = feature_image;
+      return this;
+    }
+
+    public void unsetFeature_image() {
+      this.feature_image = null;
+    }
+
+    /** Returns true if field feature_image is set (has been assigned a value) and false otherwise */
+    public boolean isSetFeature_image() {
+      return this.feature_image != null;
+    }
+
+    public void setFeature_imageIsSet(boolean value) {
+      if (!value) {
+        this.feature_image = null;
+      }
+    }
+
+    public String getGenre() {
+      return this.genre;
+    }
+
+    public create_or_edit_series_args setGenre(String genre) {
+      this.genre = genre;
+      return this;
+    }
+
+    public void unsetGenre() {
+      this.genre = null;
+    }
+
+    /** Returns true if field genre is set (has been assigned a value) and false otherwise */
+    public boolean isSetGenre() {
+      return this.genre != null;
+    }
+
+    public void setGenreIsSet(boolean value) {
+      if (!value) {
+        this.genre = null;
+      }
+    }
+
+    public String getLanguage() {
+      return this.language;
+    }
+
+    public create_or_edit_series_args setLanguage(String language) {
+      this.language = language;
+      return this;
+    }
+
+    public void unsetLanguage() {
+      this.language = null;
+    }
+
+    /** Returns true if field language is set (has been assigned a value) and false otherwise */
+    public boolean isSetLanguage() {
+      return this.language != null;
+    }
+
+    public void setLanguageIsSet(boolean value) {
+      if (!value) {
+        this.language = null;
+      }
+    }
+
+    public String getKeywords() {
+      return this.keywords;
+    }
+
+    public create_or_edit_series_args setKeywords(String keywords) {
+      this.keywords = keywords;
+      return this;
+    }
+
+    public void unsetKeywords() {
+      this.keywords = null;
+    }
+
+    /** Returns true if field keywords is set (has been assigned a value) and false otherwise */
+    public boolean isSetKeywords() {
+      return this.keywords != null;
+    }
+
+    public void setKeywordsIsSet(boolean value) {
+      if (!value) {
+        this.keywords = null;
+      }
+    }
+
+    public String getCopyrights() {
+      return this.copyrights;
+    }
+
+    public create_or_edit_series_args setCopyrights(String copyrights) {
+      this.copyrights = copyrights;
+      return this;
+    }
+
+    public void unsetCopyrights() {
+      this.copyrights = null;
+    }
+
+    /** Returns true if field copyrights is set (has been assigned a value) and false otherwise */
+    public boolean isSetCopyrights() {
+      return this.copyrights != null;
+    }
+
+    public void setCopyrightsIsSet(boolean value) {
+      if (!value) {
+        this.copyrights = null;
+      }
+    }
+
+    public String getDd_img() {
+      return this.dd_img;
+    }
+
+    public create_or_edit_series_args setDd_img(String dd_img) {
+      this.dd_img = dd_img;
+      return this;
+    }
+
+    public void unsetDd_img() {
+      this.dd_img = null;
+    }
+
+    /** Returns true if field dd_img is set (has been assigned a value) and false otherwise */
+    public boolean isSetDd_img() {
+      return this.dd_img != null;
+    }
+
+    public void setDd_imgIsSet(boolean value) {
+      if (!value) {
+        this.dd_img = null;
+      }
+    }
+
+    public String getDd_summary() {
+      return this.dd_summary;
+    }
+
+    public create_or_edit_series_args setDd_summary(String dd_summary) {
+      this.dd_summary = dd_summary;
+      return this;
+    }
+
+    public void unsetDd_summary() {
+      this.dd_summary = null;
+    }
+
+    /** Returns true if field dd_summary is set (has been assigned a value) and false otherwise */
+    public boolean isSetDd_summary() {
+      return this.dd_summary != null;
+    }
+
+    public void setDd_summaryIsSet(boolean value) {
+      if (!value) {
+        this.dd_summary = null;
+      }
+    }
+
+    public int getSeries_type() {
+      return this.series_type;
+    }
+
+    public create_or_edit_series_args setSeries_type(int series_type) {
+      this.series_type = series_type;
+      setSeries_typeIsSet(true);
+      return this;
+    }
+
+    public void unsetSeries_type() {
+      __isset_bit_vector.clear(__SERIES_TYPE_ISSET_ID);
+    }
+
+    /** Returns true if field series_type is set (has been assigned a value) and false otherwise */
+    public boolean isSetSeries_type() {
+      return __isset_bit_vector.get(__SERIES_TYPE_ISSET_ID);
+    }
+
+    public void setSeries_typeIsSet(boolean value) {
+      __isset_bit_vector.set(__SERIES_TYPE_ISSET_ID, value);
+    }
+
+    public int getTime_created() {
+      return this.time_created;
+    }
+
+    public create_or_edit_series_args setTime_created(int time_created) {
+      this.time_created = time_created;
+      setTime_createdIsSet(true);
+      return this;
+    }
+
+    public void unsetTime_created() {
+      __isset_bit_vector.clear(__TIME_CREATED_ISSET_ID);
+    }
+
+    /** Returns true if field time_created is set (has been assigned a value) and false otherwise */
+    public boolean isSetTime_created() {
+      return __isset_bit_vector.get(__TIME_CREATED_ISSET_ID);
+    }
+
+    public void setTime_createdIsSet(boolean value) {
+      __isset_bit_vector.set(__TIME_CREATED_ISSET_ID, value);
+    }
+
+    public int getIs_edit() {
+      return this.is_edit;
+    }
+
+    public create_or_edit_series_args setIs_edit(int is_edit) {
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
+      return this;
+    }
+
+    public void unsetIs_edit() {
+      __isset_bit_vector.clear(__IS_EDIT_ISSET_ID);
+    }
+
+    /** Returns true if field is_edit is set (has been assigned a value) and false otherwise */
+    public boolean isSetIs_edit() {
+      return __isset_bit_vector.get(__IS_EDIT_ISSET_ID);
+    }
+
+    public void setIs_editIsSet(boolean value) {
+      __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SERIES_ID:
+        if (value == null) {
+          unsetSeries_id();
+        } else {
+          setSeries_id((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      case TITLE:
+        if (value == null) {
+          unsetTitle();
+        } else {
+          setTitle((String)value);
+        }
+        break;
+
+      case TITLE_ID:
+        if (value == null) {
+          unsetTitle_id();
+        } else {
+          setTitle_id((String)value);
+        }
+        break;
+
+      case TAG_LINE:
+        if (value == null) {
+          unsetTag_line();
+        } else {
+          setTag_line((String)value);
+        }
+        break;
+
+      case FEATURE_IMAGE:
+        if (value == null) {
+          unsetFeature_image();
+        } else {
+          setFeature_image((String)value);
+        }
+        break;
+
+      case GENRE:
+        if (value == null) {
+          unsetGenre();
+        } else {
+          setGenre((String)value);
+        }
+        break;
+
+      case LANGUAGE:
+        if (value == null) {
+          unsetLanguage();
+        } else {
+          setLanguage((String)value);
+        }
+        break;
+
+      case KEYWORDS:
+        if (value == null) {
+          unsetKeywords();
+        } else {
+          setKeywords((String)value);
+        }
+        break;
+
+      case COPYRIGHTS:
+        if (value == null) {
+          unsetCopyrights();
+        } else {
+          setCopyrights((String)value);
+        }
+        break;
+
+      case DD_IMG:
+        if (value == null) {
+          unsetDd_img();
+        } else {
+          setDd_img((String)value);
+        }
+        break;
+
+      case DD_SUMMARY:
+        if (value == null) {
+          unsetDd_summary();
+        } else {
+          setDd_summary((String)value);
+        }
+        break;
+
+      case SERIES_TYPE:
+        if (value == null) {
+          unsetSeries_type();
+        } else {
+          setSeries_type((Integer)value);
+        }
+        break;
+
+      case TIME_CREATED:
+        if (value == null) {
+          unsetTime_created();
+        } else {
+          setTime_created((Integer)value);
+        }
+        break;
+
+      case IS_EDIT:
+        if (value == null) {
+          unsetIs_edit();
+        } else {
+          setIs_edit((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SERIES_ID:
+        return getSeries_id();
+
+      case USER_ID:
+        return getUser_id();
+
+      case TITLE:
+        return getTitle();
+
+      case TITLE_ID:
+        return getTitle_id();
+
+      case TAG_LINE:
+        return getTag_line();
+
+      case FEATURE_IMAGE:
+        return getFeature_image();
+
+      case GENRE:
+        return getGenre();
+
+      case LANGUAGE:
+        return getLanguage();
+
+      case KEYWORDS:
+        return getKeywords();
+
+      case COPYRIGHTS:
+        return getCopyrights();
+
+      case DD_IMG:
+        return getDd_img();
+
+      case DD_SUMMARY:
+        return getDd_summary();
+
+      case SERIES_TYPE:
+        return Integer.valueOf(getSeries_type());
+
+      case TIME_CREATED:
+        return Integer.valueOf(getTime_created());
+
+      case IS_EDIT:
+        return Integer.valueOf(getIs_edit());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SERIES_ID:
+        return isSetSeries_id();
+      case USER_ID:
+        return isSetUser_id();
+      case TITLE:
+        return isSetTitle();
+      case TITLE_ID:
+        return isSetTitle_id();
+      case TAG_LINE:
+        return isSetTag_line();
+      case FEATURE_IMAGE:
+        return isSetFeature_image();
+      case GENRE:
+        return isSetGenre();
+      case LANGUAGE:
+        return isSetLanguage();
+      case KEYWORDS:
+        return isSetKeywords();
+      case COPYRIGHTS:
+        return isSetCopyrights();
+      case DD_IMG:
+        return isSetDd_img();
+      case DD_SUMMARY:
+        return isSetDd_summary();
+      case SERIES_TYPE:
+        return isSetSeries_type();
+      case TIME_CREATED:
+        return isSetTime_created();
+      case IS_EDIT:
+        return isSetIs_edit();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof create_or_edit_series_args)
+        return this.equals((create_or_edit_series_args)that);
+      return false;
+    }
+
+    public boolean equals(create_or_edit_series_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_series_id = true && this.isSetSeries_id();
+      boolean that_present_series_id = true && that.isSetSeries_id();
+      if (this_present_series_id || that_present_series_id) {
+        if (!(this_present_series_id && that_present_series_id))
+          return false;
+        if (!this.series_id.equals(that.series_id))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      boolean this_present_title = true && this.isSetTitle();
+      boolean that_present_title = true && that.isSetTitle();
+      if (this_present_title || that_present_title) {
+        if (!(this_present_title && that_present_title))
+          return false;
+        if (!this.title.equals(that.title))
+          return false;
+      }
+
+      boolean this_present_title_id = true && this.isSetTitle_id();
+      boolean that_present_title_id = true && that.isSetTitle_id();
+      if (this_present_title_id || that_present_title_id) {
+        if (!(this_present_title_id && that_present_title_id))
+          return false;
+        if (!this.title_id.equals(that.title_id))
+          return false;
+      }
+
+      boolean this_present_tag_line = true && this.isSetTag_line();
+      boolean that_present_tag_line = true && that.isSetTag_line();
+      if (this_present_tag_line || that_present_tag_line) {
+        if (!(this_present_tag_line && that_present_tag_line))
+          return false;
+        if (!this.tag_line.equals(that.tag_line))
+          return false;
+      }
+
+      boolean this_present_feature_image = true && this.isSetFeature_image();
+      boolean that_present_feature_image = true && that.isSetFeature_image();
+      if (this_present_feature_image || that_present_feature_image) {
+        if (!(this_present_feature_image && that_present_feature_image))
+          return false;
+        if (!this.feature_image.equals(that.feature_image))
+          return false;
+      }
+
+      boolean this_present_genre = true && this.isSetGenre();
+      boolean that_present_genre = true && that.isSetGenre();
+      if (this_present_genre || that_present_genre) {
+        if (!(this_present_genre && that_present_genre))
+          return false;
+        if (!this.genre.equals(that.genre))
+          return false;
+      }
+
+      boolean this_present_language = true && this.isSetLanguage();
+      boolean that_present_language = true && that.isSetLanguage();
+      if (this_present_language || that_present_language) {
+        if (!(this_present_language && that_present_language))
+          return false;
+        if (!this.language.equals(that.language))
+          return false;
+      }
+
+      boolean this_present_keywords = true && this.isSetKeywords();
+      boolean that_present_keywords = true && that.isSetKeywords();
+      if (this_present_keywords || that_present_keywords) {
+        if (!(this_present_keywords && that_present_keywords))
+          return false;
+        if (!this.keywords.equals(that.keywords))
+          return false;
+      }
+
+      boolean this_present_copyrights = true && this.isSetCopyrights();
+      boolean that_present_copyrights = true && that.isSetCopyrights();
+      if (this_present_copyrights || that_present_copyrights) {
+        if (!(this_present_copyrights && that_present_copyrights))
+          return false;
+        if (!this.copyrights.equals(that.copyrights))
+          return false;
+      }
+
+      boolean this_present_dd_img = true && this.isSetDd_img();
+      boolean that_present_dd_img = true && that.isSetDd_img();
+      if (this_present_dd_img || that_present_dd_img) {
+        if (!(this_present_dd_img && that_present_dd_img))
+          return false;
+        if (!this.dd_img.equals(that.dd_img))
+          return false;
+      }
+
+      boolean this_present_dd_summary = true && this.isSetDd_summary();
+      boolean that_present_dd_summary = true && that.isSetDd_summary();
+      if (this_present_dd_summary || that_present_dd_summary) {
+        if (!(this_present_dd_summary && that_present_dd_summary))
+          return false;
+        if (!this.dd_summary.equals(that.dd_summary))
+          return false;
+      }
+
+      boolean this_present_series_type = true;
+      boolean that_present_series_type = true;
+      if (this_present_series_type || that_present_series_type) {
+        if (!(this_present_series_type && that_present_series_type))
+          return false;
+        if (this.series_type != that.series_type)
+          return false;
+      }
+
+      boolean this_present_time_created = true;
+      boolean that_present_time_created = true;
+      if (this_present_time_created || that_present_time_created) {
+        if (!(this_present_time_created && that_present_time_created))
+          return false;
+        if (this.time_created != that.time_created)
+          return false;
+      }
+
+      boolean this_present_is_edit = true;
+      boolean that_present_is_edit = true;
+      if (this_present_is_edit || that_present_is_edit) {
+        if (!(this_present_is_edit && that_present_is_edit))
+          return false;
+        if (this.is_edit != that.is_edit)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(create_or_edit_series_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      create_or_edit_series_args typedOther = (create_or_edit_series_args)other;
+
+      lastComparison = Boolean.valueOf(isSetSeries_id()).compareTo(typedOther.isSetSeries_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSeries_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.series_id, typedOther.series_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTitle()).compareTo(typedOther.isSetTitle());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTitle()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.title, typedOther.title);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTitle_id()).compareTo(typedOther.isSetTitle_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTitle_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.title_id, typedOther.title_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTag_line()).compareTo(typedOther.isSetTag_line());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTag_line()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.tag_line, typedOther.tag_line);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetFeature_image()).compareTo(typedOther.isSetFeature_image());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetFeature_image()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.feature_image, typedOther.feature_image);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetGenre()).compareTo(typedOther.isSetGenre());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetGenre()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.genre, typedOther.genre);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLanguage()).compareTo(typedOther.isSetLanguage());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLanguage()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.language, typedOther.language);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetKeywords()).compareTo(typedOther.isSetKeywords());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetKeywords()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.keywords, typedOther.keywords);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetCopyrights()).compareTo(typedOther.isSetCopyrights());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetCopyrights()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.copyrights, typedOther.copyrights);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetDd_img()).compareTo(typedOther.isSetDd_img());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDd_img()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dd_img, typedOther.dd_img);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetDd_summary()).compareTo(typedOther.isSetDd_summary());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetDd_summary()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dd_summary, typedOther.dd_summary);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetSeries_type()).compareTo(typedOther.isSetSeries_type());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSeries_type()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.series_type, typedOther.series_type);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTime_created()).compareTo(typedOther.isSetTime_created());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTime_created()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.time_created, typedOther.time_created);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIs_edit()).compareTo(typedOther.isSetIs_edit());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIs_edit()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.is_edit, typedOther.is_edit);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("create_or_edit_series_args(");
+      boolean first = true;
+
+      sb.append("series_id:");
+      if (this.series_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.series_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("title:");
+      if (this.title == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.title);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("title_id:");
+      if (this.title_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.title_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("tag_line:");
+      if (this.tag_line == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.tag_line);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("feature_image:");
+      if (this.feature_image == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.feature_image);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("genre:");
+      if (this.genre == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.genre);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("language:");
+      if (this.language == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.language);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("keywords:");
+      if (this.keywords == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.keywords);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("copyrights:");
+      if (this.copyrights == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.copyrights);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("dd_img:");
+      if (this.dd_img == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.dd_img);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("dd_summary:");
+      if (this.dd_summary == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.dd_summary);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("series_type:");
+      sb.append(this.series_type);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("time_created:");
+      sb.append(this.time_created);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("is_edit:");
+      sb.append(this.is_edit);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class create_or_edit_series_argsStandardSchemeFactory implements SchemeFactory {
+      public create_or_edit_series_argsStandardScheme getScheme() {
+        return new create_or_edit_series_argsStandardScheme();
+      }
+    }
+
+    private static class create_or_edit_series_argsStandardScheme extends StandardScheme<create_or_edit_series_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, create_or_edit_series_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // SERIES_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.series_id = iprot.readString();
+                struct.setSeries_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // TITLE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.title = iprot.readString();
+                struct.setTitleIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // TITLE_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.title_id = iprot.readString();
+                struct.setTitle_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 5: // TAG_LINE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.tag_line = iprot.readString();
+                struct.setTag_lineIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 6: // FEATURE_IMAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.feature_image = iprot.readString();
+                struct.setFeature_imageIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 7: // GENRE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.genre = iprot.readString();
+                struct.setGenreIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 8: // LANGUAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.language = iprot.readString();
+                struct.setLanguageIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 9: // KEYWORDS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.keywords = iprot.readString();
+                struct.setKeywordsIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 10: // COPYRIGHTS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.copyrights = iprot.readString();
+                struct.setCopyrightsIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 11: // DD_IMG
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.dd_img = iprot.readString();
+                struct.setDd_imgIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 12: // DD_SUMMARY
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.dd_summary = iprot.readString();
+                struct.setDd_summaryIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 13: // SERIES_TYPE
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.series_type = iprot.readI32();
+                struct.setSeries_typeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 14: // TIME_CREATED
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.time_created = iprot.readI32();
+                struct.setTime_createdIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 15: // IS_EDIT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.is_edit = iprot.readI32();
+                struct.setIs_editIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, create_or_edit_series_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.series_id != null) {
+          oprot.writeFieldBegin(SERIES_ID_FIELD_DESC);
+          oprot.writeString(struct.series_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.title != null) {
+          oprot.writeFieldBegin(TITLE_FIELD_DESC);
+          oprot.writeString(struct.title);
+          oprot.writeFieldEnd();
+        }
+        if (struct.title_id != null) {
+          oprot.writeFieldBegin(TITLE_ID_FIELD_DESC);
+          oprot.writeString(struct.title_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.tag_line != null) {
+          oprot.writeFieldBegin(TAG_LINE_FIELD_DESC);
+          oprot.writeString(struct.tag_line);
+          oprot.writeFieldEnd();
+        }
+        if (struct.feature_image != null) {
+          oprot.writeFieldBegin(FEATURE_IMAGE_FIELD_DESC);
+          oprot.writeString(struct.feature_image);
+          oprot.writeFieldEnd();
+        }
+        if (struct.genre != null) {
+          oprot.writeFieldBegin(GENRE_FIELD_DESC);
+          oprot.writeString(struct.genre);
+          oprot.writeFieldEnd();
+        }
+        if (struct.language != null) {
+          oprot.writeFieldBegin(LANGUAGE_FIELD_DESC);
+          oprot.writeString(struct.language);
+          oprot.writeFieldEnd();
+        }
+        if (struct.keywords != null) {
+          oprot.writeFieldBegin(KEYWORDS_FIELD_DESC);
+          oprot.writeString(struct.keywords);
+          oprot.writeFieldEnd();
+        }
+        if (struct.copyrights != null) {
+          oprot.writeFieldBegin(COPYRIGHTS_FIELD_DESC);
+          oprot.writeString(struct.copyrights);
+          oprot.writeFieldEnd();
+        }
+        if (struct.dd_img != null) {
+          oprot.writeFieldBegin(DD_IMG_FIELD_DESC);
+          oprot.writeString(struct.dd_img);
+          oprot.writeFieldEnd();
+        }
+        if (struct.dd_summary != null) {
+          oprot.writeFieldBegin(DD_SUMMARY_FIELD_DESC);
+          oprot.writeString(struct.dd_summary);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(SERIES_TYPE_FIELD_DESC);
+        oprot.writeI32(struct.series_type);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(TIME_CREATED_FIELD_DESC);
+        oprot.writeI32(struct.time_created);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
+        oprot.writeI32(struct.is_edit);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class create_or_edit_series_argsTupleSchemeFactory implements SchemeFactory {
+      public create_or_edit_series_argsTupleScheme getScheme() {
+        return new create_or_edit_series_argsTupleScheme();
+      }
+    }
+
+    private static class create_or_edit_series_argsTupleScheme extends TupleScheme<create_or_edit_series_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, create_or_edit_series_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSeries_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetTitle()) {
+          optionals.set(2);
+        }
+        if (struct.isSetTitle_id()) {
+          optionals.set(3);
+        }
+        if (struct.isSetTag_line()) {
+          optionals.set(4);
+        }
+        if (struct.isSetFeature_image()) {
+          optionals.set(5);
+        }
+        if (struct.isSetGenre()) {
+          optionals.set(6);
+        }
+        if (struct.isSetLanguage()) {
+          optionals.set(7);
+        }
+        if (struct.isSetKeywords()) {
+          optionals.set(8);
+        }
+        if (struct.isSetCopyrights()) {
+          optionals.set(9);
+        }
+        if (struct.isSetDd_img()) {
+          optionals.set(10);
+        }
+        if (struct.isSetDd_summary()) {
+          optionals.set(11);
+        }
+        if (struct.isSetSeries_type()) {
+          optionals.set(12);
+        }
+        if (struct.isSetTime_created()) {
+          optionals.set(13);
+        }
+        if (struct.isSetIs_edit()) {
+          optionals.set(14);
+        }
+        oprot.writeBitSet(optionals, 15);
+        if (struct.isSetSeries_id()) {
+          oprot.writeString(struct.series_id);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+        if (struct.isSetTitle()) {
+          oprot.writeString(struct.title);
+        }
+        if (struct.isSetTitle_id()) {
+          oprot.writeString(struct.title_id);
+        }
+        if (struct.isSetTag_line()) {
+          oprot.writeString(struct.tag_line);
+        }
+        if (struct.isSetFeature_image()) {
+          oprot.writeString(struct.feature_image);
+        }
+        if (struct.isSetGenre()) {
+          oprot.writeString(struct.genre);
+        }
+        if (struct.isSetLanguage()) {
+          oprot.writeString(struct.language);
+        }
+        if (struct.isSetKeywords()) {
+          oprot.writeString(struct.keywords);
+        }
+        if (struct.isSetCopyrights()) {
+          oprot.writeString(struct.copyrights);
+        }
+        if (struct.isSetDd_img()) {
+          oprot.writeString(struct.dd_img);
+        }
+        if (struct.isSetDd_summary()) {
+          oprot.writeString(struct.dd_summary);
+        }
+        if (struct.isSetSeries_type()) {
+          oprot.writeI32(struct.series_type);
+        }
+        if (struct.isSetTime_created()) {
+          oprot.writeI32(struct.time_created);
+        }
+        if (struct.isSetIs_edit()) {
+          oprot.writeI32(struct.is_edit);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_series_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(15);
+        if (incoming.get(0)) {
+          struct.series_id = iprot.readString();
+          struct.setSeries_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.title = iprot.readString();
+          struct.setTitleIsSet(true);
+        }
+        if (incoming.get(3)) {
+          struct.title_id = iprot.readString();
+          struct.setTitle_idIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.tag_line = iprot.readString();
+          struct.setTag_lineIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.feature_image = iprot.readString();
+          struct.setFeature_imageIsSet(true);
+        }
+        if (incoming.get(6)) {
+          struct.genre = iprot.readString();
+          struct.setGenreIsSet(true);
+        }
+        if (incoming.get(7)) {
+          struct.language = iprot.readString();
+          struct.setLanguageIsSet(true);
+        }
+        if (incoming.get(8)) {
+          struct.keywords = iprot.readString();
+          struct.setKeywordsIsSet(true);
+        }
+        if (incoming.get(9)) {
+          struct.copyrights = iprot.readString();
+          struct.setCopyrightsIsSet(true);
+        }
+        if (incoming.get(10)) {
+          struct.dd_img = iprot.readString();
+          struct.setDd_imgIsSet(true);
+        }
+        if (incoming.get(11)) {
+          struct.dd_summary = iprot.readString();
+          struct.setDd_summaryIsSet(true);
+        }
+        if (incoming.get(12)) {
+          struct.series_type = iprot.readI32();
+          struct.setSeries_typeIsSet(true);
+        }
+        if (incoming.get(13)) {
+          struct.time_created = iprot.readI32();
+          struct.setTime_createdIsSet(true);
+        }
+        if (incoming.get(14)) {
+          struct.is_edit = iprot.readI32();
+          struct.setIs_editIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class create_or_edit_series_result implements org.apache.thrift.TBase<create_or_edit_series_result, create_or_edit_series_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_series_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new create_or_edit_series_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new create_or_edit_series_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_series_result.class, metaDataMap);
+    }
+
+    public create_or_edit_series_result() {
+    }
+
+    public create_or_edit_series_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public create_or_edit_series_result(create_or_edit_series_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public create_or_edit_series_result deepCopy() {
+      return new create_or_edit_series_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public create_or_edit_series_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof create_or_edit_series_result)
+        return this.equals((create_or_edit_series_result)that);
+      return false;
+    }
+
+    public boolean equals(create_or_edit_series_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(create_or_edit_series_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      create_or_edit_series_result typedOther = (create_or_edit_series_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("create_or_edit_series_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class create_or_edit_series_resultStandardSchemeFactory implements SchemeFactory {
+      public create_or_edit_series_resultStandardScheme getScheme() {
+        return new create_or_edit_series_resultStandardScheme();
+      }
+    }
+
+    private static class create_or_edit_series_resultStandardScheme extends StandardScheme<create_or_edit_series_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, create_or_edit_series_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, create_or_edit_series_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class create_or_edit_series_resultTupleSchemeFactory implements SchemeFactory {
+      public create_or_edit_series_resultTupleScheme getScheme() {
+        return new create_or_edit_series_resultTupleScheme();
+      }
+    }
+
+    private static class create_or_edit_series_resultTupleScheme extends TupleScheme<create_or_edit_series_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, create_or_edit_series_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_series_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
