@@ -41,14 +41,39 @@ public class Kahania implements KahaniaService.Iface{
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
 
 	public static final String SERIES_ID_INDEX = "series_index_by_id";
+	public static final String REVIEW_ID_INDEX = "review_index_by_id";
+	public static final String CHAPTER_ID_INDEX = "chapter_index_by_id";
+	public static final String CHAPTER_TITLE_ID_INDEX = "chapter_index_by_title_id";
 	public static final String SERIES_TITLE_ID_INDEX = "series_index_by_title_id";
 	public static final String SERIES_TYPE_INDEX = "series_index_by_type";
+	
+	public static final String USER_VIEWED_CHAPTER_REL_INDEX = "user_viewed_chapter_relation_index";
+	
+	public static final String KEYWORD_INDEX = "keyword_index_by_name";
 	
 	public static final String LOCK_INDEX = "lock_index";
 	
 	//lock related keys
 	public static final String LockName = "lock_node";
 
+	//review related keys
+	public static final String REVIEW_ID = "review_id";
+	public static final String REVIEW_DATA = "review_data";
+	
+	//chapter related keys
+	public static final String CHAPTER_ID = "chapter_id";
+	public static final String CHAPTER_TITLE = "chapter_title";
+	public static final String CHAPTER_TITLE_ID = "chapter_title_id";
+	public static final String CHAPTER_FEAT_IMAGE = "chapter_feat_image";
+	public static final String CHAPTER_FREE_OR_PAID = "chapter_free_or_paid";
+	
+	//chapter - user relationship properties
+	public static final String CHAPTER_RATING = "chapter_rating";
+	public static final String CHAPTER_VIEWS = "chapter_views";
+	
+	//user viewed a chapter related key
+	public static final String USER_VIEWED_A_CHAPTER_ID = "user_viewer_a_chapter_id";
+		
 	//user related keys
 	public static final String USER_ID = "user_id";
 	public static final String USER_NAME = "user_name";
@@ -60,12 +85,17 @@ public class Kahania implements KahaniaService.Iface{
 	public static final String PRIVILEGE = "privilege";
 	public static final String STATUS = "status";
 	public static final String TIME_CREATED = "time_created";
+	public static final String TIME_EDITED = "time_edited";
 	
 	//genre node related keys
 	public static final String GENRE_NAME = "genre_name";
 
 	//language node related keys
 	public static final String LANG_NAME = "language_name";
+	
+	//keyword node related keys
+	public static final String KEYWORD_NAME = "keyword_name";
+	
 	
 	//series node related keys
 	public static final String SERIES_ID = "series_id";
@@ -84,6 +114,9 @@ public class Kahania implements KahaniaService.Iface{
 	public static final String GENRE_NODE = "genre_node";
 	public static final String LANG_NODE = "language_node";
 	public static final String SERIES_NODE = "series_node";
+	public static final String KEYWORD_NODE = "keyword_node";
+	public static final String REVIEW_NODE = "review_node";
+	public static final String CHAPTER_NODE = "chapter_node";
 
 	private static GraphDatabaseService graphDb = null;
 	
@@ -95,7 +128,16 @@ public class Kahania implements KahaniaService.Iface{
 
 	RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
 	RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
+	RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
 	
+	RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
+	RelationshipType REVIEW_BELONGS_TO_SERIES = DynamicRelationshipType.withName("REVIEW_BELONGS_TO_SERIES");
+	RelationshipType USER_SUBSCRIBED_TO_SERIES = DynamicRelationshipType.withName("USER_SUBSCRIBED_TO_SERIES");	
+	RelationshipType USER_FAV_CHAPTER = DynamicRelationshipType.withName("USER_FAV_CHAPTER");
+	RelationshipType USER_RATED_A_CHAPTER = DynamicRelationshipType.withName("USER_RATED_A_CHAPTER");
+	RelationshipType USER_VIEWED_A_CHAPTER = DynamicRelationshipType.withName("USER_VIEWED_A_CHAPTER");	
+	RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
+	RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
 	
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
@@ -148,6 +190,13 @@ public class Kahania implements KahaniaService.Iface{
 	    node.setProperty(NODE_TYPE, GENRE_NODE);
 	    return node;
 	} 
+
+    private Node Keyword(String name){
+		Node node = graphDb.createNode();
+		node.setProperty(KEYWORD_NAME,name);
+	    node.setProperty(NODE_TYPE, KEYWORD_NODE);
+	    return node;
+	} 
     
     private Node Language(String name){
 		Node node = graphDb.createNode();
@@ -174,6 +223,28 @@ public class Kahania implements KahaniaService.Iface{
 		node.setProperty(NODE_TYPE, SERIES_NODE);
 		node.setProperty(TIME_CREATED, time_created);
 		
+		return node;
+	}
+	
+	private Node Review(String review_id, String data, int time_created)
+	{
+		Node node = graphDb.createNode();
+		node.setProperty(REVIEW_ID, review_id);
+		node.setProperty(REVIEW_DATA, data);
+		node.setProperty(NODE_TYPE, REVIEW_NODE);
+		return node;
+	}
+
+	private Node Chapter(String chapter_id, String title_id, String title,
+			String feat_image, int free_or_paid, int time_created) {
+		Node node = graphDb.createNode();
+		node.setProperty(CHAPTER_ID, chapter_id);
+		node.setProperty(CHAPTER_TITLE_ID, title_id);
+		node.setProperty(CHAPTER_TITLE, title);
+		node.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
+		node.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
+		node.setProperty(TIME_CREATED, time_created);
+		node.setProperty(NODE_TYPE, CHAPTER_NODE);
 		return node;
 	}
 	
@@ -245,10 +316,23 @@ public class Kahania implements KahaniaService.Iface{
 		
 		//create indexes if any (node index and relation index)
 		String[] nodeIndexNames = {
-									USER_ID_INDEX,
-									USER_NAME_INDEX,
-									USER_EMAIL_INDEX,
-									};		
+								GENRE_NAME_INDEX,
+								LANG_NAME_INDEX,
+								USER_ID_INDEX,
+								USER_NAME_INDEX,
+								USER_EMAIL_INDEX,
+								SERIES_ID_INDEX,
+								REVIEW_ID_INDEX,
+								CHAPTER_ID_INDEX,
+								SERIES_TITLE_ID_INDEX,
+								SERIES_TYPE_INDEX,
+								KEYWORD_INDEX,
+								LOCK_INDEX
+									};	
+		
+		String[] relationshipIndexNames = {
+								USER_VIEWED_CHAPTER_REL_INDEX
+									};
 		
 		//customConfiguration for indexes
 		Map<String, String> customConfig = new HashMap<String,String>();
@@ -260,6 +344,10 @@ public class Kahania implements KahaniaService.Iface{
 			//create indexes for nodes
 			for(String nodeIndexName: nodeIndexNames)
 				graphDb.index().forNodes(nodeIndexName, customConfig);
+			
+			//create indexes for relations
+			for(String relationIndexName: relationshipIndexNames)
+				graphDb.index().forRelationships(relationIndexName, customConfig);
 				
 			tx.success();
 		}
@@ -311,9 +399,9 @@ public class Kahania implements KahaniaService.Iface{
 		return tx.acquireWriteLock(tobeLockedNode);  //lock simultaneous execution of create_comment to avoid duplicate comment creation
 	}
 
-	private boolean isRelationExistsBetween(RelationshipType rel, Node srcNode, Node targetNode)
+	private boolean isRelationExistsBetween(RelationshipType relType, Node srcNode, Node targetNode)
 	{
-		Iterator<Relationship> itr = srcNode.getRelationships(Direction.OUTGOING, rel).iterator();
+		Iterator<Relationship> itr = srcNode.getRelationships(Direction.OUTGOING, relType).iterator();
 		while(itr.hasNext())
 		{
 			if(targetNode.equals(itr.next().getEndNode())) return true;
@@ -321,9 +409,9 @@ public class Kahania implements KahaniaService.Iface{
 		return false;
 	}
 
-	private void deleteRelation(RelationshipType rel, Node srcNode, Node targetNode)
+	private void deleteRelation(RelationshipType relType, Node srcNode, Node targetNode)
 	{
-		Iterator<Relationship> itr = srcNode.getRelationships(Direction.OUTGOING, rel).iterator();
+		Iterator<Relationship> itr = srcNode.getRelationships(Direction.OUTGOING, relType).iterator();
 		while(itr.hasNext())
 		{
 			Relationship t_rel = itr.next();
@@ -335,14 +423,18 @@ public class Kahania implements KahaniaService.Iface{
 		}
 	}
 
-	private void createRelation(RelationshipType rel, Node srcNode, Node targetNode)
+	private Relationship createRelation(RelationshipType relType, Node srcNode, Node targetNode)
 	{
-		srcNode.createRelationshipTo(targetNode, rel).setProperty(TIME_CREATED, (int)(System.currentTimeMillis()/1000));
+		Relationship rel = srcNode.createRelationshipTo(targetNode, relType);
+		rel.setProperty(TIME_CREATED, (int)(System.currentTimeMillis()/1000));
+		return rel;
 	}
 
-	private void createRelation(RelationshipType rel, Node srcNode, Node targetNode, int time_created)
+	private Relationship createRelation(RelationshipType relType, Node srcNode, Node targetNode, int time_created)
 	{
-		srcNode.createRelationshipTo(targetNode, rel).setProperty(TIME_CREATED, time_created);
+		Relationship rel = srcNode.createRelationshipTo(targetNode, relType);
+		rel.setProperty(TIME_CREATED, time_created);
+		return rel;
 	}
 
 	@Override
@@ -354,9 +446,14 @@ public class Kahania implements KahaniaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			
+			if(name == null || name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for genre name");
+			
+			name = name.toLowerCase();
+			
 			if(genreName_index.get(GENRE_NAME,name).getSingle()!=null)
 				throw new KahaniaCustomException("Genre already exists with given name : "+name);
-
+			
 			Node genre_node = Genre(name);  // Creating a new genre node
 			if(genre_node == null)
 				throw new KahaniaCustomException("Something went wrong, while creating genre with given name");
@@ -392,11 +489,22 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+
+			if(old_name == null || old_name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for genre existing name");
+			if(new_name == null || new_name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for new genre name");
 			
+			old_name = old_name.toLowerCase();
+			new_name = new_name.toLowerCase();
+						
 			Node genre_node = genreName_index.get(GENRE_NAME,old_name).getSingle();
-			
+	
 			if(genre_node == null)
-				throw new KahaniaCustomException("Genre node doesnot exists with given name");
+				throw new KahaniaCustomException("Genre doesnot exists with given old name");
+
+			if(genreName_index.get(GENRE_NAME,new_name).getSingle() != null)
+				throw new KahaniaCustomException("Genre already exists with given new name");
 
 			genre_node.setProperty(GENRE_NAME, old_name);
 			//Update indexing for genre node
@@ -432,15 +540,23 @@ public class Kahania implements KahaniaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			
+			if(name == null || name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for genre name");
+			
+			name = name.toLowerCase();
+			
 			Node genre_node = genreName_index.get(GENRE_NAME,name).getSingle();
 			
 			if(genre_node == null)
 				throw new KahaniaCustomException("Genre node doesnot exists with given name");
 
 			//Remove relationships for genre node
-			for(Relationship rel : genre_node.getRelationships())
-				rel.delete();
+//			for(Relationship rel : genre_node.getRelationships())
+//				rel.delete();
 
+			if(genre_node.getDegree(SERIES_BELONGS_TO_GENRE) > 0)
+				throw new KahaniaCustomException("Genre node cannot be deleted, there exists some series related to given genre : " + name );
+			
 			//Remove indexing for genre node
 			genreName_index.remove(genre_node);
 			genre_node.delete();
@@ -506,6 +622,11 @@ public class Kahania implements KahaniaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
 			
+			if(name == null || name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for language name");
+			
+			name = name.toLowerCase();
+			
 			if(langName_index.get(LANG_NAME,name).getSingle()!=null)
 				throw new KahaniaCustomException("Lang already exists with given name : "+name);
 
@@ -544,12 +665,22 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			if(old_name == null || old_name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for old language name");
+			if(new_name == null || new_name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for new language name");
+			
+			old_name = old_name.toLowerCase();
+			new_name = new_name.toLowerCase();
 			
 			Node lang_node = langName_index.get(LANG_NAME,old_name).getSingle();
 			
 			if(lang_node == null)
-				throw new KahaniaCustomException("Lang node doesnot exists with given name");
+				throw new KahaniaCustomException("Lang doesnot exists with given old name");
 
+			if(langName_index.get(LANG_NAME,new_name).getSingle() != null)
+				throw new KahaniaCustomException("Lang already exists with given new name");
+			
 			lang_node.setProperty(LANG_NAME, old_name);
 			//Update indexing for lang node
 			langName_index.remove(lang_node);
@@ -583,15 +714,22 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+
+			if(name == null || name.length() == 0)
+				throw new KahaniaCustomException("Null or empty string found for language name");
 			
+			name = name.toLowerCase();
+
 			Node lang_node = langName_index.get(LANG_NAME,name).getSingle();
 			
 			if(lang_node == null)
 				throw new KahaniaCustomException("Lang node doesnot exists with given name");
 
 			//Remove relationships for lang node
-			for(Relationship rel : lang_node.getRelationships())
-				rel.delete();
+//			for(Relationship rel : lang_node.getRelationships())
+//				rel.delete();
+			if(lang_node.getDegree(SERIES_BELONGS_TO_LANGUAGE) > 0)
+				throw new KahaniaCustomException("Lang node cannot be deleted, there exists some series related to given lang : " + name );
 
 			//Remove indexing for lang node
 			langName_index.remove(lang_node);
@@ -680,14 +818,14 @@ public class Kahania implements KahaniaService.Iface{
 			//create relationships with Genres and Languages
 			for(String genre_name : genres.split(","))
 			{
-				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
-					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
+				if(genreName_index.get(GENRE_NAME, genre_name.toLowerCase()).getSingle() != null)
+					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, genre_name.toLowerCase()).getSingle());
 			}
 			
 			for(String lang_name : languages.split(","))
 			{
-				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
-					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+				if(langName_index.get(LANG_NAME, lang_name.toLowerCase()).getSingle() != null)
+					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name.toLowerCase()).getSingle());
 			}
 			
 			//Indexing newly created user node
@@ -716,6 +854,7 @@ public class Kahania implements KahaniaService.Iface{
 		return res;
 	
 	}
+	
 
 	@Override
 	public String edit_user_basic_info(String id, String full_name,
@@ -796,6 +935,7 @@ public class Kahania implements KahaniaService.Iface{
 		}
 		return res;
 	}
+	
 
 	@Override
 	public String edit_user_security_details(String id, String user_name)
@@ -836,6 +976,7 @@ public class Kahania implements KahaniaService.Iface{
 		}
 		return res;
 	}
+	
 
 	@Override
 	public String edit_user_languages(String id, String languages)
@@ -856,8 +997,8 @@ public class Kahania implements KahaniaService.Iface{
 
 			for(String lang_name : languages.split(","))
 			{
-				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
-					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name).getSingle());
+				if(langName_index.get(LANG_NAME, lang_name.toLowerCase()).getSingle() != null)
+					createRelation(USER_INTERESTED_LANGUAGE, user_node, langName_index.get(LANG_NAME, lang_name.toLowerCase()).getSingle());
 			}
 
 			res = "true";
@@ -880,6 +1021,7 @@ public class Kahania implements KahaniaService.Iface{
 		}
 		return res;
 	}
+	
 
 	@Override
 	public String edit_user_genres(String id, String genres)
@@ -900,8 +1042,8 @@ public class Kahania implements KahaniaService.Iface{
 
 			for(String lang_name : genres.split(","))
 			{
-				if(genreName_index.get(GENRE_NAME, lang_name).getSingle() != null)
-					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, lang_name).getSingle());
+				if(genreName_index.get(GENRE_NAME, lang_name.toLowerCase()).getSingle() != null)
+					createRelation(USER_INTERESTED_GENRE, user_node, genreName_index.get(GENRE_NAME, lang_name.toLowerCase()).getSingle());
 			}
 
 			res = "true";
@@ -1008,7 +1150,6 @@ public class Kahania implements KahaniaService.Iface{
 			String keywords, String copyrights, String dd_img,
 			String dd_summary, int series_type, int time_created, int is_edit)
 			throws TException {
-		
 		if(is_edit == 0)
 			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created);
 		else if(is_edit == 1)
@@ -1034,6 +1175,8 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
 			
+			Index<Node> keyword_index = graphDb.index().forNodes(KEYWORD_INDEX);
+			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
 				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
@@ -1042,26 +1185,43 @@ public class Kahania implements KahaniaService.Iface{
 			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id).getSingle()!=null)
 				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
 
+			//validate genre and language
+			if(language == null || language.length() == 0)
+				throw new KahaniaCustomException("Null or Empty string receieved for the param language");
+			if(genre == null || genre.length() == 0)
+				throw new KahaniaCustomException("Null or Empty string receieved for the param genre");
+			
+			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+			if(genreNode == null)
+				throw new KahaniaCustomException("Genre doesnot exists for the name : " + genre);
+			
+			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
+			if(langNode == null)
+				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
+			
 			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created);  // Creating a new series node
 			if(series_node == null)
 				throw new KahaniaCustomException("Something went wrong, while creating series ");
 
 			//create relationship with user
-			
 			createRelation(USER_STARTED_SERIES, userNode, series_node);
 			
+			//create relationship with keywords
+			keywords = keywords.toLowerCase();
+			for(String keyword : keywords.split(","))
+			{
+				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword).getSingle();
+				if(keyword_node == null)
+				{
+					keyword_node = Keyword(keyword);
+					keyword_index.add(keyword_node, KEYWORD_NAME, keyword);
+				}
+				createRelation(SERIES_KEYWORD, series_node, keyword_node);
+				
+			}
 			//create relationships with Genres and Languages
-			for(String genre_name : genre.split(","))
-			{
-				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
-					createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
-			}
-			
-			for(String lang_name : language.split(","))
-			{
-				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
-					createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langName_index.get(LANG_NAME, lang_name).getSingle());
-			}
+			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode);
+			createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langNode);
 			
 			//Indexing newly created series node
 			seriesId_index.add(series_node, SERIES_ID, series_id);
@@ -1101,26 +1261,58 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
-			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
 			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
 			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+
+			Index<Node> keyword_index = graphDb.index().forNodes(KEYWORD_INDEX);
 			
 			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
 			if(series_node == null)
 				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
-			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id).getSingle()!=null)
-				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
+			
+			//validate genre and language
+			if(language == null || language.length() == 0)
+				throw new KahaniaCustomException("Null or Empty string receieved for the param language");
+			if(genre == null || genre.length() == 0)
+				throw new KahaniaCustomException("Null or Empty string receieved for the param genre");
 
-			//remove existing relationships with Genres and Languages
+			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+			if(genreNode == null)
+				throw new KahaniaCustomException("Genre doesnot exists for the name : " + genre);
+			
+			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
+			if(langNode == null)
+				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
+			
+			//remove existing relationships with Genres, Languages and keywords
 			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_GENRE))
 				rel.delete();
 			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_LANGUAGE))
 				rel.delete();
+			for(Relationship rel : series_node.getRelationships(SERIES_KEYWORD))
+				rel.delete();
 
+			//create relationships with Genres and Languages
+			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
+			createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langNode, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
+			
+			//create relationship with keywords
+			keywords = keywords.toLowerCase();
+			for(String keyword : keywords.split(","))
+			{
+				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword).getSingle();
+				if(keyword_node == null)
+				{
+					keyword_node = Keyword(keyword);
+					keyword_index.add(keyword_node, KEYWORD_NAME, keyword);
+				}
+				createRelation(SERIES_KEYWORD, series_node, keyword_node, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
+				
+			}
+			
 			series_node.setProperty(SERIES_TITLE, title);
-			series_node.setProperty(SERIES_TITLE_ID, title_id);
 			series_node.setProperty(SERIES_TAG_LINE, tag_line);
 			series_node.setProperty(SERIES_FEAT_IMG, feature_image);
 			series_node.setProperty(SERIES_KEYWORDS, keywords);
@@ -1129,22 +1321,8 @@ public class Kahania implements KahaniaService.Iface{
 			series_node.setProperty(SERIES_DD_SUMMARY, dd_summary);
 			series_node.setProperty(SERIES_TYPE, series_type);
 			
-			//create relationships with Genres and Languages
-			for(String genre_name : genre.split(","))
-			{
-				if(genreName_index.get(GENRE_NAME, genre_name).getSingle() != null)
-					createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreName_index.get(GENRE_NAME, genre_name).getSingle());
-			}
-			
-			for(String lang_name : language.split(","))
-			{
-				if(langName_index.get(LANG_NAME, lang_name).getSingle() != null)
-					createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langName_index.get(LANG_NAME, lang_name).getSingle());
-			}
 			
 			//update indexing for the edited series node
-			seriesTitleId_index.remove(series_node);
-			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id);
 			seriesType_index.remove(series_node);
 			seriesType_index.add(series_node, SERIES_TYPE, series_type);
 
@@ -1154,20 +1332,432 @@ public class Kahania implements KahaniaService.Iface{
 		}
 		catch(KahaniaCustomException ex)
 		{
-			System.out.println("Exception @ create_series()");
-			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+			System.out.println("Exception @ edit_series()");
+			System.out.println("Something went wrong, while editing series from edit_series  :"+ex.getMessage());
 //				ex.printStackTrace();
 			res = "false";
 		}
 		catch(Exception ex)
 		{
-			System.out.println("Exception @ create_series()");
-			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
+			System.out.println("Exception @ edit_series()");
+			System.out.println("Something went wrong, while editing series from edit_series  :"+ex.getMessage());
 			ex.printStackTrace();
 			res = "false";
 		}
 		return res;
 
+	}
+
+	@Override
+	public String create_or_edit_review(String series_id, String review_id,
+			String data, String user_id, int time_created, int is_edit) throws TException {
+		if(is_edit == 0)
+			return create_review(series_id, review_id, data, user_id, time_created);
+		else if(is_edit == 1)
+			return edit_review(series_id, review_id, data, user_id, time_created);
+		else return "false";		
+	}
+	
+	public String create_review(String series_id, String review_id, String data, String user_id, int time_created)
+	{
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
+			if(seriesNode == null)
+				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+			
+			if(reviewId_index.get(REVIEW_ID,review_id).getSingle()!=null)
+				throw new KahaniaCustomException("Review already exists with given id : "+review_id);
+			
+			Node review_node = Review(review_id, data, time_created);  // Creating a new review node
+			if(review_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating review ");
+
+			//create relationship with user
+			createRelation(USER_WRITTEN_A_REVIEW, userNode, review_node, time_created);
+			
+			//create relationships with Series
+			createRelation(REVIEW_BELONGS_TO_SERIES, review_node, seriesNode, time_created);
+			
+			//Indexing newly created series node
+			reviewId_index.add(review_node, REVIEW_ID, review_id);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_review()");
+			System.out.println("Something went wrong, while creating review from create_review  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_review()");
+			System.out.println("Something went wrong, while creating review from create_review  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	public String edit_review(String series_id, String review_id, String data, String user_id, int time_edited)
+	{
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+			Node review_node = reviewId_index.get(REVIEW_ID, review_id).getSingle();
+			if(review_node == null)
+				throw new KahaniaCustomException("Review doesnot exists with given id : "+review_id);
+			
+			review_node.setProperty(REVIEW_DATA, data);
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_review()");
+			System.out.println("Something went wrong, while editing review from edit_review  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_review()");
+			System.out.println("Something went wrong, while editing review from edit_review  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String create_or_edit_chapter(String chapter_id, String series_id,
+			String series_type, String user_id, String title_id, String title,
+			String feat_image, int time_created, int free_or_paid, int is_edit)
+			throws TException {
+		if(is_edit == 0)
+			return create_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created);
+		else if(is_edit == 1)
+			return edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created);
+		else return "false";		
+	}
+	
+	private String edit_chapter(String chapter_id, String series_id,
+			String series_type, String user_id, String title_id,
+			String title, String feat_image, int free_or_paid, int time_created) {
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
+			if(seriesNode == null)
+				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+
+			Node chapterNode = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
+			if(chapterNode == null)
+				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+
+			chapterNode.setProperty(CHAPTER_TITLE, title);
+			chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
+			chapterNode.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ edit_chapter()");
+			System.out.println("Something went wrong, while editing chapter from edit_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_chapter()");
+			System.out.println("Something went wrong, while editing chapter from edit_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	private String create_chapter(String chapter_id, String series_id,
+			String series_type, String user_id, String title_id,
+			String title, String feat_image, int free_or_paid, int time_created) {
+		
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
+			if(seriesNode == null)
+				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+
+			if(chapterId_index.get(CHAPTER_ID,chapter_id).getSingle()!=null)
+				throw new KahaniaCustomException("Chapter already exists with given id : "+chapter_id);
+			
+			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id).getSingle()!=null)
+				throw new KahaniaCustomException("Chapter already exists with given title id : "+title_id);
+			
+			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created);  // Creating a new chapter node
+			if(chapter_node == null)
+				throw new KahaniaCustomException("Something went wrong, while creating chapter ");
+
+			//create relationship with user
+			createRelation(USER_WRITTEN_A_CHAPTER, userNode, chapter_node, time_created);
+			
+			//create relationships with Series
+			createRelation(CHAPTER_BELONGS_TO_SERIES, chapter_node, seriesNode, time_created);
+			
+			//Indexing newly created series node
+			chapterId_index.add(chapter_node, CHAPTER_ID, chapter_id);
+			chapterTitleId_index.add(chapter_node, CHAPTER_TITLE_ID, title_id);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ create_chapter()");
+			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_chapter()");
+			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String subscribe_series(String series_id, String user_id, int time)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
+			if(series_node == null)
+				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(USER_SUBSCRIBED_TO_SERIES, user_node, series_node))
+				deleteRelation(USER_SUBSCRIBED_TO_SERIES, user_node, series_node);
+			else
+				createRelation(USER_SUBSCRIBED_TO_SERIES, user_node, series_node, time);
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ subscribe_series()");
+			System.out.println("Something went wrong, while subscribing series from subscribe_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ subscribe_series()");
+			System.out.println("Something went wrong, while subscribing series from subscribe_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String favourite_chapter(String chapter_id, String series_id,
+			String user_id, int time) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(USER_FAV_CHAPTER, user_node, chapter_node))
+				deleteRelation(USER_FAV_CHAPTER, user_node, chapter_node);
+			else
+				createRelation(USER_FAV_CHAPTER, user_node, chapter_node, time);
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String rate_chapter(String chapter_id, String series_id, int rating,
+			String user_id, int time) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(USER_RATED_A_CHAPTER, user_node, chapter_node))
+				deleteRelation(USER_RATED_A_CHAPTER, user_node, chapter_node);
+			else
+			{
+				createRelation(USER_RATED_A_CHAPTER, user_node, chapter_node, time).setProperty(CHAPTER_RATING, rating);
+			}			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String recored_chapter_view(String chapter_id, String series_id,
+			String user_id, int time) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Relationship> userViewedChapterRelIndex = graphDb.index().forRelationships(USER_VIEWED_CHAPTER_REL_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+			
+			Relationship rel = userViewedChapterRelIndex.get(USER_VIEWED_A_CHAPTER_ID, user_id+"_view_"+chapter_id).getSingle();
+			if(rel != null)
+			{
+				rel.setProperty(CHAPTER_VIEWS, Integer.parseInt(rel.getProperty(CHAPTER_VIEWS).toString())+1);
+			}
+			else
+			{
+				rel = createRelation(USER_VIEWED_A_CHAPTER, user_node, chapter_node, time);
+				rel.setProperty(CHAPTER_VIEWS, 1);
+				userViewedChapterRelIndex.add(rel, USER_VIEWED_A_CHAPTER_ID, user_id+"_view_"+chapter_id);
+			}			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ favourite_chapter()");
+			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String get_feed(String titleType, String feedType, String filter,
+			int prev_cnt, int count, String user_id) throws TException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 
