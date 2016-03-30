@@ -36,6 +36,7 @@ public class Kahania implements KahaniaService.Iface{
 	//Index names
 	public static final String GENRE_NAME_INDEX = "genre_index_by_name";
 	public static final String LANG_NAME_INDEX = "language_index_by_name";
+	public static final String GENRE_LANG_INDEX = "genre_language_index_by_name";
 	public static final String USER_ID_INDEX = "user_index_by_id";
 	public static final String USER_NAME_INDEX = "user_index_by_uname";
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
@@ -93,6 +94,9 @@ public class Kahania implements KahaniaService.Iface{
 	//language node related keys
 	public static final String LANG_NAME = "language_name";
 	
+	//genre_language node related keys
+	public static final String GENRE_LANG_NAME = "genre_language_name";
+	
 	//keyword node related keys
 	public static final String KEYWORD_NAME = "keyword_name";
 	
@@ -113,6 +117,7 @@ public class Kahania implements KahaniaService.Iface{
 	public static final String USER_NODE = "user_node";
 	public static final String GENRE_NODE = "genre_node";
 	public static final String LANG_NODE = "language_node";
+	public static final String GENRE_LANG_NODE = "genre_language_node";
 	public static final String SERIES_NODE = "series_node";
 	public static final String KEYWORD_NODE = "keyword_node";
 	public static final String REVIEW_NODE = "review_node";
@@ -128,6 +133,7 @@ public class Kahania implements KahaniaService.Iface{
 
 	RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
 	RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
+	RelationshipType SERIES_BELONGS_TO_GENRE_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE_LANGUAGE");
 	RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
 	
 	RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
@@ -188,6 +194,14 @@ public class Kahania implements KahaniaService.Iface{
 		Node node = graphDb.createNode();
 		node.setProperty(GENRE_NAME,name);
 	    node.setProperty(NODE_TYPE, GENRE_NODE);
+	    return node;
+	} 
+
+    private Node GenreLang(String genre_name, String lang_name){
+		Node node = graphDb.createNode();
+		node.setProperty(GENRE_NAME,genre_name);
+		node.setProperty(LANG_NAME,lang_name);
+	    node.setProperty(NODE_TYPE, GENRE_LANG_NODE);
 	    return node;
 	} 
 
@@ -318,6 +332,7 @@ public class Kahania implements KahaniaService.Iface{
 		String[] nodeIndexNames = {
 								GENRE_NAME_INDEX,
 								LANG_NAME_INDEX,
+								GENRE_LANG_INDEX,
 								USER_ID_INDEX,
 								USER_NAME_INDEX,
 								USER_EMAIL_INDEX,
@@ -445,6 +460,8 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for genre name");
@@ -459,7 +476,16 @@ public class Kahania implements KahaniaService.Iface{
 				throw new KahaniaCustomException("Something went wrong, while creating genre with given name");
 
 			//Indexing newly created genre node
-			genreName_index.add(genre_node, GENRE_NAME, name);
+			genreName_index.add(genre_node, GENRE_NAME, name.toLowerCase());
+			
+			//create genre_lang nodes for each language
+			ResourceIterator<Node> langNodesItr = langName_index.query(LANG_NAME, "*").iterator();
+			while(langNodesItr.hasNext())
+			{
+				Node langNode = langNodesItr.next();
+				genre_lang_index.add(GenreLang(name, langNode.getProperty(LANG_NAME).toString()), GENRE_LANG_NAME, (name+" "+langNode.getProperty(LANG_NAME).toString()).toLowerCase());
+			}
+			
 			res = "true";
 			tx.success();
 
@@ -489,6 +515,8 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			if(old_name == null || old_name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for genre existing name");
@@ -498,18 +526,35 @@ public class Kahania implements KahaniaService.Iface{
 			old_name = old_name.toLowerCase();
 			new_name = new_name.toLowerCase();
 						
-			Node genre_node = genreName_index.get(GENRE_NAME,old_name).getSingle();
+			Node genre_node = genreName_index.get(GENRE_NAME,old_name.toLowerCase()).getSingle();
 	
 			if(genre_node == null)
 				throw new KahaniaCustomException("Genre doesnot exists with given old name");
 
-			if(genreName_index.get(GENRE_NAME,new_name).getSingle() != null)
+			if(genreName_index.get(GENRE_NAME,new_name.toLowerCase()).getSingle() != null)
 				throw new KahaniaCustomException("Genre already exists with given new name");
 
 			genre_node.setProperty(GENRE_NAME, old_name);
 			//Update indexing for genre node
 			genreName_index.remove(genre_node);
-			genreName_index.add(genre_node, GENRE_NAME, new_name);
+			genreName_index.add(genre_node, GENRE_NAME, new_name.toLowerCase());
+			
+			//update all genre_lang nodes
+			//create genre_lang nodes for each language
+			ResourceIterator<Node> langNodesItr = langName_index.query(LANG_NAME, "*").iterator();
+			while(langNodesItr.hasNext())
+			{
+				Node langNode = langNodesItr.next();
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, (old_name + " " + langNode.getProperty(LANG_NAME).toString()).toLowerCase()).getSingle();
+				if(genre_lang_node != null)
+				{
+					genre_lang_node.setProperty(GENRE_LANG_NAME, new_name + " " + langNode.getProperty(LANG_NAME).toString());
+					genre_lang_index.remove(genre_lang_node);
+					genre_lang_index.add(genre_lang_node, GENRE_LANG_NAME, (new_name+ " " + langNode.getProperty(LANG_NAME).toString()).toLowerCase());
+				}
+			}
+			
+			
 			res = "true";
 			tx.success();
 
@@ -539,13 +584,15 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for genre name");
 			
 			name = name.toLowerCase();
 			
-			Node genre_node = genreName_index.get(GENRE_NAME,name).getSingle();
+			Node genre_node = genreName_index.get(GENRE_NAME,name.toLowerCase()).getSingle();
 			
 			if(genre_node == null)
 				throw new KahaniaCustomException("Genre node doesnot exists with given name");
@@ -556,6 +603,20 @@ public class Kahania implements KahaniaService.Iface{
 
 			if(genre_node.getDegree(SERIES_BELONGS_TO_GENRE) > 0)
 				throw new KahaniaCustomException("Genre node cannot be deleted, there exists some series related to given genre : " + name );
+			
+			//Remove genre_lang for all other lang
+			ResourceIterator<Node> langNodesItr = langName_index.query(LANG_NAME, "*").iterator();
+			while(langNodesItr.hasNext())
+			{
+				Node langNode = langNodesItr.next();
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, (name + " " + langNode.getProperty(LANG_NAME).toString()).toLowerCase()).getSingle();
+				if(genre_lang_node != null)
+				{
+					genre_lang_index.remove(genre_lang_node);
+					genre_lang_node.delete();
+				}
+			}
+
 			
 			//Remove indexing for genre node
 			genreName_index.remove(genre_node);
@@ -621,21 +682,32 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for language name");
 			
 			name = name.toLowerCase();
 			
-			if(langName_index.get(LANG_NAME,name).getSingle()!=null)
+			if(langName_index.get(LANG_NAME,name.toLowerCase()).getSingle()!=null)
 				throw new KahaniaCustomException("Lang already exists with given name : "+name);
 
 			Node lang_node = Language(name);  // Creating a new lang node
 			if(lang_node == null)
 				throw new KahaniaCustomException("Something went wrong, while creating language with given name");
 
+			//create genre_lang nodes for each language
+			ResourceIterator<Node> genreNodesItr = genreName_index.query(GENRE_NAME, "*").iterator();
+			while(genreNodesItr.hasNext())
+			{
+				Node genreNode = genreNodesItr.next();
+				genre_lang_index.add(GenreLang(genreNode.getProperty(GENRE_NAME).toString(), name), GENRE_LANG_NAME, (genreNode.getProperty(GENRE_NAME).toString()+" "+name).toLowerCase());
+			}
+			
+
 			//Indexing newly created lang node
-			langName_index.add(lang_node, LANG_NAME, name);
+			langName_index.add(lang_node, LANG_NAME, name.toLowerCase());
 			res = "true";
 			tx.success();
 
@@ -665,6 +737,9 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
+
 			if(old_name == null || old_name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for old language name");
 			if(new_name == null || new_name.length() == 0)
@@ -673,18 +748,36 @@ public class Kahania implements KahaniaService.Iface{
 			old_name = old_name.toLowerCase();
 			new_name = new_name.toLowerCase();
 			
-			Node lang_node = langName_index.get(LANG_NAME,old_name).getSingle();
+			Node lang_node = langName_index.get(LANG_NAME,old_name.toLowerCase()).getSingle();
 			
 			if(lang_node == null)
 				throw new KahaniaCustomException("Lang doesnot exists with given old name");
 
-			if(langName_index.get(LANG_NAME,new_name).getSingle() != null)
+			if(langName_index.get(LANG_NAME,new_name.toLowerCase()).getSingle() != null)
 				throw new KahaniaCustomException("Lang already exists with given new name");
 			
 			lang_node.setProperty(LANG_NAME, old_name);
+			
+			//update all genre_lang nodes
+			//create genre_lang nodes for each language
+			ResourceIterator<Node> genreNodesItr = genreName_index.query(GENRE_NAME, "*").iterator();
+			while(genreNodesItr.hasNext())
+			{
+				Node genreNode = genreNodesItr.next();
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, (genreNode.getProperty(GENRE_NAME).toString()+" "+old_name).toLowerCase()).getSingle();
+				if(genre_lang_node != null)
+				{
+					genre_lang_node.setProperty(GENRE_LANG_NAME, genreNode.getProperty(GENRE_NAME).toString()+" "+new_name);
+					genre_lang_index.remove(genre_lang_node);
+					genre_lang_index.add(genre_lang_node, GENRE_LANG_NAME, (genreNode.getProperty(GENRE_NAME).toString()+" "+new_name).toLowerCase());
+				}
+			}
+
+			
 			//Update indexing for lang node
+			
 			langName_index.remove(lang_node);
-			langName_index.add(lang_node, LANG_NAME, new_name);
+			langName_index.add(lang_node, LANG_NAME, new_name.toLowerCase());
 			res = "true";
 			tx.success();
 
@@ -714,13 +807,15 @@ public class Kahania implements KahaniaService.Iface{
 		{
 			aquireWriteLock(tx);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			if(name == null || name.length() == 0)
 				throw new KahaniaCustomException("Null or empty string found for language name");
 			
 			name = name.toLowerCase();
 
-			Node lang_node = langName_index.get(LANG_NAME,name).getSingle();
+			Node lang_node = langName_index.get(LANG_NAME,name.toLowerCase()).getSingle();
 			
 			if(lang_node == null)
 				throw new KahaniaCustomException("Lang node doesnot exists with given name");
@@ -731,6 +826,20 @@ public class Kahania implements KahaniaService.Iface{
 			if(lang_node.getDegree(SERIES_BELONGS_TO_LANGUAGE) > 0)
 				throw new KahaniaCustomException("Lang node cannot be deleted, there exists some series related to given lang : " + name );
 
+
+			//Remove genre_lang for all other lang
+			ResourceIterator<Node> genreNodesItr = genreName_index.query(GENRE_NAME, "*").iterator();
+			while(genreNodesItr.hasNext())
+			{
+				Node genreNode = genreNodesItr.next();
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, (genreNode.getProperty(LANG_NAME).toString()+" "+name).toLowerCase()).getSingle();
+				if(genre_lang_node != null)
+				{
+					genre_lang_index.remove(genre_lang_node);
+					genre_lang_node.delete();
+				}
+			}
+			
 			//Remove indexing for lang node
 			langName_index.remove(lang_node);
 			lang_node.delete();
@@ -806,9 +915,9 @@ public class Kahania implements KahaniaService.Iface{
 			
 			if(userId_index.get(USER_ID,id).getSingle()!=null)
 				throw new KahaniaCustomException("User already exists with given id : "+id);
-			if(userName_index.get(USER_NAME,user_name).getSingle()!=null)
+			if(userName_index.get(USER_NAME,user_name.toLowerCase()).getSingle()!=null)
 				throw new KahaniaCustomException("User already exists with given user_name : "+user_name);
-			if(userEmail_index.get(EMAIL,email).getSingle()!=null)
+			if(userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
 				throw new KahaniaCustomException("User already exists with given email : "+email);
 
 			Node user_node = User(id, full_name, user_name, email, mobile_number, dob, privilege, status, time_created);  // Creating a new user node
@@ -830,8 +939,8 @@ public class Kahania implements KahaniaService.Iface{
 			
 			//Indexing newly created user node
 			userId_index.add(user_node, USER_ID, id);
-			userName_index.add(user_node, USER_NAME, user_name);
-			userEmail_index.add(user_node, EMAIL, email);
+			userName_index.add(user_node, USER_NAME, user_name.toLowerCase());
+			userEmail_index.add(user_node, EMAIL, email.toLowerCase());
 
 			res = "true";
 			tx.success();
@@ -913,7 +1022,7 @@ public class Kahania implements KahaniaService.Iface{
 			user_node.setProperty(MOBILE_NUMBER, mobile_number);
 			
 			userEmail_index.remove(user_node);
-			userEmail_index.add(user_node, EMAIL, email);
+			userEmail_index.add(user_node, EMAIL, email.toLowerCase());
 			
 			res = "true";
 			tx.success();
@@ -954,7 +1063,7 @@ public class Kahania implements KahaniaService.Iface{
 			user_node.setProperty(USER_NAME, user_name);
 			
 			userName_index.remove(user_node);
-			userName_index.add(user_node, USER_NAME, user_name);
+			userName_index.add(user_node, USER_NAME, user_name.toLowerCase());
 			
 			res = "true";
 			tx.success();
@@ -1174,6 +1283,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			Index<Node> keyword_index = graphDb.index().forNodes(KEYWORD_INDEX);
 			
@@ -1182,7 +1292,7 @@ public class Kahania implements KahaniaService.Iface{
 				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
 			if(seriesId_index.get(SERIES_ID,series_id).getSingle()!=null)
 				throw new KahaniaCustomException("Series already exists with given id : "+series_id);
-			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id).getSingle()!=null)
+			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
 				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
 
 			//validate genre and language
@@ -1198,6 +1308,10 @@ public class Kahania implements KahaniaService.Iface{
 			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
 			if(langNode == null)
 				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
+	
+			Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase() + " " +language.toLowerCase()).getSingle();
+			if(genre_lang_node == null)
+				throw new KahaniaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
 			
 			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created);  // Creating a new series node
 			if(series_node == null)
@@ -1210,11 +1324,11 @@ public class Kahania implements KahaniaService.Iface{
 			keywords = keywords.toLowerCase();
 			for(String keyword : keywords.split(","))
 			{
-				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword).getSingle();
+				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword.toLowerCase()).getSingle();
 				if(keyword_node == null)
 				{
 					keyword_node = Keyword(keyword);
-					keyword_index.add(keyword_node, KEYWORD_NAME, keyword);
+					keyword_index.add(keyword_node, KEYWORD_NAME, keyword.toLowerCase());
 				}
 				createRelation(SERIES_KEYWORD, series_node, keyword_node);
 				
@@ -1222,10 +1336,11 @@ public class Kahania implements KahaniaService.Iface{
 			//create relationships with Genres and Languages
 			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode);
 			createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langNode);
+			createRelation(SERIES_BELONGS_TO_GENRE_LANGUAGE, series_node, genre_lang_node);
 			
 			//Indexing newly created series node
 			seriesId_index.add(series_node, SERIES_ID, series_id);
-			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id);
+			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id.toLowerCase());
 			seriesType_index.add(series_node, SERIES_TYPE, series_type);
 
 			res = "true";
@@ -1265,6 +1380,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			Index<Node> keyword_index = graphDb.index().forNodes(KEYWORD_INDEX);
 			
@@ -1286,10 +1402,16 @@ public class Kahania implements KahaniaService.Iface{
 			if(langNode == null)
 				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
 			
+			Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase()+" "+language.toLowerCase()).getSingle();
+			if(genre_lang_node == null)
+				throw new KahaniaCustomException("Genre Language doesnot exists for the name : " + genre+" "+language);
+			
 			//remove existing relationships with Genres, Languages and keywords
 			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_GENRE))
 				rel.delete();
 			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_LANGUAGE))
+				rel.delete();
+			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE))
 				rel.delete();
 			for(Relationship rel : series_node.getRelationships(SERIES_KEYWORD))
 				rel.delete();
@@ -1297,16 +1419,17 @@ public class Kahania implements KahaniaService.Iface{
 			//create relationships with Genres and Languages
 			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
 			createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langNode, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
+			createRelation(SERIES_BELONGS_TO_GENRE_LANGUAGE, series_node, genre_lang_node, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
 			
 			//create relationship with keywords
 			keywords = keywords.toLowerCase();
 			for(String keyword : keywords.split(","))
 			{
-				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword).getSingle();
+				Node keyword_node = keyword_index.get(KEYWORD_NAME, keyword.toLowerCase()).getSingle();
 				if(keyword_node == null)
 				{
 					keyword_node = Keyword(keyword);
-					keyword_index.add(keyword_node, KEYWORD_NAME, keyword);
+					keyword_index.add(keyword_node, KEYWORD_NAME, keyword.toLowerCase());
 				}
 				createRelation(SERIES_KEYWORD, series_node, keyword_node, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
 				
@@ -1531,7 +1654,7 @@ public class Kahania implements KahaniaService.Iface{
 			if(chapterId_index.get(CHAPTER_ID,chapter_id).getSingle()!=null)
 				throw new KahaniaCustomException("Chapter already exists with given id : "+chapter_id);
 			
-			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id).getSingle()!=null)
+			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
 				throw new KahaniaCustomException("Chapter already exists with given title id : "+title_id);
 			
 			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created);  // Creating a new chapter node
@@ -1546,7 +1669,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			//Indexing newly created series node
 			chapterId_index.add(chapter_node, CHAPTER_ID, chapter_id);
-			chapterTitleId_index.add(chapter_node, CHAPTER_TITLE_ID, title_id);
+			chapterTitleId_index.add(chapter_node, CHAPTER_TITLE_ID, title_id.toLowerCase());
 			
 			res = "true";
 			tx.success();
