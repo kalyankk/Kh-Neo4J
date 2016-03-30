@@ -2094,44 +2094,54 @@ public class Kahania implements KahaniaService.Iface{
 	private JSONObject getJSONForChapter(Node chapter)
 	{
 		JSONObject obj = new JSONObject();
-		obj.put("P_Author_FullName","Devendar");
-		obj.put("P_Author","d8e817661570c9d7b0603e3d4746a33a");
-		obj.put("P_Title_ID","chapter1");
-		obj.put("P_Title","Chapter Title");
-		obj.put("P_Feature_Image","feature-image.jpg");
-		obj.put("P_Id","e4f1d52cb0242b11dab566f4ea833805");
+		obj.put("P_Author_FullName",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("P_Author",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Title_ID",chapter.getProperty(CHAPTER_TITLE_ID).toString());
+		obj.put("P_Title",chapter.getProperty(CHAPTER_TITLE).toString());
+		obj.put("P_Feature_Image",chapter.getProperty(CHAPTER_FEAT_IMAGE));
+		obj.put("P_Id",chapter.getProperty(CHAPTER_ID).toString());
+		
+		Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 		
 		JSONObject seriesJSON = new JSONObject();
-		seriesJSON.put("Series_Id", "9f3fd4f07cd65cb299f74cb146197d0a");
-		seriesJSON.put("Series_Ttl", "Series Title");
-		seriesJSON.put("Series_Tid", "series-title");
-		seriesJSON.put("Series_Typ", 1);
+		seriesJSON.put("Series_Id", series.getProperty(SERIES_ID).toString());
+		seriesJSON.put("Series_Ttl", series.getProperty(SERIES_TITLE).toString());
+		seriesJSON.put("Series_Tid", series.getProperty(SERIES_TITLE_ID).toString());
+		seriesJSON.put("Series_Typ", series.getProperty(SERIES_TYPE));
 		
 		obj.put("Series_Info", seriesJSON);
-		obj.put("P_Genre","Fiction");
-		obj.put("P_Lang","telugu");
-		obj.put("P_TimeCreated","1458298195");
-		obj.put("P_Num_Views",17);
-		obj.put("P_Num_Fvrts",2);
-		obj.put("P_Rating",4);
+		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getStartNode().getProperty(GENRE_NAME).toString());
+		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getStartNode().getProperty(LANG_NAME).toString());
+		obj.put("P_TimeCreated",chapter.getProperty(TIME_CREATED).toString());
+		obj.put("P_Num_Views",chapter.getDegree(USER_VIEWED_A_CHAPTER, Direction.INCOMING));
+		obj.put("P_Num_Fvrts",chapter.getDegree(USER_FAV_CHAPTER, Direction.INCOMING));
+		
+		int tot_rating = 0;
+		Iterator<Relationship> ratingRelItr = chapter.getRelationships(Direction.INCOMING, USER_RATED_A_CHAPTER).iterator();
+		while(ratingRelItr.hasNext())
+			tot_rating = tot_rating + Integer.parseInt(ratingRelItr.next().getProperty(CHAPTER_RATING).toString());
+		if(chapter.getDegree(USER_RATED_A_CHAPTER, Direction.INCOMING) == 0)
+			obj.put("P_Rating",tot_rating);
+		else
+			obj.put("P_Rating",tot_rating/chapter.getDegree(USER_RATED_A_CHAPTER, Direction.INCOMING));
 		return obj;
 	}
 	
 	private JSONObject getJSONForSeries(Node series)
 	{
 		JSONObject obj = new JSONObject();
-		obj.put("P_Author_FullName","Devendar");
-		obj.put("P_Author","d8e817661570c9d7b0603e3d4746a33a");
-		obj.put("P_Title_ID","chapter1");
-		obj.put("P_Title","Chapter Title");
-		obj.put("P_Feature_Image","feature-image.jpg");
-		obj.put("P_Id","e4f1d52cb0242b11dab566f4ea833805");
-		obj.put("P_Genre","Fiction");
-		obj.put("P_Lang","telugu");
-		obj.put("P_TimeCreated","1458298195");
-		obj.put("P_Num_Views",17);
-		obj.put("P_Num_Fvrts",2);
-		obj.put("P_Rating",4);
+		obj.put("P_Author_FullName",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("P_Author",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Title_ID",series.getProperty(SERIES_TITLE_ID).toString());
+		obj.put("P_Title",series.getProperty(SERIES_TITLE).toString());
+		obj.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG).toString());
+		obj.put("P_Id",series.getProperty(SERIES_ID).toString());
+		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getStartNode().getProperty(GENRE_NAME).toString());
+		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getStartNode().getProperty(LANG_NAME).toString());
+		obj.put("P_TimeCreated",series.getProperty(TIME_CREATED).toString());
+		obj.put("P_Num_Views",0);
+		obj.put("P_Num_Fvrts",0);
+		obj.put("P_Rating",0);
 		return obj;
 	}
 
