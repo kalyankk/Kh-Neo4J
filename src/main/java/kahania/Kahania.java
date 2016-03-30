@@ -1,9 +1,12 @@
 package kahania;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +31,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.Index;
 
+import scala.collection.immutable.List;
 import kahania.KahaniaCustomException;
 
 public class Kahania implements KahaniaService.Iface{
@@ -1877,11 +1881,258 @@ public class Kahania implements KahaniaService.Iface{
 	}
 
 	@Override
-	public String get_feed(String titleType, String feedType, String filter,
+	public String get_feed(String tileType, String feedType, String filter,
 			int prev_cnt, int count, String user_id) throws TException {
-		// TODO Auto-generated method stub
-		return null;
+		if(tileType.equalsIgnoreCase("S"))
+			return get_series(feedType, filter, prev_cnt, count, user_id);
+		else if(tileType.equalsIgnoreCase("C"))
+				return get_chapters(feedType, filter, prev_cnt, count, user_id);
+		else return "";
 	}
 	
+	private String get_series(String feedType, String filter, int prev_cnt, int count, String user_id)
+	{
+
+		JSONObject res = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			int c = 0;
+			JSONArray jsonArray = new JSONArray();
+			LinkedList<Node> outputSeriesNode = new LinkedList<Node>();
+			
+			if(feedType.equalsIgnoreCase("S"))
+			{
+				if(user_node == null)
+					throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				Iterator<Relationship> subscribedRelsItr = user_node.getRelationships(USER_SUBSCRIBED_TO_SERIES).iterator();
+				LinkedList<Relationship> subscribedRelsList = new LinkedList<Relationship>();
+				while(subscribedRelsItr.hasNext())
+					subscribedRelsList.addLast(subscribedRelsItr.next());
+				Collections.sort(subscribedRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : subscribedRelsList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node series = rel.getEndNode();
+					if(filter != null)
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						for(String genre: filterJSON.getString("genres").split(","))
+						{
+							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+							if(genreNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().equals(genreNode))
+							{
+								for(String lang: filterJSON.getString("languages").split(","))
+								{
+									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+									if(langNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().equals(langNode))
+									{
+										if(c < prev_cnt)
+										{
+											c++;
+											continue;
+										}
+										c++;
+										outputSeriesNode.addLast(series);
+
+									}
+								}
+							}
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);
+					}
+					
+				}
+			}
+
+			for(Node series : outputSeriesNode)
+				jsonArray.put(getJSONForSeries(series));
+			
+			res.put("status", 1);
+			res.put("msg", jsonArray);
+
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = new JSONObject();
+		}
+		return res.toString();
+	}
+	
+	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String user_id)
+	{
+
+		JSONObject res = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			int c = 0;
+			JSONArray jsonArray = new JSONArray();
+			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
+			
+			if(feedType.equalsIgnoreCase("F"))
+			{
+				if(user_node == null)
+					throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				Iterator<Relationship> favCHaptersRelsItr = user_node.getRelationships(USER_FAV_CHAPTER).iterator();
+				LinkedList<Relationship> favChaptersRelsList = new LinkedList<Relationship>();
+				while(favCHaptersRelsItr.hasNext())
+					favChaptersRelsList.addLast(favCHaptersRelsItr.next());
+				Collections.sort(favChaptersRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : favChaptersRelsList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getEndNode();
+					if(filter != null)
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						for(String genre: filterJSON.getString("genres").split(","))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+							if(genreNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().equals(genreNode))
+							{
+								for(String lang: filterJSON.getString("languages").split(","))
+								{
+									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+									if(langNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().equals(langNode))
+									{
+										if(c < prev_cnt)
+										{
+											c++;
+											continue;
+										}
+										c++;
+										outputChaptersNode.addLast(chapter);
+
+									}
+								}
+							}
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
+
+			for(Node chapter : outputChaptersNode)
+				jsonArray.put(getJSONForChapter(chapter));
+			
+			res.put("status", 1);
+			res.put("msg", jsonArray);
+
+			tx.success();
+
+		}
+		catch(KahaniaCustomException ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = new JSONObject();
+		}
+		return res.toString();
+	}
+	
+	private JSONObject getJSONForChapter(Node chapter)
+	{
+		JSONObject obj = new JSONObject();
+		obj.put("P_Author_FullName","Devendar");
+		obj.put("P_Author","d8e817661570c9d7b0603e3d4746a33a");
+		obj.put("P_Title_ID","chapter1");
+		obj.put("P_Title","Chapter Title");
+		obj.put("P_Feature_Image","feature-image.jpg");
+		obj.put("P_Id","e4f1d52cb0242b11dab566f4ea833805");
+		
+		JSONObject seriesJSON = new JSONObject();
+		seriesJSON.put("Series_Id", "9f3fd4f07cd65cb299f74cb146197d0a");
+		seriesJSON.put("Series_Ttl", "Series Title");
+		seriesJSON.put("Series_Tid", "series-title");
+		seriesJSON.put("Series_Typ", 1);
+		
+		obj.put("Series_Info", seriesJSON);
+		obj.put("P_Genre","Fiction");
+		obj.put("P_Lang","telugu");
+		obj.put("P_TimeCreated","1458298195");
+		obj.put("P_Num_Views",17);
+		obj.put("P_Num_Fvrts",2);
+		obj.put("P_Rating",4);
+		return obj;
+	}
+	
+	private JSONObject getJSONForSeries(Node series)
+	{
+		JSONObject obj = new JSONObject();
+		obj.put("P_Author_FullName","Devendar");
+		obj.put("P_Author","d8e817661570c9d7b0603e3d4746a33a");
+		obj.put("P_Title_ID","chapter1");
+		obj.put("P_Title","Chapter Title");
+		obj.put("P_Feature_Image","feature-image.jpg");
+		obj.put("P_Id","e4f1d52cb0242b11dab566f4ea833805");
+		obj.put("P_Genre","Fiction");
+		obj.put("P_Lang","telugu");
+		obj.put("P_TimeCreated","1458298195");
+		obj.put("P_Num_Views",17);
+		obj.put("P_Num_Fvrts",2);
+		obj.put("P_Rating",4);
+		return obj;
+	}
 
 }
