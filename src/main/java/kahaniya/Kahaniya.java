@@ -1,4 +1,4 @@
-package kahania;
+package kahaniya;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,9 +32,9 @@ import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.Index;
 
 import scala.collection.immutable.List;
-import kahania.KahaniaCustomException;
+import kahaniya.KahaniyaCustomException;
 
-public class Kahania implements KahaniaService.Iface{
+public class Kahaniya implements KahaniyaService.Iface{
 
 	
 	//Index names
@@ -272,7 +272,7 @@ public class Kahania implements KahaniaService.Iface{
 		try{
 			
 			TServerSocket serverTransport = new TServerSocket(9779);
-			KahaniaService.Processor<KahaniaService.Iface> processor = new KahaniaService.Processor<KahaniaService.Iface>(this);
+			KahaniyaService.Processor<KahaniyaService.Iface> processor = new KahaniyaService.Processor<KahaniyaService.Iface>(this);
 			Args serverArgs = new Args(serverTransport);
 			serverArgs.processor(processor);
 			TServer server = new TThreadPoolServer(serverArgs);
@@ -310,7 +310,7 @@ public class Kahania implements KahaniaService.Iface{
 		return res;
 	}
 	
-	public Kahania()
+	public Kahaniya()
 	{
 		if(graphDb == null)
 			initGraphDb();
@@ -320,7 +320,7 @@ public class Kahania implements KahaniaService.Iface{
 	private static void initGraphDb()
 	{
 		//db path
-		String storeDir = "/kahania/n4j/data/graph.db";
+		String storeDir = "/var/kahania/n4j/data/graph.db";
 		
 		//starting graph database with configuration
 		graphDb = new GraphDatabaseFactory()
@@ -468,16 +468,16 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for genre name");
+				throw new KahaniyaCustomException("Null or empty string found for genre name");
 			
 			name = name.toLowerCase();
 			
 			if(genreName_index.get(GENRE_NAME,name).getSingle()!=null)
-				throw new KahaniaCustomException("Genre already exists with given name : "+name);
+				throw new KahaniyaCustomException("Genre already exists with given name : "+name);
 			
 			Node genre_node = Genre(name);  // Creating a new genre node
 			if(genre_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating genre with given name");
+				throw new KahaniyaCustomException("Something went wrong, while creating genre with given name");
 
 			//Indexing newly created genre node
 			genreName_index.add(genre_node, GENRE_NAME, name.toLowerCase());
@@ -494,7 +494,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_genre('"+name+"')");
 			System.out.println("Something went wrong, while creating genre from create_genre  :"+ex.getMessage());
@@ -523,9 +523,9 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			if(old_name == null || old_name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for genre existing name");
+				throw new KahaniyaCustomException("Null or empty string found for genre existing name");
 			if(new_name == null || new_name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for new genre name");
+				throw new KahaniyaCustomException("Null or empty string found for new genre name");
 			
 			old_name = old_name.toLowerCase();
 			new_name = new_name.toLowerCase();
@@ -533,10 +533,10 @@ public class Kahania implements KahaniaService.Iface{
 			Node genre_node = genreName_index.get(GENRE_NAME,old_name.toLowerCase()).getSingle();
 	
 			if(genre_node == null)
-				throw new KahaniaCustomException("Genre doesnot exists with given old name");
+				throw new KahaniyaCustomException("Genre doesnot exists with given old name");
 
 			if(genreName_index.get(GENRE_NAME,new_name.toLowerCase()).getSingle() != null)
-				throw new KahaniaCustomException("Genre already exists with given new name");
+				throw new KahaniyaCustomException("Genre already exists with given new name");
 
 			genre_node.setProperty(GENRE_NAME, old_name);
 			//Update indexing for genre node
@@ -563,7 +563,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_genre('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing genre from edit_genre  :"+ex.getMessage());
@@ -592,21 +592,21 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for genre name");
+				throw new KahaniyaCustomException("Null or empty string found for genre name");
 			
 			name = name.toLowerCase();
 			
 			Node genre_node = genreName_index.get(GENRE_NAME,name.toLowerCase()).getSingle();
 			
 			if(genre_node == null)
-				throw new KahaniaCustomException("Genre node doesnot exists with given name");
+				throw new KahaniyaCustomException("Genre node doesnot exists with given name");
 
 			//Remove relationships for genre node
 //			for(Relationship rel : genre_node.getRelationships())
 //				rel.delete();
 
 			if(genre_node.getDegree(SERIES_BELONGS_TO_GENRE) > 0)
-				throw new KahaniaCustomException("Genre node cannot be deleted, there exists some series related to given genre : " + name );
+				throw new KahaniyaCustomException("Genre node cannot be deleted, there exists some series related to given genre : " + name );
 			
 			//Remove genre_lang for all other lang
 			ResourceIterator<Node> langNodesItr = langName_index.query(LANG_NAME, "*").iterator();
@@ -629,7 +629,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ delete_genre('"+name+"')");
 			System.out.println("Something went wrong, while deleting genre from delete_genre  :"+ex.getMessage());
@@ -661,7 +661,7 @@ public class Kahania implements KahaniaService.Iface{
 				res.put(getJSONForGenre(genre_nodes_itr.next()));
 			
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ list_genres()");
 			System.out.println("Something went wrong, while returning genres  :"+ex.getMessage());
@@ -690,16 +690,16 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			if(name == null || name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for language name");
+				throw new KahaniyaCustomException("Null or empty string found for language name");
 			
 			name = name.toLowerCase();
 			
 			if(langName_index.get(LANG_NAME,name.toLowerCase()).getSingle()!=null)
-				throw new KahaniaCustomException("Lang already exists with given name : "+name);
+				throw new KahaniyaCustomException("Lang already exists with given name : "+name);
 
 			Node lang_node = Language(name);  // Creating a new lang node
 			if(lang_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating language with given name");
+				throw new KahaniyaCustomException("Something went wrong, while creating language with given name");
 
 			//create genre_lang nodes for each language
 			ResourceIterator<Node> genreNodesItr = genreName_index.query(GENRE_NAME, "*").iterator();
@@ -716,7 +716,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_language('"+name+"')");
 			System.out.println("Something went wrong, while creating language from create_language  :"+ex.getMessage());
@@ -745,9 +745,9 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			if(old_name == null || old_name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for old language name");
+				throw new KahaniyaCustomException("Null or empty string found for old language name");
 			if(new_name == null || new_name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for new language name");
+				throw new KahaniyaCustomException("Null or empty string found for new language name");
 			
 			old_name = old_name.toLowerCase();
 			new_name = new_name.toLowerCase();
@@ -755,10 +755,10 @@ public class Kahania implements KahaniaService.Iface{
 			Node lang_node = langName_index.get(LANG_NAME,old_name.toLowerCase()).getSingle();
 			
 			if(lang_node == null)
-				throw new KahaniaCustomException("Lang doesnot exists with given old name");
+				throw new KahaniyaCustomException("Lang doesnot exists with given old name");
 
 			if(langName_index.get(LANG_NAME,new_name.toLowerCase()).getSingle() != null)
-				throw new KahaniaCustomException("Lang already exists with given new name");
+				throw new KahaniyaCustomException("Lang already exists with given new name");
 			
 			lang_node.setProperty(LANG_NAME, old_name);
 			
@@ -786,7 +786,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_language('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing language from edit_language  :"+ex.getMessage());
@@ -815,20 +815,20 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 
 			if(name == null || name.length() == 0)
-				throw new KahaniaCustomException("Null or empty string found for language name");
+				throw new KahaniyaCustomException("Null or empty string found for language name");
 			
 			name = name.toLowerCase();
 
 			Node lang_node = langName_index.get(LANG_NAME,name.toLowerCase()).getSingle();
 			
 			if(lang_node == null)
-				throw new KahaniaCustomException("Lang node doesnot exists with given name");
+				throw new KahaniyaCustomException("Lang node doesnot exists with given name");
 
 			//Remove relationships for lang node
 //			for(Relationship rel : lang_node.getRelationships())
 //				rel.delete();
 			if(lang_node.getDegree(SERIES_BELONGS_TO_LANGUAGE) > 0)
-				throw new KahaniaCustomException("Lang node cannot be deleted, there exists some series related to given lang : " + name );
+				throw new KahaniyaCustomException("Lang node cannot be deleted, there exists some series related to given lang : " + name );
 
 
 			//Remove genre_lang for all other lang
@@ -851,7 +851,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ delete_language('"+name+"')");
 			System.out.println("Something went wrong, while deleting language from delete_language  :"+ex.getMessage());
@@ -883,7 +883,7 @@ public class Kahania implements KahaniaService.Iface{
 				res.put(getJSONForLang(lang_nodes_itr.next()));
 			
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ list_languages()");
 			System.out.println("Something went wrong, while returning languages  :"+ex.getMessage());
@@ -918,15 +918,15 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
 			
 			if(userId_index.get(USER_ID,id).getSingle()!=null)
-				throw new KahaniaCustomException("User already exists with given id : "+id);
+				throw new KahaniyaCustomException("User already exists with given id : "+id);
 			if(userName_index.get(USER_NAME,user_name.toLowerCase()).getSingle()!=null)
-				throw new KahaniaCustomException("User already exists with given user_name : "+user_name);
+				throw new KahaniyaCustomException("User already exists with given user_name : "+user_name);
 			if(userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
-				throw new KahaniaCustomException("User already exists with given email : "+email);
+				throw new KahaniyaCustomException("User already exists with given email : "+email);
 
 			Node user_node = User(id, full_name, user_name, email, mobile_number, dob, privilege, status, time_created);  // Creating a new user node
 			if(user_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating user ");
+				throw new KahaniyaCustomException("Something went wrong, while creating user ");
 
 			//create relationships with Genres and Languages
 			for(String genre_name : genres.split(","))
@@ -950,7 +950,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_user()");
 			System.out.println("Something went wrong, while creating user from create_user  :"+ex.getMessage());
@@ -980,7 +980,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User does not exists with given id : "+id);
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
 			user_node.setProperty(FULL_NAME, full_name);
 			user_node.setProperty(GENDER, gender);
@@ -990,7 +990,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_user_basic_info()");
 			System.out.println("Something went wrong, while editing user from edit_user_basic_info  :"+ex.getMessage());
@@ -1020,7 +1020,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User does not exists with given id : "+id);
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
 			user_node.setProperty(EMAIL, email);
 			user_node.setProperty(MOBILE_NUMBER, mobile_number);
@@ -1032,7 +1032,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_user_contact_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_contact_details  :"+ex.getMessage());
@@ -1062,7 +1062,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User does not exists with given id : "+id);
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
 			user_node.setProperty(USER_NAME, user_name);
 			
@@ -1073,7 +1073,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_user_security_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_security_details  :"+ex.getMessage());
@@ -1103,7 +1103,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User does not exists with given id : "+id);
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
 			for(Relationship rel : user_node.getRelationships(USER_INTERESTED_LANGUAGE))
 				rel.delete();
@@ -1118,7 +1118,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_user_languages()");
 			System.out.println("Something went wrong, while editing user from edit_user_languages  :"+ex.getMessage());
@@ -1148,7 +1148,7 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User does not exists with given id : "+id);
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
 			for(Relationship rel : user_node.getRelationships(USER_INTERESTED_GENRE))
 				rel.delete();
@@ -1163,7 +1163,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_user_genres()");
 			System.out.println("Something went wrong, while editing user from edit_user_genres  :"+ex.getMessage());
@@ -1193,9 +1193,9 @@ public class Kahania implements KahaniaService.Iface{
 			Node userTwo = userIdIndex.get(USER_ID, user_id_2).getSingle();
 
 			if(userOne == null)
-				throw new KahaniaCustomException("User does not exists with given id : " + user_id_1);
+				throw new KahaniyaCustomException("User does not exists with given id : " + user_id_1);
 			if(userTwo == null)
-				throw new KahaniaCustomException("User does not exists with given id : " + user_id_2);
+				throw new KahaniyaCustomException("User does not exists with given id : " + user_id_2);
 			
 			if(isRelationExistsBetween(USER_FOLLOW_USER, userOne, userTwo))
 			{
@@ -1210,7 +1210,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ follow_user()");
 			System.out.println("Something went wrong, while following user from follow_user  :"+ex.getMessage());
@@ -1240,7 +1240,7 @@ public class Kahania implements KahaniaService.Iface{
 		
 			JSONObject obj = new JSONObject();
 			obj.put("name", genre.getProperty(GENRE_NAME).toString());
-		ret.put("type", "lang");
+		ret.put("type", "genre");
 		ret.put("Obj",obj);
 		return ret;
 	}
@@ -1293,33 +1293,33 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			if(seriesId_index.get(SERIES_ID,series_id).getSingle()!=null)
-				throw new KahaniaCustomException("Series already exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series already exists with given id : "+series_id);
 			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
-				throw new KahaniaCustomException("Series already exists with given title id : "+title_id);
+				throw new KahaniyaCustomException("Series already exists with given title id : "+title_id);
 
 			//validate genre and language
 			if(language == null || language.length() == 0)
-				throw new KahaniaCustomException("Null or Empty string receieved for the param language");
+				throw new KahaniyaCustomException("Null or Empty string receieved for the param language");
 			if(genre == null || genre.length() == 0)
-				throw new KahaniaCustomException("Null or Empty string receieved for the param genre");
+				throw new KahaniyaCustomException("Null or Empty string receieved for the param genre");
 			
 			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 			if(genreNode == null)
-				throw new KahaniaCustomException("Genre doesnot exists for the name : " + genre);
+				throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
 			
 			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
 			if(langNode == null)
-				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
+				throw new KahaniyaCustomException("Language doesnot exists for the name : " + language);
 	
 			Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase() + " " +language.toLowerCase()).getSingle();
 			if(genre_lang_node == null)
-				throw new KahaniaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
+				throw new KahaniyaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
 			
 			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created);  // Creating a new series node
 			if(series_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating series ");
+				throw new KahaniyaCustomException("Something went wrong, while creating series ");
 
 			//create relationship with user
 			createRelation(USER_STARTED_SERIES, userNode, series_node);
@@ -1351,7 +1351,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_series()");
 			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
@@ -1390,25 +1390,25 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
 			if(series_node == null)
-				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 			
 			//validate genre and language
 			if(language == null || language.length() == 0)
-				throw new KahaniaCustomException("Null or Empty string receieved for the param language");
+				throw new KahaniyaCustomException("Null or Empty string receieved for the param language");
 			if(genre == null || genre.length() == 0)
-				throw new KahaniaCustomException("Null or Empty string receieved for the param genre");
+				throw new KahaniyaCustomException("Null or Empty string receieved for the param genre");
 
 			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 			if(genreNode == null)
-				throw new KahaniaCustomException("Genre doesnot exists for the name : " + genre);
+				throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
 			
 			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
 			if(langNode == null)
-				throw new KahaniaCustomException("Language doesnot exists for the name : " + language);
+				throw new KahaniyaCustomException("Language doesnot exists for the name : " + language);
 			
 			Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase()+" "+language.toLowerCase()).getSingle();
 			if(genre_lang_node == null)
-				throw new KahaniaCustomException("Genre Language doesnot exists for the name : " + genre+" "+language);
+				throw new KahaniyaCustomException("Genre Language doesnot exists for the name : " + genre+" "+language);
 			
 			//remove existing relationships with Genres, Languages and keywords
 			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_GENRE))
@@ -1457,7 +1457,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_series()");
 			System.out.println("Something went wrong, while editing series from edit_series  :"+ex.getMessage());
@@ -1497,17 +1497,17 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
 			if(seriesNode == null)
-				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 			
 			if(reviewId_index.get(REVIEW_ID,review_id).getSingle()!=null)
-				throw new KahaniaCustomException("Review already exists with given id : "+review_id);
+				throw new KahaniyaCustomException("Review already exists with given id : "+review_id);
 			
 			Node review_node = Review(review_id, data, time_created);  // Creating a new review node
 			if(review_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating review ");
+				throw new KahaniyaCustomException("Something went wrong, while creating review ");
 
 			//create relationship with user
 			createRelation(USER_WRITTEN_A_REVIEW, userNode, review_node, time_created);
@@ -1522,7 +1522,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_review()");
 			System.out.println("Something went wrong, while creating review from create_review  :"+ex.getMessage());
@@ -1550,7 +1550,7 @@ public class Kahania implements KahaniaService.Iface{
 			Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
 			Node review_node = reviewId_index.get(REVIEW_ID, review_id).getSingle();
 			if(review_node == null)
-				throw new KahaniaCustomException("Review doesnot exists with given id : "+review_id);
+				throw new KahaniyaCustomException("Review doesnot exists with given id : "+review_id);
 			
 			review_node.setProperty(REVIEW_DATA, data);
 
@@ -1558,7 +1558,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_review()");
 			System.out.println("Something went wrong, while editing review from edit_review  :"+ex.getMessage());
@@ -1601,14 +1601,14 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
 			if(seriesNode == null)
-				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 
 			Node chapterNode = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
 			if(chapterNode == null)
-				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
 
 			chapterNode.setProperty(CHAPTER_TITLE, title);
 			chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
@@ -1618,7 +1618,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ edit_chapter()");
 			System.out.println("Something went wrong, while editing chapter from edit_chapter  :"+ex.getMessage());
@@ -1650,20 +1650,20 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			Node seriesNode = seriesId_index.get(SERIES_ID,series_id).getSingle();
 			if(seriesNode == null)
-				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 
 			if(chapterId_index.get(CHAPTER_ID,chapter_id).getSingle()!=null)
-				throw new KahaniaCustomException("Chapter already exists with given id : "+chapter_id);
+				throw new KahaniyaCustomException("Chapter already exists with given id : "+chapter_id);
 			
 			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
-				throw new KahaniaCustomException("Chapter already exists with given title id : "+title_id);
+				throw new KahaniyaCustomException("Chapter already exists with given title id : "+title_id);
 			
 			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created);  // Creating a new chapter node
 			if(chapter_node == null)
-				throw new KahaniaCustomException("Something went wrong, while creating chapter ");
+				throw new KahaniyaCustomException("Something went wrong, while creating chapter ");
 
 			//create relationship with user
 			createRelation(USER_WRITTEN_A_CHAPTER, userNode, chapter_node, time_created);
@@ -1679,7 +1679,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ create_chapter()");
 			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
@@ -1708,11 +1708,11 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
 			if(series_node == null)
-				throw new KahaniaCustomException("Series doesnot exists with given id : "+series_id);
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			
 			if(isRelationExistsBetween(USER_SUBSCRIBED_TO_SERIES, user_node, series_node))
 				deleteRelation(USER_SUBSCRIBED_TO_SERIES, user_node, series_node);
@@ -1723,7 +1723,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ subscribe_series()");
 			System.out.println("Something went wrong, while subscribing series from subscribe_series  :"+ex.getMessage());
@@ -1752,11 +1752,11 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
 			if(chapter_node == null)
-				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			
 			if(isRelationExistsBetween(USER_FAV_CHAPTER, user_node, chapter_node))
 				deleteRelation(USER_FAV_CHAPTER, user_node, chapter_node);
@@ -1767,7 +1767,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
@@ -1796,11 +1796,11 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
 			if(chapter_node == null)
-				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			
 			if(isRelationExistsBetween(USER_RATED_A_CHAPTER, user_node, chapter_node))
 				deleteRelation(USER_RATED_A_CHAPTER, user_node, chapter_node);
@@ -1812,7 +1812,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
@@ -1842,11 +1842,11 @@ public class Kahania implements KahaniaService.Iface{
 			
 			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
 			if(chapter_node == null)
-				throw new KahaniaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
-				throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			
 			Relationship rel = userViewedChapterRelIndex.get(USER_VIEWED_A_CHAPTER_ID, user_id+"_view_"+chapter_id).getSingle();
 			if(rel != null)
@@ -1863,7 +1863,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
@@ -1911,7 +1911,7 @@ public class Kahania implements KahaniaService.Iface{
 			if(feedType.equalsIgnoreCase("S"))
 			{
 				if(user_node == null)
-					throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 				Iterator<Relationship> subscribedRelsItr = user_node.getRelationships(USER_SUBSCRIBED_TO_SERIES).iterator();
 				LinkedList<Relationship> subscribedRelsList = new LinkedList<Relationship>();
 				while(subscribedRelsItr.hasNext())
@@ -1973,7 +1973,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
@@ -2011,7 +2011,7 @@ public class Kahania implements KahaniaService.Iface{
 			if(feedType.equalsIgnoreCase("F"))
 			{
 				if(user_node == null)
-					throw new KahaniaCustomException("User doesnot exists with given id : "+user_id);
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 				Iterator<Relationship> favCHaptersRelsItr = user_node.getRelationships(USER_FAV_CHAPTER).iterator();
 				LinkedList<Relationship> favChaptersRelsList = new LinkedList<Relationship>();
 				while(favCHaptersRelsItr.hasNext())
@@ -2074,7 +2074,7 @@ public class Kahania implements KahaniaService.Iface{
 			tx.success();
 
 		}
-		catch(KahaniaCustomException ex)
+		catch(KahaniyaCustomException ex)
 		{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());

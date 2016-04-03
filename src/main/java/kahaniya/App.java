@@ -1,4 +1,4 @@
-package kahania;
+package kahaniya;
 
 public class App 
 {
@@ -6,7 +6,7 @@ public class App
     {
 		System.out.println("30th March, 2016 - 12:30 P.M");
 		
-		Kahania kahania = new Kahania();
+		Kahaniya kahania = new Kahaniya();
 		kahania.add_neo4j_lock_nodes();
 		kahania.startThriftServer();
 
