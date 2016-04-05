@@ -415,7 +415,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		Node tobeLockedNode = lockNodeIndex.get( LockName, LockName ).getSingle();
 		if(tobeLockedNode == null)
 	      throw new RuntimeException("Locking node for "+LockName+" not found, unbale to synchronize the call.");
-		return tx.acquireWriteLock(tobeLockedNode);  //lock simultaneous execution of create_comment to avoid duplicate comment creation
+		return tx.acquireWriteLock(tobeLockedNode);  //lock simultaneous execution of create_call to avoid duplicate creation
 	}
 
 	private boolean isRelationExistsBetween(RelationshipType relType, Node srcNode, Node targetNode)
@@ -921,9 +921,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("User already exists with given id : "+id);
 			if(userName_index.get(USER_NAME,user_name.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("User already exists with given user_name : "+user_name);
-			if(userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
+			
+			if(email == null)
+				email = "";
+			if(mobile_number == null)
+				mobile_number = "";
+			
+			if(!email.equals("") && userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("User already exists with given email : "+email);
-
+			
 			Node user_node = User(id, full_name, user_name, email, mobile_number, dob, privilege, status, time_created);  // Creating a new user node
 			if(user_node == null)
 				throw new KahaniyaCustomException("Something went wrong, while creating user ");
@@ -944,7 +950,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			//Indexing newly created user node
 			userId_index.add(user_node, USER_ID, id);
 			userName_index.add(user_node, USER_NAME, user_name.toLowerCase());
-			userEmail_index.add(user_node, EMAIL, email.toLowerCase());
+			
+			if(!email.equals(""))
+				userEmail_index.add(user_node, EMAIL, email.toLowerCase());
 
 			res = "true";
 			tx.success();
@@ -1019,14 +1027,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			
 			if(user_node == null)
 				throw new KahaniyaCustomException("User does not exists with given id : "+id);
+			
+			if(email == null)
+				email = "";
+			if(mobile_number == null)
+				mobile_number = "";
+			
+			if(!email.equals("") && userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
+				throw new KahaniyaCustomException("User already exists with given email : "+email);
+			
 			
 			user_node.setProperty(EMAIL, email);
 			user_node.setProperty(MOBILE_NUMBER, mobile_number);
 			
 			userEmail_index.remove(user_node);
-			userEmail_index.add(user_node, EMAIL, email.toLowerCase());
+			if(!email.equals(""))userEmail_index.add(user_node, EMAIL, email.toLowerCase());
 			
 			res = "true";
 			tx.success();
@@ -1883,13 +1901,139 @@ public class Kahaniya implements KahaniyaService.Iface{
 	@Override
 	public String get_feed(String tileType, String feedType, String filter,
 			int prev_cnt, int count, String user_id) throws TException {
-		if(tileType.equalsIgnoreCase("S"))
+		if(feedType.equalsIgnoreCase("R"))
+			return get_recommended(filter, prev_cnt, count, user_id);
+		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
 				return get_chapters(feedType, filter, prev_cnt, count, user_id);
 		else return "";
 	}
 	
+	private String get_recommended(String filter, int prev_cnt, int count, String user_id)
+	{
+
+		JSONObject res = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			if(user_node == null)
+				throw new KahaniyaCustomException("No user exists with given id : "+user_id);
+			
+			Iterator<Relationship> genres_itr = user_node.getRelationships(USER_INTERESTED_GENRE).iterator();					
+			Iterator<Relationship> lang_itr = user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();					
+			
+			LinkedList<Node> genres = new LinkedList<Node>();
+			LinkedList<Node> langs = new LinkedList<Node>();
+			
+			LinkedList<Node> lang_genres = new LinkedList<Node>();
+			
+			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
+
+			while(genres_itr.hasNext())
+				genres.addLast(genres_itr.next().getEndNode());
+			while(lang_itr.hasNext())
+				langs.addLast(lang_itr.next().getEndNode());
+			
+			for(Node gen : genres)
+			{
+				for(Node lang : langs)
+				{
+					Node n = genre_lang_index.get(GENRE_LANG_NAME, gen.getProperty(GENRE_NAME).toString() + " " + lang.getProperty(LANG_NAME).toString()).getSingle();
+					if(n != null)
+						lang_genres.addLast(n);
+				}
+			}
+			
+			int c = 0;
+			JSONArray jsonArray = new JSONArray();
+
+			for(Node n : lang_genres)
+			{
+				JSONObject jobj = new JSONObject();
+				JSONArray jarray = new JSONArray();
+				
+				Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(seriesRelItr.hasNext())
+				{
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+						chapterList.addLast(chapterRelItr.next().getStartNode());
+				}
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				for(int i=0; i< 3; i++)
+				{
+					if(chapterList.size() > i+1)
+						jarray.put(getJSONForChapter(chapterList.get(i)));
+				}
+				if(jarray.length() > 0)
+				{
+					jobj.put("tp",c);
+					jobj.put("ttl", n.getProperty(GENRE_NAME));
+					jobj.put("data", jarray);
+				}
+				
+				c++;
+			}
+			
+			for(Node n : langs)
+			{
+				JSONObject jobj = new JSONObject();
+				JSONArray jarray = new JSONArray();
+				
+				Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_LANGUAGE).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(seriesRelItr.hasNext())
+				{
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+						chapterList.addLast(chapterRelItr.next().getStartNode());
+				}
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				for(int i=0; i< 3; i++)
+				{
+					if(chapterList.size() > i+1)
+						jarray.put(getJSONForChapter(chapterList.get(i)));
+				}
+				if(jarray.length() > 0)
+				{
+					jobj.put("tp",c);
+					jobj.put("ttl", n.getProperty(LANG_NAME));
+					jobj.put("data", jarray);
+				}
+				
+				c++;
+			}
+			
+			res.put("status", 1);
+			res.put("msg", jsonArray);
+
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ get_recommended()");
+			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_recommended()");
+			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = new JSONObject();
+		}
+		return res.toString();
+	}
+
 	private String get_series(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 
