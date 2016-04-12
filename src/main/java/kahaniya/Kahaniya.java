@@ -138,30 +138,30 @@ public class Kahaniya implements KahaniyaService.Iface{
 	
 	
 	//Relationship names
-	RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
-	RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
-	RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
-	RelationshipType USER_STARTED_SERIES = DynamicRelationshipType.withName("USER_STARTED_SERIES");
+	public static final RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
+	public static final RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
+	public static final RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
+	public static final RelationshipType USER_STARTED_SERIES = DynamicRelationshipType.withName("USER_STARTED_SERIES");
 
-	RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
-	RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
-	RelationshipType SERIES_BELONGS_TO_GENRE_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE_LANGUAGE");
-	RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
+	public static final RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
+	public static final RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
+	public static final RelationshipType SERIES_BELONGS_TO_GENRE_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE_LANGUAGE");
+	public static final RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
 	
-	RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
-	RelationshipType REVIEW_BELONGS_TO_SERIES = DynamicRelationshipType.withName("REVIEW_BELONGS_TO_SERIES");
-	RelationshipType USER_SUBSCRIBED_TO_SERIES = DynamicRelationshipType.withName("USER_SUBSCRIBED_TO_SERIES");	
-	RelationshipType USER_FAV_CHAPTER = DynamicRelationshipType.withName("USER_FAV_CHAPTER");
-	RelationshipType USER_RATED_A_CHAPTER = DynamicRelationshipType.withName("USER_RATED_A_CHAPTER");
-	RelationshipType USER_VIEWED_A_CHAPTER = DynamicRelationshipType.withName("USER_VIEWED_A_CHAPTER");	
-	RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
-	RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
+	public static final RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
+	public static final RelationshipType REVIEW_BELONGS_TO_SERIES = DynamicRelationshipType.withName("REVIEW_BELONGS_TO_SERIES");
+	public static final RelationshipType USER_SUBSCRIBED_TO_SERIES = DynamicRelationshipType.withName("USER_SUBSCRIBED_TO_SERIES");	
+	public static final RelationshipType USER_FAV_CHAPTER = DynamicRelationshipType.withName("USER_FAV_CHAPTER");
+	public static final RelationshipType USER_RATED_A_CHAPTER = DynamicRelationshipType.withName("USER_RATED_A_CHAPTER");
+	public static final RelationshipType USER_VIEWED_A_CHAPTER = DynamicRelationshipType.withName("USER_VIEWED_A_CHAPTER");	
+	public static final RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
+	public static final RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
 
-	RelationshipType USER_WRITTEN_A_COMMENT = DynamicRelationshipType.withName("USER_WRITTEN_A_COMMENT");
-	RelationshipType COMMENT_WRITTEN_ON_CHAPTER = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CHAPTER");
-	RelationshipType REPLY_COMMENT_WRITTEN_ON_COMMENT = DynamicRelationshipType.withName("REPLY_COMMENT_WRITTEN_ON_COMMENT");	
+	public static final RelationshipType USER_WRITTEN_A_COMMENT = DynamicRelationshipType.withName("USER_WRITTEN_A_COMMENT");
+	public static final RelationshipType COMMENT_WRITTEN_ON_CHAPTER = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CHAPTER");
+	public static final RelationshipType REPLY_COMMENT_WRITTEN_ON_COMMENT = DynamicRelationshipType.withName("REPLY_COMMENT_WRITTEN_ON_COMMENT");	
 	
-	
+
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
@@ -175,8 +175,41 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   //descending order
 		   return v2-v1;
 	    }};
-		
-	private static Comparator<Relationship> TimeCreatedComparatorForRelationships = new Comparator<Relationship>() {
+	    
+	private static Comparator<Node> TrendingComparatorForNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   int t = (int)(new Date().getTime()/1000) - (24*60*60);
+		   if(n1.hasRelationship(USER_VIEWED_A_CHAPTER))
+		   {
+			   Iterator<Relationship> views = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+			   
+			   while(views.hasNext())
+			   {
+				   Relationship rel = views.next();
+				   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					   v1++;
+			   }
+		   }
+		   if(n2.hasRelationship(USER_VIEWED_A_CHAPTER))
+		   {
+			   Iterator<Relationship> views = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+			   
+			   while(views.hasNext())
+			   {
+				   Relationship rel = views.next();
+				   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					   v2++;
+			   }
+		   }
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
+	
+private static Comparator<Relationship> TimeCreatedComparatorForRelationships = new Comparator<Relationship>() {
 		public int compare(Relationship n1, Relationship n2) {
 		   int v1 = 0;
 		   int v2 = 0;
@@ -1937,7 +1970,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	private String get_recommended(String filter, int prev_cnt, int count, String user_id)
 	{
 
-		JSONObject res = new JSONObject();		
+		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
@@ -1956,8 +1989,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			LinkedList<Node> langs = new LinkedList<Node>();
 			
 			LinkedList<Node> lang_genres = new LinkedList<Node>();
-			
-			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
 
 			while(genres_itr.hasNext())
 			{
@@ -1967,6 +1998,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				langs.addLast(lang_itr.next().getEndNode());
 			}
+			
+
+			JSONArray jsonArrayForGenres = new JSONArray();
 			
 			for(Node gen : genres)
 			{
@@ -1980,9 +2014,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 			}
 			
-			int c = 0;
-			JSONArray jsonArray = new JSONArray();
+			int c = 1;
 
+			LinkedList<Node> allChapterList = new LinkedList<Node>();
+			
 			for(Node n : lang_genres)
 			{
 				JSONObject jobj = new JSONObject();
@@ -1995,9 +2030,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 					while(chapterRelItr.hasNext())
 					{
-						chapterList.addLast(chapterRelItr.next().getStartNode());
+						Node t = chapterRelItr.next().getStartNode();
+						chapterList.addLast(t);
+						allChapterList.addLast(t);
 					}
 				}
+				
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
 				for(int i=0; i< 3; i++)
 				{
@@ -2011,11 +2049,34 @@ public class Kahaniya implements KahaniyaService.Iface{
 					jobj.put("data", jarray);
 
 					c++;
-					jsonArray.put(jobj);
+					jsonArrayForGenres.put(jobj);
 				}
 				
 			}
 			
+
+			
+				Collections.sort(allChapterList, TrendingComparatorForNodes);
+
+				JSONObject jRecObj = new JSONObject();
+				JSONArray jRecArray = new JSONArray();
+				
+				for(int i=0; i< 3; i++)
+				{
+					if(allChapterList.size() > i)
+						jRecArray.put(getJSONForChapter(allChapterList.get(i)));
+				}
+				if(jRecArray.length() > 0)
+				{
+					jRecObj.put("tp",0);
+					jRecObj.put("data", jRecArray);
+
+					jsonArray.put(jRecObj);
+				} 
+				
+				for(int i=0; i<jsonArrayForGenres.length(); i++)
+					jsonArray.put(jsonArrayForGenres.get(i));
+				
 			for(Node n : langs)
 			{
 				JSONObject jobj = new JSONObject();
@@ -2049,9 +2110,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 			}
 			
-			res.put("status", 1);
-			res.put("msg", jsonArray);
-
+			
 			tx.success();
 
 		}
@@ -2060,22 +2119,22 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Exception @ get_recommended()");
 			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
 //				ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Exception @ get_recommended()");
 			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
 			ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
-		return res.toString();
+		return jsonArray.toString();
 	}
 
 	private String get_series(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 
-		JSONObject res = new JSONObject();		
+		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
@@ -2087,10 +2146,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			
 			int c = 0;
-			JSONArray jsonArray = new JSONArray();
 			LinkedList<Node> outputSeriesNode = new LinkedList<Node>();
 			
-			if(feedType.equalsIgnoreCase("S"))
+			if(feedType.equalsIgnoreCase("SUB"))
 			{
 				if(user_node == null)
 					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
@@ -2098,15 +2156,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				LinkedList<Relationship> subscribedRelsList = new LinkedList<Relationship>();
 				while(subscribedRelsItr.hasNext())
 					subscribedRelsList.addLast(subscribedRelsItr.next());
-				Collections.sort(subscribedRelsList, TimeCreatedComparatorForRelationships);
-								
+				Collections.sort(subscribedRelsList, TimeCreatedComparatorForRelationships);				
 				for(Relationship rel : subscribedRelsList)
-				{
+				{				
+					
 					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
 						break;
 					
 					Node series = rel.getEndNode();
-					if(filter != null)
+					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
 						for(String genre: filterJSON.getString("genres").split(","))
@@ -2125,8 +2183,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 											continue;
 										}
 										c++;
-										outputSeriesNode.addLast(series);
-
+										outputSeriesNode.addLast(series);			
+										
 									}
 								}
 							}
@@ -2140,7 +2198,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 							continue;
 						}
 						c++;
-						outputSeriesNode.addLast(series);
+						outputSeriesNode.addLast(series);			
+						
 					}
 					
 				}
@@ -2149,9 +2208,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			for(Node series : outputSeriesNode)
 				jsonArray.put(getJSONForSeries(series));
 			
-			res.put("status", 1);
-			res.put("msg", jsonArray);
-
 			tx.success();
 
 		}
@@ -2160,22 +2216,22 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 //				ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 			ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
-		return res.toString();
+		return jsonArray.toString();
 	}
 	
 	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 
-		JSONObject res = new JSONObject();		
+		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
@@ -2186,7 +2242,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			
 			int c = 0;
-			JSONArray jsonArray = new JSONArray();
 			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
 			
 			if(feedType.equalsIgnoreCase("F"))
@@ -2207,7 +2262,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					Node chapter = rel.getEndNode();
 					if(filter != null && !filter.equals(""))
 					{
-						JSONObject filterJSON = new JSONObject(filter);
+						JSONObject filterJSON = new JSONObject(filter);						
 						for(String genre: filterJSON.getString("genres").split(","))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
@@ -2249,9 +2304,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			for(Node chapter : outputChaptersNode)
 				jsonArray.put(getJSONForChapter(chapter));
 			
-			res.put("status", 1);
-			res.put("msg", jsonArray);
-
 			tx.success();
 
 		}
@@ -2260,16 +2312,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 //				ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 			ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
-		return res.toString();
+		return jsonArray.toString();
 	}
 	
 	private JSONObject getJSONForChapter(Node chapter)
@@ -2330,8 +2382,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Title",series.getProperty(SERIES_TITLE).toString());
 		obj.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG).toString());
 		obj.put("P_Id",series.getProperty(SERIES_ID).toString());
-		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getStartNode().getProperty(GENRE_NAME).toString());
-		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getStartNode().getProperty(LANG_NAME).toString());
+		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().getProperty(GENRE_NAME).toString());
+		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
 		obj.put("P_TimeCreated",series.getProperty(TIME_CREATED).toString());
 		obj.put("P_Num_Views",0);
 		obj.put("P_Num_Fvrts",0);
@@ -2494,7 +2546,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	@Override
 	public String get_comments(String chapter_id, int prev_cnt, int count) throws TException {
 
-		JSONObject res = new JSONObject();		
+		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
@@ -2511,7 +2563,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Collections.sort(cmntsRelList, TimeCreatedComparatorForRelationships);
 			
 			int c = 0;
-			JSONArray jsonArray = new JSONArray();
 			for(Relationship rel : cmntsRelList)
 			{
 				if(c < prev_cnt)
@@ -2522,8 +2573,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 					jsonArray.put(getJSONForComment(rel.getStartNode()));
 			}
 			
-			res.put("status", 1);
-			res.put("msg", jsonArray);
 			tx.success();
 
 		}
@@ -2532,16 +2581,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Exception @ create_comment()");
 			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
 //				ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Exception @ create_comment()");
 			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
 			ex.printStackTrace();
-			res = new JSONObject();
+			jsonArray = new JSONArray();
 		}
-		return res.toString();
+		return jsonArray.toString();
 	}
 
 }
