@@ -2164,30 +2164,81 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 						break;
 					
 					Node series = rel.getEndNode();
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
-						for(String genre: filterJSON.getString("genres").split(","))
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
 						{
-							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
-							if(genreNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().equals(genreNode))
+							for(String genre: filterJSON.getString("genres").split(","))
 							{
-								for(String lang: filterJSON.getString("languages").split(","))
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
-									if(langNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().equals(langNode))
+									for(String lang: filterJSON.getString("languages").split(","))
 									{
-										if(c < prev_cnt)
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
 											c++;
-											continue;
+											outputSeriesNode.addLast(series);			
+											
 										}
-										c++;
-										outputSeriesNode.addLast(series);			
-										
 									}
 								}
 							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+									
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputSeriesNode.addLast(series);			
+							
 						}
 					}
 					else // i.e., no need to apply filter
@@ -2262,29 +2313,82 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 					Node chapter = rel.getEndNode();
 					if(filter != null && !filter.equals(""))
 					{
-						JSONObject filterJSON = new JSONObject(filter);						
-						for(String genre: filterJSON.getString("genres").split(","))
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
-							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
-							if(genreNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().equals(genreNode))
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
 							{
-								for(String lang: filterJSON.getString("languages").split(","))
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
-									if(langNode != null && series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().equals(langNode))
+									for(String lang: filterJSON.getString("languages").split(","))
 									{
-										if(c < prev_cnt)
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
 											c++;
-											continue;
+											outputChaptersNode.addLast(chapter);
+	
 										}
-										c++;
-										outputChaptersNode.addLast(chapter);
-
 									}
 								}
 							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
@@ -2364,11 +2468,13 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 	private JSONObject getJSONForComment(Node comment)
 	{
 		JSONObject obj = new JSONObject();
-		obj.put("P_Author_FullName",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
-		obj.put("P_Author",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
-		obj.put("P_Id",comment.getProperty(COMMENT_ID).toString());
-		obj.put("P_Content", comment.getProperty(COMMENT_CONTENT).toString());
-		obj.put("P_TimeCreated",comment.getProperty(TIME_CREATED).toString());
+		obj.put("Cm_By_Fullname",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("Cm_By_UserId",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("Cm_ID",comment.getProperty(COMMENT_ID).toString());
+		obj.put("Cm_CID",comment.getSingleRelationship(COMMENT_WRITTEN_ON_CHAPTER, Direction.OUTGOING).getEndNode().getProperty(CHAPTER_ID).toString());
+		obj.put("Cm_Cntnt", comment.getProperty(COMMENT_CONTENT).toString());
+		obj.put("Cm_TimeCreated",comment.getProperty(TIME_CREATED).toString());
+		obj.put("Cm_Rply_Cnt",comment.getDegree(REPLY_COMMENT_WRITTEN_ON_COMMENT, Direction.INCOMING));
 		obj.put("Is_Neo4j",true);
 		return obj;
 	}
