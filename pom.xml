@@ -53,7 +53,7 @@
       <configuration>
         <archive>
           <manifest>
-            <mainClass>kahania.App</mainClass>
+            <mainClass>kahaniya.App</mainClass>
           </manifest>
         </archive>
         <descriptorRefs>

@@ -44,6 +44,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String USER_ID_INDEX = "user_index_by_id";
 	public static final String USER_NAME_INDEX = "user_index_by_uname";
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
+	public static final String COMMENT_ID_INDEX = "comment_index_by_id";
 
 	public static final String SERIES_ID_INDEX = "series_index_by_id";
 	public static final String REVIEW_ID_INDEX = "review_index_by_id";
@@ -117,6 +118,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SERIES_DD_SUMMARY = "series_dd_summary";
 	public static final String SERIES_TYPE = "series_type";
 	
+	//comment related keys
+	public static final String COMMENT_ID = "comment_id";
+	public static final String COMMENT_CONTENT = "comment_content";
+	
 	public static final String NODE_TYPE = "node_type";
 	public static final String USER_NODE = "user_node";
 	public static final String GENRE_NODE = "genre_node";
@@ -126,8 +131,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String KEYWORD_NODE = "keyword_node";
 	public static final String REVIEW_NODE = "review_node";
 	public static final String CHAPTER_NODE = "chapter_node";
+	public static final String COMMENT_NODE = "comment_node";
 
+	
 	private static GraphDatabaseService graphDb = null;
+	
 	
 	//Relationship names
 	RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
@@ -148,6 +156,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 	RelationshipType USER_VIEWED_A_CHAPTER = DynamicRelationshipType.withName("USER_VIEWED_A_CHAPTER");	
 	RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
 	RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
+
+	RelationshipType USER_WRITTEN_A_COMMENT = DynamicRelationshipType.withName("USER_WRITTEN_A_COMMENT");
+	RelationshipType COMMENT_WRITTEN_ON_CHAPTER = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CHAPTER");
+	RelationshipType REPLY_COMMENT_WRITTEN_ON_COMMENT = DynamicRelationshipType.withName("REPLY_COMMENT_WRITTEN_ON_COMMENT");	
+	
 	
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
@@ -191,6 +204,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(STATUS,status);
 	    node.setProperty(TIME_CREATED,time_created);
 	    node.setProperty(NODE_TYPE, USER_NODE);
+	    return node;
+	}
+
+    private Node Comment(String id, String content, int time_created){
+		Node node = graphDb.createNode();
+		node.setProperty(COMMENT_ID,id);
+	    node.setProperty(COMMENT_CONTENT,content);
+		node.setProperty(TIME_CREATED,time_created);
+	    node.setProperty(NODE_TYPE, COMMENT_NODE);
 	    return node;
 	} 
 
@@ -276,7 +298,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Args serverArgs = new Args(serverTransport);
 			serverArgs.processor(processor);
 			TServer server = new TThreadPoolServer(serverArgs);
-			System.out.println("Kahania thrift service is started");
+			System.out.println("Kahaniya thrift service is started");
 			server.serve();
 			
 		}catch(Exception e)
@@ -320,7 +342,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	private static void initGraphDb()
 	{
 		//db path
-		String storeDir = "/var/kahania/n4j/data/graph.db";
+		String storeDir = "/var/kahaniyaN4j/data/graph.db";
 		
 		//starting graph database with configuration
 		graphDb = new GraphDatabaseFactory()
@@ -1260,6 +1282,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			obj.put("name", genre.getProperty(GENRE_NAME).toString());
 		ret.put("type", "genre");
 		ret.put("Obj",obj);
+		ret.put("Is_Neo4j",true);
 		return ret;
 	}
 	
@@ -1271,6 +1294,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			obj.put("name", genre.getProperty(LANG_NAME).toString());
 		ret.put("type", "lang");
 		ret.put("Obj",obj);
+		ret.put("Is_Neo4j",true);
 		return ret;
 	}
 
@@ -1924,7 +1948,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			if(user_node == null)
 				throw new KahaniyaCustomException("No user exists with given id : "+user_id);
-			
+
 			Iterator<Relationship> genres_itr = user_node.getRelationships(USER_INTERESTED_GENRE).iterator();					
 			Iterator<Relationship> lang_itr = user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();					
 			
@@ -1936,9 +1960,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
 
 			while(genres_itr.hasNext())
+			{
 				genres.addLast(genres_itr.next().getEndNode());
+			}
 			while(lang_itr.hasNext())
+			{
 				langs.addLast(lang_itr.next().getEndNode());
+			}
 			
 			for(Node gen : genres)
 			{
@@ -1946,7 +1974,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 				{
 					Node n = genre_lang_index.get(GENRE_LANG_NAME, gen.getProperty(GENRE_NAME).toString() + " " + lang.getProperty(LANG_NAME).toString()).getSingle();
 					if(n != null)
+					{
 						lang_genres.addLast(n);
+					}
 				}
 			}
 			
@@ -1964,12 +1994,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 				{
 					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 					while(chapterRelItr.hasNext())
+					{
 						chapterList.addLast(chapterRelItr.next().getStartNode());
+					}
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
 				for(int i=0; i< 3; i++)
 				{
-					if(chapterList.size() > i+1)
+					if(chapterList.size() > i)
 						jarray.put(getJSONForChapter(chapterList.get(i)));
 				}
 				if(jarray.length() > 0)
@@ -1977,9 +2009,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 					jobj.put("tp",c);
 					jobj.put("ttl", n.getProperty(GENRE_NAME));
 					jobj.put("data", jarray);
+
+					c++;
+					jsonArray.put(jobj);
 				}
 				
-				c++;
 			}
 			
 			for(Node n : langs)
@@ -1993,12 +2027,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 				{
 					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 					while(chapterRelItr.hasNext())
+					{
 						chapterList.addLast(chapterRelItr.next().getStartNode());
+					}
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
 				for(int i=0; i< 3; i++)
 				{
-					if(chapterList.size() > i+1)
+					if(chapterList.size() > i)
 						jarray.put(getJSONForChapter(chapterList.get(i)));
 				}
 				if(jarray.length() > 0)
@@ -2006,9 +2042,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 					jobj.put("tp",c);
 					jobj.put("ttl", n.getProperty(LANG_NAME));
 					jobj.put("data", jarray);
+
+					c++;
+					jsonArray.put(jobj);
 				}
 				
-				c++;
 			}
 			
 			res.put("status", 1);
@@ -2141,7 +2179,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
-			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
@@ -2168,7 +2205,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 						break;
 					
 					Node chapter = rel.getEndNode();
-					if(filter != null)
+					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
 						for(String genre: filterJSON.getString("genres").split(","))
@@ -2254,11 +2291,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 		seriesJSON.put("Series_Typ", series.getProperty(SERIES_TYPE));
 		
 		obj.put("Series_Info", seriesJSON);
-		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getStartNode().getProperty(GENRE_NAME).toString());
-		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getStartNode().getProperty(LANG_NAME).toString());
+		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().getProperty(GENRE_NAME).toString());
+		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
 		obj.put("P_TimeCreated",chapter.getProperty(TIME_CREATED).toString());
 		obj.put("P_Num_Views",chapter.getDegree(USER_VIEWED_A_CHAPTER, Direction.INCOMING));
 		obj.put("P_Num_Fvrts",chapter.getDegree(USER_FAV_CHAPTER, Direction.INCOMING));
+		obj.put("Is_Neo4j",true);
 		
 		int tot_rating = 0;
 		Iterator<Relationship> ratingRelItr = chapter.getRelationships(Direction.INCOMING, USER_RATED_A_CHAPTER).iterator();
@@ -2268,6 +2306,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 			obj.put("P_Rating",tot_rating);
 		else
 			obj.put("P_Rating",tot_rating/chapter.getDegree(USER_RATED_A_CHAPTER, Direction.INCOMING));
+		return obj;
+	}
+	
+	private JSONObject getJSONForComment(Node comment)
+	{
+		JSONObject obj = new JSONObject();
+		obj.put("P_Author_FullName",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("P_Author",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Id",comment.getProperty(COMMENT_ID).toString());
+		obj.put("P_Content", comment.getProperty(COMMENT_CONTENT).toString());
+		obj.put("P_TimeCreated",comment.getProperty(TIME_CREATED).toString());
+		obj.put("Is_Neo4j",true);
 		return obj;
 	}
 	
@@ -2286,7 +2336,212 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Num_Views",0);
 		obj.put("P_Num_Fvrts",0);
 		obj.put("P_Rating",0);
+		obj.put("Is_Neo4j",true);
 		return obj;
+	}
+
+	@Override
+	public String create_or_edit_comment(String chapter_id, String comment_id,
+			String content, String parent_cmnt_id, String user_id, int time, int is_edit)
+			throws TException {
+		if(is_edit == 0)
+			return create_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time);
+		else if(is_edit == 1)
+			return edit_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time);
+		else return "false";		
+	}
+	
+	
+	public String create_comment(String chapter_id, String comment_id,
+			String content, String parent_cmnt_id, String user_id, int time)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+
+			Node chapter_node = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter does not exists with given id : "+chapter_id);
+			
+			Node parentCommentNode = null;
+			if(parent_cmnt_id != null && !parent_cmnt_id.equals(""))
+			parentCommentNode = commentId_index.get(COMMENT_ID,parent_cmnt_id).getSingle();
+			
+			if(commentId_index.get(COMMENT_ID,comment_id).getSingle() != null)
+				throw new KahaniyaCustomException("Comment already exists with given id : "+comment_id);
+			
+			Node comment_node = Comment(comment_id, content, time);  // Creating a new comment node
+			if(comment_node == null)
+				throw new KahaniyaCustomException("Something went wrong, while creating comment ");
+
+			//create relationship with user
+			createRelation(USER_WRITTEN_A_COMMENT, userNode, comment_node, time);
+			
+			//create relationships with Chapter
+			createRelation(COMMENT_WRITTEN_ON_CHAPTER, comment_node, chapter_node, time);
+
+			//create relationships with parent commment
+			if(parentCommentNode != null)
+				createRelation(REPLY_COMMENT_WRITTEN_ON_COMMENT, comment_node, parentCommentNode, time);
+			
+			//Indexing newly created comment node
+			commentId_index.add(comment_node, COMMENT_ID, comment_id);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ create_comment()");
+			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_comment()");
+			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+
+	
+	public String edit_comment(String chapter_id, String comment_id,
+			String content, String parent_cmnt_id, String user_id, int time)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+			
+			Node commentNode = commentId_index.get(COMMENT_ID,comment_id).getSingle();
+			if(commentNode == null)
+				throw new KahaniyaCustomException("Comment does not exists with given id : "+comment_id);
+			
+			commentNode.setProperty(COMMENT_CONTENT, content);
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ edit_comment()");
+			System.out.println("Something went wrong, while editing comment from edit_comment  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ edit_comment()");
+			System.out.println("Something went wrong, while editing comment from edit_comment  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String delete_comment(String comment_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+			
+			Node commentNode = commentId_index.get(COMMENT_ID,comment_id).getSingle();
+			if(commentNode == null)
+				throw new KahaniyaCustomException("Comment does not exists with given id : "+comment_id);
+			
+			commentId_index.remove(commentNode);
+			Iterator<Relationship> relItr = commentNode.getRelationships().iterator();
+			while(relItr.hasNext())
+				relItr.next().delete();
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ delete_comment()");
+			System.out.println("Something went wrong, while deleting comment from delete_comment  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ delete_comment()");
+			System.out.println("Something went wrong, while deleting comment from delete_comment  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
+	public String get_comments(String chapter_id, int prev_cnt, int count) throws TException {
+
+		JSONObject res = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter does not exists with given id : "+chapter_id);
+			
+			Iterator<Relationship> cmntsRelItr = chapter_node.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
+			LinkedList<Relationship> cmntsRelList = new LinkedList<Relationship>();
+			while(cmntsRelItr.hasNext())
+				cmntsRelList.addLast(cmntsRelItr.next());
+			Collections.sort(cmntsRelList, TimeCreatedComparatorForRelationships);
+			
+			int c = 0;
+			JSONArray jsonArray = new JSONArray();
+			for(Relationship rel : cmntsRelList)
+			{
+				if(c < prev_cnt)
+					continue;
+				else if ( c > prev_cnt+count)
+					break;
+				else
+					jsonArray.put(getJSONForComment(rel.getStartNode()));
+			}
+			
+			res.put("status", 1);
+			res.put("msg", jsonArray);
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ create_comment()");
+			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ create_comment()");
+			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = new JSONObject();
+		}
+		return res.toString();
 	}
 
 }
