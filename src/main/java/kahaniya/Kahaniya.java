@@ -176,7 +176,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   return v2-v1;
 	    }};
 	    
-	private static Comparator<Node> TrendingComparatorForNodes = new Comparator<Node>() {
+	private static Comparator<Node> TrendingComparatorForChapterNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
 		   int v2 = 0;
@@ -208,21 +208,60 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   //descending order
 		   return v2-v1;
 	    }};
-	
-private static Comparator<Relationship> TimeCreatedComparatorForRelationships = new Comparator<Relationship>() {
-		public int compare(Relationship n1, Relationship n2) {
+		
+	private static Comparator<Node> TrendingComparatorForSeriesNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
 		   int v2 = 0;
-		   if(n1.hasProperty(TIME_CREATED))
-			   v1 = (int)n1.getProperty(TIME_CREATED);
-		   if(n2.hasProperty(TIME_CREATED))
-			   v2 = (int)n2.getProperty(TIME_CREATED);
+		   int t = (int)(new Date().getTime()/1000) - (24*60*60);
+		   Iterator<Relationship> chaptersItr1 = n1.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		   while(chaptersItr1.hasNext()) {
+			   if(chaptersItr1.next().getStartNode().hasRelationship(USER_VIEWED_A_CHAPTER))
+			   {
+				   Iterator<Relationship> views = chaptersItr1.next().getStartNode().getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+				   
+				   while(views.hasNext())
+				   {
+					   Relationship rel = views.next();
+					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						   v1++;
+				   }
+			   }
+		   }
+		   Iterator<Relationship> chaptersItr2 = n2.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		   while(chaptersItr2.hasNext()) {
+			   if(chaptersItr2.next().getStartNode().hasRelationship(USER_VIEWED_A_CHAPTER))
+			   {
+				   Iterator<Relationship> views = chaptersItr2.next().getStartNode().getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+			   
+				   while(views.hasNext())
+				   {
+					   Relationship rel = views.next();
+					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						   v2++;
+				   }
+			   }
+		   }
 		   //ascending order
 		   //return v1-v2;
 		   //descending order
 		   return v2-v1;
-	    }
-	}; 
+	    }};
+			
+	private static Comparator<Relationship> TimeCreatedComparatorForRelationships = new Comparator<Relationship>() {
+			public int compare(Relationship n1, Relationship n2) {
+			   int v1 = 0;
+			   int v2 = 0;
+			   if(n1.hasProperty(TIME_CREATED))
+				   v1 = (int)n1.getProperty(TIME_CREATED);
+			   if(n2.hasProperty(TIME_CREATED))
+				   v2 = (int)n2.getProperty(TIME_CREATED);
+			   //ascending order
+			   //return v1-v2;
+			   //descending order
+			   return v2-v1;
+		    }
+		}; 
 
     private Node User(String id, String full_name, String user_name, String email, String mobile, String dob, int privilege, int status, int time_created){
 		Node node = graphDb.createNode();
@@ -1960,6 +1999,8 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 			int prev_cnt, int count, String user_id) throws TException {
 		if(feedType.equalsIgnoreCase("R"))
 			return get_recommended(filter, prev_cnt, count, user_id);
+		else if(tileType.equalsIgnoreCase("A"))
+			return get_authors(feedType, filter, prev_cnt, count, user_id);
 		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
@@ -2056,7 +2097,7 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 			
 
 			
-				Collections.sort(allChapterList, TrendingComparatorForNodes);
+				Collections.sort(allChapterList, TrendingComparatorForChapterNodes);
 
 				JSONObject jRecObj = new JSONObject();
 				JSONArray jRecArray = new JSONArray();
@@ -2256,6 +2297,223 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 				}
 			}
 
+			else if(feedType.equalsIgnoreCase("W"))
+			{
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+				Iterator<Relationship> subscribedRelsItr = user_node.getRelationships(USER_STARTED_SERIES).iterator();
+				LinkedList<Relationship> subscribedRelsList = new LinkedList<Relationship>();
+				while(subscribedRelsItr.hasNext())
+					subscribedRelsList.addLast(subscribedRelsItr.next());
+				Collections.sort(subscribedRelsList, TimeCreatedComparatorForRelationships);				
+				for(Relationship rel : subscribedRelsList)
+				{				
+					
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node series = rel.getEndNode();
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
+											c++;
+											outputSeriesNode.addLast(series);			
+											
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+									
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputSeriesNode.addLast(series);			
+							
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);			
+						
+					}
+					
+				}
+			}
+
+			else if(feedType.equalsIgnoreCase("D"))
+			{
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+
+				ResourceIterator<Node> seriesNodesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+				LinkedList<Node> seriesList = new LinkedList<Node>();
+				while(seriesNodesItr.hasNext())
+					seriesList.addLast(seriesNodesItr.next());
+				Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
+				for(Node series : seriesList)
+				{				
+					if(series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().equals(user_node))
+						continue;
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
+											c++;
+											outputSeriesNode.addLast(series);			
+											
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+									
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputSeriesNode.addLast(series);			
+							
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);			
+						
+					}
+					
+				}
+			}
+
 			for(Node series : outputSeriesNode)
 				jsonArray.put(getJSONForSeries(series));
 			
@@ -2292,11 +2550,12 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			
-			int c = 0;
 			LinkedList<Node> outputChaptersNode = new LinkedList<Node>();
 			
 			if(feedType.equalsIgnoreCase("F"))
 			{
+				int c = 0;
+				
 				if(user_node == null)
 					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 				Iterator<Relationship> favCHaptersRelsItr = user_node.getRelationships(USER_FAV_CHAPTER).iterator();
@@ -2404,6 +2663,524 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 					
 				}
 			}
+			
+			else if(feedType.equalsIgnoreCase("T"))
+			{
+				Index<Node> chapter_id_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				ResourceIterator<Node> allChapters = chapter_id_index.query(CHAPTER_ID, "*").iterator();
+				LinkedList<Node> allChaptersList = new LinkedList<Node>();
+				while(allChapters.hasNext())
+					allChaptersList.addLast(allChapters.next());
+				Collections.sort(allChaptersList, TrendingComparatorForChapterNodes);
+					
+				int i = 0;
+				for(Node chapter : allChaptersList)
+				{
+					if(i >= 10) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											i++;
+											outputChaptersNode.addLast(chapter);
+	
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							i++;
+							outputChaptersNode.addLast(chapter);
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						i++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
+
+			else if(feedType.equalsIgnoreCase("D"))
+			{
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+
+				Index<Node> chapter_id_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				ResourceIterator<Node> allChapters = chapter_id_index.query(CHAPTER_ID, "*").iterator();
+				LinkedList<Node> allChaptersList = new LinkedList<Node>();
+				while(allChapters.hasNext())
+					allChaptersList.addLast(allChapters.next());
+				Collections.sort(allChaptersList, TrendingComparatorForChapterNodes);
+					
+				int i = 0;
+				for(Node chapter : allChaptersList)
+				{
+					if(chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().equals(user_node))
+						continue;
+					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											i++;
+											outputChaptersNode.addLast(chapter);
+	
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							i++;
+							outputChaptersNode.addLast(chapter);
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						i++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
+			
+			else if(feedType.equalsIgnoreCase("L"))
+			{
+				Index<Node> chapter_id_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				ResourceIterator<Node> allChapters = chapter_id_index.query(CHAPTER_ID, "*").iterator();
+				LinkedList<Node> allChaptersList = new LinkedList<Node>();
+				while(allChapters.hasNext())
+					allChaptersList.addLast(allChapters.next());
+				Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
+					
+				int i = 0;
+				for(Node chapter : allChaptersList)
+				{
+					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(i < prev_cnt)
+											{
+												i++;
+												continue;
+											}
+											
+											i++;
+											outputChaptersNode.addLast(chapter);
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
+							i++;
+							outputChaptersNode.addLast(chapter);
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
+						i++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
+
+			else if(feedType.equalsIgnoreCase("H"))
+			{
+				int i = 0;
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+				Iterator<Relationship> favCHaptersRelsItr = user_node.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+				LinkedList<Relationship> favChaptersRelsList = new LinkedList<Relationship>();
+				while(favCHaptersRelsItr.hasNext())
+					favChaptersRelsList.addLast(favCHaptersRelsItr.next());
+				Collections.sort(favChaptersRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : favChaptersRelsList)
+				{
+					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getEndNode();
+					
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(i < prev_cnt)
+											{
+												i++;
+												continue;
+											}
+											
+											i++;
+											outputChaptersNode.addLast(chapter);
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
+							i++;
+							outputChaptersNode.addLast(chapter);
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
+						i++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
+
+			else if(feedType.equalsIgnoreCase("W"))
+			{
+				int i = 0;
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+				Iterator<Relationship> favCHaptersRelsItr = user_node.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
+				LinkedList<Relationship> favChaptersRelsList = new LinkedList<Relationship>();
+				while(favCHaptersRelsItr.hasNext())
+					favChaptersRelsList.addLast(favCHaptersRelsItr.next());
+				Collections.sort(favChaptersRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : favChaptersRelsList)
+				{
+					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getEndNode();
+					
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);	
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(i < prev_cnt)
+											{
+												i++;
+												continue;
+											}
+											
+											i++;
+											outputChaptersNode.addLast(chapter);
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
+									i++;
+									outputChaptersNode.addLast(chapter);
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
+							i++;
+							outputChaptersNode.addLast(chapter);
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
+						i++;
+						outputChaptersNode.addLast(chapter);
+					}
+					
+				}
+			}
 
 			for(Node chapter : outputChaptersNode)
 				jsonArray.put(getJSONForChapter(chapter));
@@ -2413,15 +3190,15 @@ private static Comparator<Relationship> TimeCreatedComparatorForRelationships = 
 		}
 		catch(KahaniyaCustomException ex)
 		{
-			System.out.println("Exception @ get_series()");
-			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			System.out.println("Exception @ get_chapters()");
+			System.out.println("Something went wrong, while returning chapters from get_chapters  :"+ex.getMessage());
 //				ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
-			System.out.println("Exception @ get_series()");
-			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			System.out.println("Exception @ get_chapters()");
+			System.out.println("Something went wrong, while returning chapters from get_chapters  :"+ex.getMessage());
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
