@@ -79,7 +79,7 @@ public class KahaniyaService {
 
     public String recored_chapter_view(String chapter_id, String series_id, String user_id, int time) throws org.apache.thrift.TException;
 
-    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id) throws org.apache.thrift.TException;
+    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang) throws org.apache.thrift.TException;
 
     public String create_or_edit_comment(String chapter_id, String comment_id, String content, String parent_cmnt_id, String user_id, int time, int is_edit) throws org.apache.thrift.TException;
 
@@ -143,7 +143,7 @@ public class KahaniyaService {
 
     public void recored_chapter_view(String chapter_id, String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.recored_chapter_view_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_feed_call> resultHandler) throws org.apache.thrift.TException;
+    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_feed_call> resultHandler) throws org.apache.thrift.TException;
 
     public void create_or_edit_comment(String chapter_id, String comment_id, String content, String parent_cmnt_id, String user_id, int time, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_comment_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -788,13 +788,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "recored_chapter_view failed: unknown result");
     }
 
-    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id) throws org.apache.thrift.TException
+    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang) throws org.apache.thrift.TException
     {
-      send_get_feed(titleType, feedType, filter, prev_cnt, count, user_id);
+      send_get_feed(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang);
       return recv_get_feed();
     }
 
-    public void send_get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id) throws org.apache.thrift.TException
+    public void send_get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang) throws org.apache.thrift.TException
     {
       get_feed_args args = new get_feed_args();
       args.setTitleType(titleType);
@@ -803,6 +803,8 @@ public class KahaniyaService {
       args.setPrev_cnt(prev_cnt);
       args.setCount(count);
       args.setUser_id(user_id);
+      args.setGenre(genre);
+      args.setLang(lang);
       sendBase("get_feed", args);
     }
 
@@ -1905,9 +1907,9 @@ public class KahaniyaService {
       }
     }
 
-    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler) throws org.apache.thrift.TException {
+    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      get_feed_call method_call = new get_feed_call(titleType, feedType, filter, prev_cnt, count, user_id, resultHandler, this, ___protocolFactory, ___transport);
+      get_feed_call method_call = new get_feed_call(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -1919,7 +1921,9 @@ public class KahaniyaService {
       private int prev_cnt;
       private int count;
       private String user_id;
-      public get_feed_call(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private String genre;
+      private String lang;
+      public get_feed_call(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.titleType = titleType;
         this.feedType = feedType;
@@ -1927,6 +1931,8 @@ public class KahaniyaService {
         this.prev_cnt = prev_cnt;
         this.count = count;
         this.user_id = user_id;
+        this.genre = genre;
+        this.lang = lang;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -1938,6 +1944,8 @@ public class KahaniyaService {
         args.setPrev_cnt(prev_cnt);
         args.setCount(count);
         args.setUser_id(user_id);
+        args.setGenre(genre);
+        args.setLang(lang);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -2586,7 +2594,7 @@ public class KahaniyaService {
 
       protected get_feed_result getResult(I iface, get_feed_args args) throws org.apache.thrift.TException {
         get_feed_result result = new get_feed_result();
-        result.success = iface.get_feed(args.titleType, args.feedType, args.filter, args.prev_cnt, args.count, args.user_id);
+        result.success = iface.get_feed(args.titleType, args.feedType, args.filter, args.prev_cnt, args.count, args.user_id, args.genre, args.lang);
         return result;
       }
     }
@@ -25445,6 +25453,8 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField PREV_CNT_FIELD_DESC = new org.apache.thrift.protocol.TField("prev_cnt", org.apache.thrift.protocol.TType.I32, (short)4);
     private static final org.apache.thrift.protocol.TField COUNT_FIELD_DESC = new org.apache.thrift.protocol.TField("count", org.apache.thrift.protocol.TType.I32, (short)5);
     private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)6);
+    private static final org.apache.thrift.protocol.TField GENRE_FIELD_DESC = new org.apache.thrift.protocol.TField("genre", org.apache.thrift.protocol.TType.STRING, (short)7);
+    private static final org.apache.thrift.protocol.TField LANG_FIELD_DESC = new org.apache.thrift.protocol.TField("lang", org.apache.thrift.protocol.TType.STRING, (short)8);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -25458,6 +25468,8 @@ public class KahaniyaService {
     public int prev_cnt; // required
     public int count; // required
     public String user_id; // required
+    public String genre; // required
+    public String lang; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -25466,7 +25478,9 @@ public class KahaniyaService {
       FILTER((short)3, "filter"),
       PREV_CNT((short)4, "prev_cnt"),
       COUNT((short)5, "count"),
-      USER_ID((short)6, "user_id");
+      USER_ID((short)6, "user_id"),
+      GENRE((short)7, "genre"),
+      LANG((short)8, "lang");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -25493,6 +25507,10 @@ public class KahaniyaService {
             return COUNT;
           case 6: // USER_ID
             return USER_ID;
+          case 7: // GENRE
+            return GENRE;
+          case 8: // LANG
+            return LANG;
           default:
             return null;
         }
@@ -25551,6 +25569,10 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.GENRE, new org.apache.thrift.meta_data.FieldMetaData("genre", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.LANG, new org.apache.thrift.meta_data.FieldMetaData("lang", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(get_feed_args.class, metaDataMap);
     }
@@ -25564,7 +25586,9 @@ public class KahaniyaService {
       String filter,
       int prev_cnt,
       int count,
-      String user_id)
+      String user_id,
+      String genre,
+      String lang)
     {
       this();
       this.titleType = titleType;
@@ -25575,6 +25599,8 @@ public class KahaniyaService {
       this.count = count;
       setCountIsSet(true);
       this.user_id = user_id;
+      this.genre = genre;
+      this.lang = lang;
     }
 
     /**
@@ -25597,6 +25623,12 @@ public class KahaniyaService {
       if (other.isSetUser_id()) {
         this.user_id = other.user_id;
       }
+      if (other.isSetGenre()) {
+        this.genre = other.genre;
+      }
+      if (other.isSetLang()) {
+        this.lang = other.lang;
+      }
     }
 
     public get_feed_args deepCopy() {
@@ -25613,6 +25645,8 @@ public class KahaniyaService {
       setCountIsSet(false);
       this.count = 0;
       this.user_id = null;
+      this.genre = null;
+      this.lang = null;
     }
 
     public String getTitleType() {
@@ -25757,6 +25791,54 @@ public class KahaniyaService {
       }
     }
 
+    public String getGenre() {
+      return this.genre;
+    }
+
+    public get_feed_args setGenre(String genre) {
+      this.genre = genre;
+      return this;
+    }
+
+    public void unsetGenre() {
+      this.genre = null;
+    }
+
+    /** Returns true if field genre is set (has been assigned a value) and false otherwise */
+    public boolean isSetGenre() {
+      return this.genre != null;
+    }
+
+    public void setGenreIsSet(boolean value) {
+      if (!value) {
+        this.genre = null;
+      }
+    }
+
+    public String getLang() {
+      return this.lang;
+    }
+
+    public get_feed_args setLang(String lang) {
+      this.lang = lang;
+      return this;
+    }
+
+    public void unsetLang() {
+      this.lang = null;
+    }
+
+    /** Returns true if field lang is set (has been assigned a value) and false otherwise */
+    public boolean isSetLang() {
+      return this.lang != null;
+    }
+
+    public void setLangIsSet(boolean value) {
+      if (!value) {
+        this.lang = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case TITLE_TYPE:
@@ -25807,6 +25889,22 @@ public class KahaniyaService {
         }
         break;
 
+      case GENRE:
+        if (value == null) {
+          unsetGenre();
+        } else {
+          setGenre((String)value);
+        }
+        break;
+
+      case LANG:
+        if (value == null) {
+          unsetLang();
+        } else {
+          setLang((String)value);
+        }
+        break;
+
       }
     }
 
@@ -25829,6 +25927,12 @@ public class KahaniyaService {
 
       case USER_ID:
         return getUser_id();
+
+      case GENRE:
+        return getGenre();
+
+      case LANG:
+        return getLang();
 
       }
       throw new IllegalStateException();
@@ -25853,6 +25957,10 @@ public class KahaniyaService {
         return isSetCount();
       case USER_ID:
         return isSetUser_id();
+      case GENRE:
+        return isSetGenre();
+      case LANG:
+        return isSetLang();
       }
       throw new IllegalStateException();
     }
@@ -25921,6 +26029,24 @@ public class KahaniyaService {
         if (!(this_present_user_id && that_present_user_id))
           return false;
         if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      boolean this_present_genre = true && this.isSetGenre();
+      boolean that_present_genre = true && that.isSetGenre();
+      if (this_present_genre || that_present_genre) {
+        if (!(this_present_genre && that_present_genre))
+          return false;
+        if (!this.genre.equals(that.genre))
+          return false;
+      }
+
+      boolean this_present_lang = true && this.isSetLang();
+      boolean that_present_lang = true && that.isSetLang();
+      if (this_present_lang || that_present_lang) {
+        if (!(this_present_lang && that_present_lang))
+          return false;
+        if (!this.lang.equals(that.lang))
           return false;
       }
 
@@ -26000,6 +26126,26 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetGenre()).compareTo(typedOther.isSetGenre());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetGenre()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.genre, typedOther.genre);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLang()).compareTo(typedOther.isSetLang());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLang()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.lang, typedOther.lang);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -26057,6 +26203,22 @@ public class KahaniyaService {
         sb.append("null");
       } else {
         sb.append(this.user_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("genre:");
+      if (this.genre == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.genre);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("lang:");
+      if (this.lang == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.lang);
       }
       first = false;
       sb.append(")");
@@ -26151,6 +26313,22 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 7: // GENRE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.genre = iprot.readString();
+                struct.setGenreIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 8: // LANG
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.lang = iprot.readString();
+                struct.setLangIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -26192,6 +26370,16 @@ public class KahaniyaService {
           oprot.writeString(struct.user_id);
           oprot.writeFieldEnd();
         }
+        if (struct.genre != null) {
+          oprot.writeFieldBegin(GENRE_FIELD_DESC);
+          oprot.writeString(struct.genre);
+          oprot.writeFieldEnd();
+        }
+        if (struct.lang != null) {
+          oprot.writeFieldBegin(LANG_FIELD_DESC);
+          oprot.writeString(struct.lang);
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -26228,7 +26416,13 @@ public class KahaniyaService {
         if (struct.isSetUser_id()) {
           optionals.set(5);
         }
-        oprot.writeBitSet(optionals, 6);
+        if (struct.isSetGenre()) {
+          optionals.set(6);
+        }
+        if (struct.isSetLang()) {
+          optionals.set(7);
+        }
+        oprot.writeBitSet(optionals, 8);
         if (struct.isSetTitleType()) {
           oprot.writeString(struct.titleType);
         }
@@ -26247,12 +26441,18 @@ public class KahaniyaService {
         if (struct.isSetUser_id()) {
           oprot.writeString(struct.user_id);
         }
+        if (struct.isSetGenre()) {
+          oprot.writeString(struct.genre);
+        }
+        if (struct.isSetLang()) {
+          oprot.writeString(struct.lang);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, get_feed_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(6);
+        BitSet incoming = iprot.readBitSet(8);
         if (incoming.get(0)) {
           struct.titleType = iprot.readString();
           struct.setTitleTypeIsSet(true);
@@ -26276,6 +26476,14 @@ public class KahaniyaService {
         if (incoming.get(5)) {
           struct.user_id = iprot.readString();
           struct.setUser_idIsSet(true);
+        }
+        if (incoming.get(6)) {
+          struct.genre = iprot.readString();
+          struct.setGenreIsSet(true);
+        }
+        if (incoming.get(7)) {
+          struct.lang = iprot.readString();
+          struct.setLangIsSet(true);
         }
       }
     }
