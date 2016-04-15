@@ -1998,7 +1998,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public String get_feed(String tileType, String feedType, String filter,
 			int prev_cnt, int count, String user_id) throws TException {
 		if(feedType.equalsIgnoreCase("R"))
-			return get_recommended(filter, prev_cnt, count, user_id);
+		{
+			if(prev_cnt == 0)
+				return get_recommended(filter, prev_cnt, count, user_id);
+			else return get_recomended_by_series(filter, prev_cnt - 1, count, user_id);
+		}
 		else if(tileType.equalsIgnoreCase("A"))
 			return get_authors(feedType, filter, prev_cnt, count, user_id);
 		else if(tileType.equalsIgnoreCase("S"))
@@ -2172,6 +2176,174 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 
+	private String get_recomended_by_series(String filter, int prev_cnt, int count, String user_id)
+	{
+
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			int c = 0;
+			LinkedList<Node> outputSeriesNode = new LinkedList<Node>();
+			
+			if(user_node == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+
+			ResourceIterator<Node> seriesNodesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+			
+			LinkedList<Node> seriesList = new LinkedList<Node>();
+			while(seriesNodesItr.hasNext())
+				seriesList.addLast(seriesNodesItr.next());
+			Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
+			for(Node series : seriesList)
+			{			
+				if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+				{
+					break;
+				}
+				
+				Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+				Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+				if(filter != null && !filter.equals(""))
+				{
+					JSONObject filterJSON = new JSONObject(filter);
+					if(filterJSON.has("genres") && filterJSON.has("languages"))
+					{
+						for(String genre: filterJSON.getString("genres").split(","))
+						{
+							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+							if(genreNode != null && seriesGenreNode.equals(genreNode))
+							{
+								for(String lang: filterJSON.getString("languages").split(","))
+								{
+									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+									if(langNode != null && seriesLangNode.equals(langNode))
+									{
+										if(c < prev_cnt)
+										{
+											c++;
+											continue;
+										}
+										c++;
+										outputSeriesNode.addLast(series);			
+										
+									}
+								}
+							}
+						}
+					}
+					else if(filterJSON.has("genres"))
+					{
+						for(String genre: filterJSON.getString("genres").split(","))
+						{
+							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+							if(genreNode != null && seriesGenreNode.equals(genreNode))
+							{
+								if(c < prev_cnt)
+								{
+									c++;
+									continue;
+								}
+								c++;
+								outputSeriesNode.addLast(series);			
+							}
+						}
+					}
+					else if(filterJSON.has("languages"))
+					{
+						for(String lang: filterJSON.getString("languages").split(","))
+						{
+							Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+							if(langNode != null && seriesLangNode.equals(langNode))
+							{
+								if(c < prev_cnt)
+								{
+									c++;
+									continue;
+								}
+								c++;
+								outputSeriesNode.addLast(series);			
+								
+							}
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);			
+						
+					}
+				}
+				else // i.e., no need to apply filter
+				{
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					outputSeriesNode.addLast(series);			
+					
+				}
+				
+			}
+			
+			for(Node series : outputSeriesNode)
+			{
+				JSONObject jobj = new JSONObject();
+				JSONArray jarray = new JSONArray();
+				
+				Iterator<Relationship> chaptersRelItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(chaptersRelItr.hasNext())
+					chapterList.addLast(chaptersRelItr.next().getStartNode());
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				for(int i=0; i< 3; i++)
+				{
+					if(chapterList.size() > i)
+						jarray.put(getJSONForChapter(chapterList.get(i)));
+				}
+				if(jarray.length() > 0)
+				{
+					jobj.put("ttl", series.getProperty(SERIES_TITLE));
+					jobj.put("data", jarray);
+
+					jsonArray.put(jobj);
+				}
+				
+			}
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_series()");
+			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();
+	}
+	
 	private String get_series(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 
@@ -2548,7 +2720,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
-			
+			if(user_id == null)
+				user_id = "";
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			
 			int c = 0;
@@ -2685,7 +2858,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 
 			for(Node user : outputUserNode)
-				jsonArray.put(getJSONForUser(user));
+				jsonArray.put(getJSONForUser(user, user_node));
 			
 			tx.success();
 
@@ -3412,11 +3585,30 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return obj;
 	}
 
-	private JSONObject getJSONForUser(Node user)
+	private JSONObject getJSONForUser(Node user, Node req_user)
 	{
 		JSONObject obj = new JSONObject();
-		obj.put("P_Author_FullName",user.getProperty(FULL_NAME).toString());
-		obj.put("P_Author",user.getProperty(USER_ID).toString());
+		obj.put("FullName",user.getProperty(FULL_NAME).toString());
+		obj.put("UserId",user.getProperty(USER_ID).toString());
+		obj.put("U_Num_Following",user.getDegree(USER_FOLLOW_USER, Direction.OUTGOING));
+		obj.put("U_Num_Subscribers",user.getDegree(USER_FOLLOW_USER, Direction.INCOMING));
+		if(req_user == null)
+			obj.put("U_Is_Following",false);
+		else
+		{
+
+			obj.put("U_Is_Following",false);
+			
+			Iterator<Relationship> followingRels = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+			while(followingRels.hasNext())
+			{
+				if(followingRels.next().getEndNode().equals(req_user))
+				{
+					obj.put("U_Is_Following",true);
+					break;
+				}
+			}
+		}
 		obj.put("Is_Neo4j",true);
 		return obj;
 	}
@@ -3730,7 +3922,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Collections.sort(userList, TimeCreatedComparatorForNodes);
 			
 				for(Node user : userList)
-					jsonArray.put(getJSONForUser(user));
+					jsonArray.put(getJSONForUser(user, null));
 			}
 			
 			tx.success();
@@ -3786,7 +3978,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Node user = userId_index.get(USER_ID, item_id).getSingle();
 				if(user == null)
 					throw new KahaniyaCustomException("Invalid user id");
-				jsonObject = getJSONForUser(user);
+				jsonObject = getJSONForUser(user, null);
 			}
 			
 			tx.success();
