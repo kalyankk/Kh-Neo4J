@@ -2537,6 +2537,176 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
+	private String get_authors(String feedType, String filter, int prev_cnt, int count, String user_id)
+	{
+
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			int c = 0;
+			LinkedList<Node> outputUserNode = new LinkedList<Node>();
+
+			if(feedType.equalsIgnoreCase("D"))
+			{
+				if(user_node == null)
+					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+
+				ResourceIterator<Node> seriesNodesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+				LinkedList<Node> seriesList = new LinkedList<Node>();
+				while(seriesNodesItr.hasNext())
+					seriesList.addLast(seriesNodesItr.next());
+				Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
+				for(Node series : seriesList)
+				{				
+					if(series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().equals(user_node))
+						continue;
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("languages").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
+											Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+											if(outputUserNode.contains(user_node))
+											{
+
+												c++;
+												outputUserNode.addLast(auth);			
+											}
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genres"))
+						{
+							for(String genre: filterJSON.getString("genres").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+									if(outputUserNode.contains(user_node))
+									{
+
+										c++;
+										outputUserNode.addLast(auth);			
+									}			
+								}
+							}
+						}
+						else if(filterJSON.has("languages"))
+						{
+							for(String lang: filterJSON.getString("languages").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+									if(outputUserNode.contains(user_node))
+									{
+
+										c++;
+										outputUserNode.addLast(auth);			
+									}
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+							if(outputUserNode.contains(user_node))
+							{
+
+								c++;
+								outputUserNode.addLast(auth);			
+							}
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+						if(outputUserNode.contains(user_node))
+						{
+
+							c++;
+							outputUserNode.addLast(auth);			
+						}
+					}
+					
+				}
+			}
+
+			for(Node user : outputUserNode)
+				jsonArray.put(getJSONForUser(user));
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ get_authors()");
+			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_authors()");
+			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();
+	}
+	
 	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 
@@ -3241,6 +3411,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 			obj.put("P_Rating",tot_rating/chapter.getDegree(USER_RATED_A_CHAPTER, Direction.INCOMING));
 		return obj;
 	}
+
+	private JSONObject getJSONForUser(Node user)
+	{
+		JSONObject obj = new JSONObject();
+		obj.put("P_Author_FullName",user.getProperty(FULL_NAME).toString());
+		obj.put("P_Author",user.getProperty(USER_ID).toString());
+		obj.put("Is_Neo4j",true);
+		return obj;
+	}
 	
 	private JSONObject getJSONForComment(Node comment)
 	{
@@ -3474,6 +3653,159 @@ public class Kahaniya implements KahaniyaService.Iface{
 			jsonArray = new JSONArray();
 		}
 		return jsonArray.toString();
+	}
+
+	@Override
+	public String get_all_items(String item_type, int prev_cnt, int count)
+			throws TException {
+
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			if(item_type == null || item_type.equals(""))
+				throw new KahaniyaCustomException("Invalid item type");
+			if(item_type.equalsIgnoreCase("C"))
+			{
+				int c = 0;
+
+				Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				ResourceIterator<Node> chaptersItr = chapterId_index.query(CHAPTER_ID, "*").iterator();
+				LinkedList<Node> chaptersList = new LinkedList<Node>();
+				while(chaptersItr.hasNext())
+				{
+					if(c < prev_cnt)
+						continue;
+					else if ( c > prev_cnt+count)
+						break;
+					else
+						chaptersList.addLast(chaptersItr.next());
+				}
+				
+				Collections.sort(chaptersList, TimeCreatedComparatorForNodes);
+			
+				for(Node chapter : chaptersList)
+					jsonArray.put(getJSONForChapter(chapter));
+			}
+			else if(item_type.equalsIgnoreCase("S"))
+			{
+				int c = 0;
+
+				Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+				ResourceIterator<Node> seriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+				LinkedList<Node> seriesList = new LinkedList<Node>();
+				while(seriesItr.hasNext())
+				{
+					if(c < prev_cnt)
+						continue;
+					else if ( c > prev_cnt+count)
+						break;
+					else
+						seriesList.addLast(seriesItr.next());
+				}
+				
+				Collections.sort(seriesList, TimeCreatedComparatorForNodes);
+			
+				for(Node series : seriesList)
+					jsonArray.put(getJSONForSeries(series));
+			}
+			else if(item_type.equalsIgnoreCase("A") || item_type.equalsIgnoreCase("U"))
+			{
+				int c = 0;
+
+				Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+				ResourceIterator<Node> userItr = userId_index.query(USER_ID, "*").iterator();
+				LinkedList<Node> userList = new LinkedList<Node>();
+				while(userItr.hasNext())
+				{
+					if(c < prev_cnt)
+						continue;
+					else if ( c > prev_cnt+count)
+						break;
+					else
+						userList.addLast(userItr.next());
+				}
+				
+				Collections.sort(userList, TimeCreatedComparatorForNodes);
+			
+				for(Node user : userList)
+					jsonArray.put(getJSONForUser(user));
+			}
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ get_all_items()");
+			System.out.println("Something went wrong, while returning items from get_all_items  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_all_items()");
+			System.out.println("Something went wrong, while returning items from get_all_items  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();		
+	}
+
+	@Override
+	public String get_item_details(String item_type, String item_id)
+			throws TException {
+
+		JSONObject jsonObject = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			if(item_type == null || item_type.equals(""))
+				throw new KahaniyaCustomException("Invalid item type");
+			if(item_type.equalsIgnoreCase("C"))
+			{
+				Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				Node chapter = chapterId_index.get(CHAPTER_ID, item_id).getSingle();
+				if(chapter == null)
+					throw new KahaniyaCustomException("Invalid chapter id");
+				jsonObject = getJSONForChapter(chapter);
+			}
+			else if(item_type.equalsIgnoreCase("S"))
+			{
+				Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+				Node series = seriesId_index.get(SERIES_ID, item_id).getSingle();
+				if(series == null)
+					throw new KahaniyaCustomException("Invalid series id");
+				jsonObject = getJSONForSeries(series);
+			}
+			else if(item_type.equalsIgnoreCase("A") || item_type.equalsIgnoreCase("U"))
+			{
+				Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+				Node user = userId_index.get(USER_ID, item_id).getSingle();
+				if(user == null)
+					throw new KahaniyaCustomException("Invalid user id");
+				jsonObject = getJSONForUser(user);
+			}
+			
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println("Exception @ get_item_details()");
+			System.out.println("Something went wrong, while returning item_details  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonObject = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception @ get_item_details()");
+			System.out.println("Something went wrong, while returning item_details  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonObject = new JSONObject();
+		}
+		return jsonObject.toString();
 	}
 
 }
