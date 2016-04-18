@@ -167,9 +167,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   int v1 = 0;
 		   int v2 = 0;
 		   if(n1.hasProperty(TIME_CREATED))
-			   v1 = (int)n1.getProperty(TIME_CREATED);
+			   v1 = Integer.parseInt(n1.getProperty(TIME_CREATED).toString());
 		   if(n2.hasProperty(TIME_CREATED))
-			   v2 = (int)n2.getProperty(TIME_CREATED);
+			   v2 = Integer.parseInt(n2.getProperty(TIME_CREATED).toString());
 		   //ascending order
 		   //return v1-v2;
 		   //descending order
@@ -215,10 +215,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   int v2 = 0;
 		   int t = (int)(new Date().getTime()/1000) - (24*60*60);
 		   Iterator<Relationship> chaptersItr1 = n1.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
-		   while(chaptersItr1.hasNext()) {
-			   if(chaptersItr1.next().getStartNode().hasRelationship(USER_VIEWED_A_CHAPTER))
+		   while(chaptersItr1.hasNext())
+		   {
+			   Node chapter = chaptersItr1.next().getStartNode();
+			   if(chapter.hasRelationship(USER_VIEWED_A_CHAPTER))
 			   {
-				   Iterator<Relationship> views = chaptersItr1.next().getStartNode().getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+				   Iterator<Relationship> views = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
 				   
 				   while(views.hasNext())
 				   {
@@ -229,10 +231,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   }
 		   }
 		   Iterator<Relationship> chaptersItr2 = n2.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
-		   while(chaptersItr2.hasNext()) {
-			   if(chaptersItr2.next().getStartNode().hasRelationship(USER_VIEWED_A_CHAPTER))
+		   while(chaptersItr2.hasNext()) 
+		   {
+			   Node chapter = chaptersItr2.next().getStartNode();
+			   if(chapter.hasRelationship(USER_VIEWED_A_CHAPTER))
 			   {
-				   Iterator<Relationship> views = chaptersItr2.next().getStartNode().getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+				   Iterator<Relationship> views = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
 			   
 				   while(views.hasNext())
 				   {
@@ -253,9 +257,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   int v1 = 0;
 			   int v2 = 0;
 			   if(n1.hasProperty(TIME_CREATED))
-				   v1 = (int)n1.getProperty(TIME_CREATED);
+				   v1 = Integer.parseInt(n1.getProperty(TIME_CREATED).toString());
 			   if(n2.hasProperty(TIME_CREATED))
-				   v2 = (int)n2.getProperty(TIME_CREATED);
+				   v2 = Integer.parseInt(n2.getProperty(TIME_CREATED).toString());
 			   //ascending order
 			   //return v1-v2;
 			   //descending order
@@ -375,6 +379,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 		}catch(Exception e)
 		{
+			System.out.println(new Date().toString());
 			e.printStackTrace();
 		}
 	}
@@ -397,6 +402,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				res = "Jar will terminate in 1 minute";
 		}
 		catch(Exception ex){
+			System.out.println(new Date().toString());
 		      System.out.println("Something went wrong, while jar_shutdown :"+ex.getMessage());
 		      ex.printStackTrace();
 		      res = "Failed to terminate";
@@ -464,7 +470,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 			tx.success();
 		}
-		catch(Exception e){System.out.println("Failed to create indexes");}
+		catch(Exception e){
+			System.out.println(new Date().toString());
+			System.out.println("Failed to create indexes");
+			}
 		finally{}
 	}
 
@@ -499,6 +508,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			tx.success();
 		}
 		catch(Exception e){
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ add_neo4j_lock_nodes()");
 			System.out.println("Failed to create lock nodes : " + e.getMessage());}
 		finally{}
@@ -590,6 +600,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_genre('"+name+"')");
 			System.out.println("Something went wrong, while creating genre from create_genre  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -597,6 +608,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_genre('"+name+"')");
 			System.out.println("Something went wrong, while creating genre from create_genre  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -659,6 +671,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_genre('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing genre from edit_genre  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -666,6 +679,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_genre('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing genre from edit_genre  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -725,6 +739,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_genre('"+name+"')");
 			System.out.println("Something went wrong, while deleting genre from delete_genre  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -732,6 +747,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_genre('"+name+"')");
 			System.out.println("Something went wrong, while deleting genre from delete_genre  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -757,6 +773,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ list_genres()");
 			System.out.println("Something went wrong, while returning genres  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -764,6 +781,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ list_genres()");
 			System.out.println("Something went wrong, while returning genres  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -812,6 +830,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_language('"+name+"')");
 			System.out.println("Something went wrong, while creating language from create_language  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -819,6 +838,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_language('"+name+"')");
 			System.out.println("Something went wrong, while creating language from create_language  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -882,6 +902,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_language('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing language from edit_language  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -889,6 +910,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_language('"+old_name+"','"+new_name+"')");
 			System.out.println("Something went wrong, while editing language from edit_language  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -947,6 +969,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_language('"+name+"')");
 			System.out.println("Something went wrong, while deleting language from delete_language  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -954,6 +977,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_language('"+name+"')");
 			System.out.println("Something went wrong, while deleting language from delete_language  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -979,6 +1003,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ list_languages()");
 			System.out.println("Something went wrong, while returning languages  :"+ex.getMessage());
 //			ex.printStackTrace();
@@ -986,6 +1011,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ list_languages()");
 			System.out.println("Something went wrong, while returning languages  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1003,6 +1029,22 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter id");
+			if(full_name == null || full_name.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter full_name");
+			if(email == null)
+				email = "";
+			if(mobile_number == null)
+				mobile_number = "";
+			if(dob == null)
+				dob = "";
+			if(genres == null)
+				genres = "";
+			if(languages == null)
+				languages = "";
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
@@ -1014,12 +1056,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(userId_index.get(USER_ID,id).getSingle()!=null)
 				throw new KahaniyaCustomException("User already exists with given id : "+id);
 			if(userName_index.get(USER_NAME,user_name.toLowerCase()).getSingle()!=null)
-				throw new KahaniyaCustomException("User already exists with given user_name : "+user_name);
-			
-			if(email == null)
-				email = "";
-			if(mobile_number == null)
-				mobile_number = "";
+				throw new KahaniyaCustomException("User already exists with given user_name : "+user_name);			
 			
 			if(!email.equals("") && userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("User already exists with given email : "+email);
@@ -1054,6 +1091,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_user()");
 			System.out.println("Something went wrong, while creating user from create_user  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1061,6 +1099,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_user()");
 			System.out.println("Something went wrong, while creating user from create_user  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1077,6 +1116,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+			if(full_name == null || full_name.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param full_name");
+			if(gender == null)
+				gender = "";
+			if(dob == null)
+				dob = "";
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			
@@ -1094,6 +1142,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_basic_info()");
 			System.out.println("Something went wrong, while editing user from edit_user_basic_info  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1101,6 +1150,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_basic_info()");
 			System.out.println("Something went wrong, while editing user from edit_user_basic_info  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1116,6 +1166,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+			if(email == null)
+				email = "";
+			if(mobile_number == null)
+				mobile_number = "";
+
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
@@ -1125,10 +1182,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(user_node == null)
 				throw new KahaniyaCustomException("User does not exists with given id : "+id);
 			
-			if(email == null)
-				email = "";
-			if(mobile_number == null)
-				mobile_number = "";
 			
 			if(!email.equals("") && userEmail_index.get(EMAIL,email.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("User already exists with given email : "+email);
@@ -1146,6 +1199,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_contact_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_contact_details  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1153,6 +1207,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_contact_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_contact_details  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1168,6 +1223,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+			if(user_name == null || user_name.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_name");
+			
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
@@ -1187,6 +1248,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_security_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_security_details  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1194,6 +1256,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_security_details()");
 			System.out.println("Something went wrong, while editing user from edit_user_security_details  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1209,6 +1272,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+			if(languages == null)
+				languages = "";
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
@@ -1232,6 +1300,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_languages()");
 			System.out.println("Something went wrong, while editing user from edit_user_languages  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1239,6 +1308,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_languages()");
 			System.out.println("Something went wrong, while editing user from edit_user_languages  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1254,6 +1324,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+			if(genres == null)
+				genres = "";
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
@@ -1277,6 +1352,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_genres()");
 			System.out.println("Something went wrong, while editing user from edit_user_genres  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1284,6 +1360,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_user_genres()");
 			System.out.println("Something went wrong, while editing user from edit_user_genres  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1298,6 +1375,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id_1 == null || user_id_1.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id_1");
+			if(user_id_2 == null || user_id_2.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id_2");
+			
 			aquireWriteLock(tx);
 			
 			Index<Node> userIdIndex = graphDb.index().forNodes(USER_ID_INDEX);
@@ -1324,6 +1406,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ follow_user()");
 			System.out.println("Something went wrong, while following user from follow_user  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1331,6 +1414,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ follow_user()");
 			System.out.println("Something went wrong, while following user from follow_user  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1354,6 +1438,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 			obj.put("name", genre.getProperty(GENRE_NAME).toString());
 		ret.put("type", "genre");
 		ret.put("Obj",obj);
+		ret.put("Is_Neo4j",true);
+		return ret;
+	}
+
+	private JSONObject getJSONForReview(Node review)
+	{
+		JSONObject ret = new JSONObject();
+		ret.put("id", review.getProperty(REVIEW_ID).toString());
+		ret.put("data",review.getProperty(REVIEW_DATA));
 		ret.put("Is_Neo4j",true);
 		return ret;
 	}
@@ -1393,6 +1486,32 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(genre == null || genre.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param genre");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(tag_line == null)
+				tag_line = "";
+			if(feature_image == null)
+				feature_image = "";
+			if(keywords == null)
+				keywords = "";
+			if(copyrights == null)
+				copyrights = "";
+			if(dd_img == null)
+				dd_img = "";
+			if(dd_summary == null)
+				dd_summary = "";
+			
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
@@ -1413,12 +1532,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(seriesTitleId_index.get(SERIES_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("Series already exists with given title id : "+title_id);
 
-			//validate genre and language
-			if(language == null || language.length() == 0)
-				throw new KahaniyaCustomException("Null or Empty string receieved for the param language");
-			if(genre == null || genre.length() == 0)
-				throw new KahaniyaCustomException("Null or Empty string receieved for the param genre");
-			
 			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 			if(genreNode == null)
 				throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
@@ -1467,6 +1580,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_series()");
 			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1474,6 +1588,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_series()");
 			System.out.println("Something went wrong, while creating series from create_series  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1492,6 +1607,31 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(genre == null || genre.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param genre");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(tag_line == null)
+				tag_line = "";
+			if(feature_image == null)
+				feature_image = "";
+			if(keywords == null)
+				keywords = "";
+			if(copyrights == null)
+				copyrights = "";
+			if(dd_img == null)
+				dd_img = "";
+			if(dd_summary == null)
+				dd_summary = "";
+
 			aquireWriteLock(tx);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
@@ -1506,12 +1646,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(series_node == null)
 				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
 			
-			//validate genre and language
-			if(language == null || language.length() == 0)
-				throw new KahaniyaCustomException("Null or Empty string receieved for the param language");
-			if(genre == null || genre.length() == 0)
-				throw new KahaniyaCustomException("Null or Empty string receieved for the param genre");
-
 			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 			if(genreNode == null)
 				throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
@@ -1573,6 +1707,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_series()");
 			System.out.println("Something went wrong, while editing series from edit_series  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1580,6 +1715,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_series()");
 			System.out.println("Something went wrong, while editing series from edit_series  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1604,6 +1740,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(review_id == null || review_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param review_id");
+			if(data == null || data.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param data");
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
@@ -1638,6 +1783,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_review()");
 			System.out.println("Something went wrong, while creating review from create_review  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1645,6 +1791,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_review()");
 			System.out.println("Something went wrong, while creating review from create_review  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1659,6 +1806,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(review_id == null || review_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param review_id");
+			if(data == null || data.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param data");
+			
+
 			aquireWriteLock(tx);
 			
 			Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
@@ -1674,6 +1831,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_review()");
 			System.out.println("Something went wrong, while editing review from edit_review  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1681,6 +1839,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_review()");
 			System.out.println("Something went wrong, while editing review from edit_review  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1708,6 +1867,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(feat_image == null)
+				feat_image = "";
+
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
@@ -1734,6 +1906,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_chapter()");
 			System.out.println("Something went wrong, while editing chapter from edit_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1741,6 +1914,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_chapter()");
 			System.out.println("Something went wrong, while editing chapter from edit_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1756,6 +1930,20 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(feat_image == null)
+				feat_image = "";
+
+
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
@@ -1795,6 +1983,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_chapter()");
 			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1802,6 +1991,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_chapter()");
 			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1816,6 +2006,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+
 			aquireWriteLock(tx);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
@@ -1839,6 +2034,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ subscribe_series()");
 			System.out.println("Something went wrong, while subscribing series from subscribe_series  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1846,6 +2042,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ subscribe_series()");
 			System.out.println("Something went wrong, while subscribing series from subscribe_series  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1860,6 +2057,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
@@ -1883,6 +2087,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1890,6 +2095,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1904,6 +2110,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
@@ -1928,6 +2141,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1935,6 +2149,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1949,6 +2164,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
@@ -1979,6 +2201,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -1986,6 +2209,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ favourite_chapter()");
 			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -1997,6 +2221,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 	@Override
 	public String get_feed(String tileType, String feedType, String filter,
 			int prev_cnt, int count, String user_id, String genre, String lang) throws TException {
+		if(feedType == null)
+			feedType = "";
+		if(tileType == null)
+			tileType = "";
+		if(filter == null)
+			filter = "";
+		if(user_id == null)
+			user_id = "";
+		if(genre == null)
+			genre = "";
+		if(lang == null)
+			lang = "";
+		
 		if(feedType.equalsIgnoreCase("R"))
 		{
 			if(prev_cnt == 0)
@@ -2059,8 +2296,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 			}
 			
-			int c = 1;
-
 			LinkedList<Node> allChapterList = new LinkedList<Node>();
 			
 			for(Node n : lang_genres)
@@ -2089,39 +2324,35 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				if(jarray.length() > 0)
 				{
-					jobj.put("tp",c);
+					jobj.put("tp",2);
 					jobj.put("ttl", n.getProperty(GENRE_NAME));
 					jobj.put("data", jarray);
 
-					c++;
 					jsonArrayForGenres.put(jobj);
 				}
 				
 			}
 			
-
 			
-				Collections.sort(allChapterList, TrendingComparatorForChapterNodes);
+			Collections.sort(allChapterList, TrendingComparatorForChapterNodes);
 
-				JSONObject jRecObj = new JSONObject();
-				JSONArray jRecArray = new JSONArray();
-				
-				for(int i=0; i< 3; i++)
-				{
-					if(allChapterList.size() > i)
-						jRecArray.put(getJSONForChapter(allChapterList.get(i)));
-				}
-				if(jRecArray.length() > 0)
-				{
-					jRecObj.put("tp",0);
-					jRecObj.put("data", jRecArray);
+			JSONObject jRecObj = new JSONObject();
+			JSONArray jRecArray = new JSONArray();
+			
+			for(int i=0; i< 3; i++)
+			{
+				if(allChapterList.size() > i)
+					jRecArray.put(getJSONForChapter(allChapterList.get(i)));
+			}
+			if(jRecArray.length() > 0)
+			{
+				jRecObj.put("tp",0);
+				jRecObj.put("data", jRecArray);
 
-					jsonArray.put(jRecObj);
-				} 
+				jsonArray.put(jRecObj);
+			} 
 				
-				for(int i=0; i<jsonArrayForGenres.length(); i++)
-					jsonArray.put(jsonArrayForGenres.get(i));
-				
+
 			for(Node n : langs)
 			{
 				JSONObject jobj = new JSONObject();
@@ -2145,15 +2376,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				if(jarray.length() > 0)
 				{
-					jobj.put("tp",c);
+					jobj.put("tp",1);
 					jobj.put("ttl", n.getProperty(LANG_NAME));
 					jobj.put("data", jarray);
 
-					c++;
 					jsonArray.put(jobj);
 				}
 				
 			}
+			
+			for(int i=0; i<jsonArrayForGenres.length(); i++)
+				jsonArray.put(jsonArrayForGenres.get(i));
 			
 			
 			tx.success();
@@ -2161,6 +2394,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_recommended()");
 			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -2168,6 +2402,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_recommended()");
 			System.out.println("Something went wrong, while returning recommended chapters from get_recommended  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -2214,14 +2449,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 				if(filter != null && !filter.equals(""))
 				{
 					JSONObject filterJSON = new JSONObject(filter);
-					if(filterJSON.has("genres") && filterJSON.has("languages"))
+					if(filterJSON.has("genre") && filterJSON.has("language"))
 					{
-						for(String genre: filterJSON.getString("genres").split(","))
+						for(String genre: filterJSON.getString("genre").split(","))
 						{
 							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 							if(genreNode != null && seriesGenreNode.equals(genreNode))
 							{
-								for(String lang: filterJSON.getString("languages").split(","))
+								for(String lang: filterJSON.getString("language").split(","))
 								{
 									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 									if(langNode != null && seriesLangNode.equals(langNode))
@@ -2239,9 +2474,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 							}
 						}
 					}
-					else if(filterJSON.has("genres"))
+					else if(filterJSON.has("genre"))
 					{
-						for(String genre: filterJSON.getString("genres").split(","))
+						for(String genre: filterJSON.getString("genre").split(","))
 						{
 							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 							if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -2256,9 +2491,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 							}
 						}
 					}
-					else if(filterJSON.has("languages"))
+					else if(filterJSON.has("language"))
 					{
-						for(String lang: filterJSON.getString("languages").split(","))
+						for(String lang: filterJSON.getString("language").split(","))
 						{
 							Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 							if(langNode != null && seriesLangNode.equals(langNode))
@@ -2329,6 +2564,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -2336,6 +2572,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -2382,14 +2619,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -2407,9 +2644,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -2424,9 +2661,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -2485,19 +2722,23 @@ public class Kahaniya implements KahaniyaService.Iface{
 						break;
 					
 					Node series = rel.getEndNode();
+					
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
+					
 					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
 					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -2515,9 +2756,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -2532,9 +2773,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -2598,10 +2839,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);
 						
-						if(filterJSON.has("languages"))
+						if(filterJSON.has("language"))
 						{
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -2713,34 +2954,34 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			else if(feedType.equalsIgnoreCase("D"))
 			{
-				if(user_node == null)
-					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
-
-				ResourceIterator<Node> seriesNodesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+				ResourceIterator<Node> seriesNodesItr = seriesId_index.query(SERIES_ID, "*").iterator();
 				LinkedList<Node> seriesList = new LinkedList<Node>();
 				while(seriesNodesItr.hasNext())
 					seriesList.addLast(seriesNodesItr.next());
 				Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
 				for(Node series : seriesList)
-				{				
-					if(series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().equals(user_node))
-						continue;
+				{	
 					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
 						break;
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
+					
+					if(series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().equals(user_node))
+						continue;
 					
 					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
 					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -2758,9 +2999,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -2775,9 +3016,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -2821,13 +3062,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 
 			for(Node series : outputSeriesNode)
-				jsonArray.put(getJSONForSeries(series));
+				jsonArray.put(getJSONForSeries(series, user_node));
 			
 			tx.success();
 
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -2835,6 +3077,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_series()");
 			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -2845,7 +3088,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 	
 	private String get_authors(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
-
 		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
@@ -2863,14 +3105,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			if(feedType.equalsIgnoreCase("D"))
 			{
-				if(user_node == null)
-					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 
-				ResourceIterator<Node> seriesNodesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+				ResourceIterator<Node> seriesNodesItr = seriesId_index.query(SERIES_ID, "*").iterator();
 				LinkedList<Node> seriesList = new LinkedList<Node>();
 				while(seriesNodesItr.hasNext())
 					seriesList.addLast(seriesNodesItr.next());
-				Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
+				Collections.sort(seriesList, TrendingComparatorForSeriesNodes);	
+
 				for(Node series : seriesList)
 				{				
 					if(series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().equals(user_node))
@@ -2883,14 +3124,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -2901,7 +3142,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 												continue;
 											}
 											Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
-											if(outputUserNode.contains(user_node))
+											if(!outputUserNode.contains(auth))
 											{
 
 												c++;
@@ -2912,9 +3153,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -2925,7 +3166,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 										continue;
 									}
 									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
-									if(outputUserNode.contains(user_node))
+									if(!outputUserNode.contains(auth))
 									{
 
 										c++;
@@ -2934,9 +3175,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -2947,7 +3188,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 										continue;
 									}
 									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
-									if(outputUserNode.contains(user_node))
+									if(!outputUserNode.contains(auth))
 									{
 
 										c++;
@@ -2964,7 +3205,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 								continue;
 							}
 							Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
-							if(outputUserNode.contains(user_node))
+							if(!outputUserNode.contains(auth))
 							{
 
 								c++;
@@ -2980,7 +3221,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 							continue;
 						}
 						Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
-						if(outputUserNode.contains(user_node))
+						if(!outputUserNode.contains(auth))
 						{
 
 							c++;
@@ -2999,6 +3240,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_authors()");
 			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -3006,6 +3248,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_authors()");
 			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -3047,20 +3290,26 @@ public class Kahaniya implements KahaniyaService.Iface{
 						break;
 					
 					Node chapter = rel.getEndNode();
+					
 					if(filter != null && !filter.equals(""))
 					{
+						
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3078,11 +3327,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3097,11 +3346,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3159,17 +3408,21 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3182,11 +3435,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3196,11 +3449,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3250,11 +3503,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("languages"))
+						if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3304,11 +3557,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(langNode != null && seriesGenreNode.equals(genreNode))
@@ -3335,8 +3592,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			else if(feedType.equalsIgnoreCase("D"))
 			{
-				if(user_node == null)
-					throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 
 				Index<Node> chapter_id_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 				ResourceIterator<Node> allChapters = chapter_id_index.query(CHAPTER_ID, "*").iterator();
@@ -3352,21 +3607,25 @@ public class Kahaniya implements KahaniyaService.Iface{
 						continue;
 					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
 						break;
-					
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
+
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3379,11 +3638,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
+
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3393,11 +3653,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
+
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3409,12 +3670,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
+
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
 					{
+
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -3440,17 +3703,21 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3468,11 +3735,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3488,11 +3755,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3556,17 +3823,21 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3584,11 +3855,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3604,11 +3875,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3672,17 +3943,21 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
-						if(filterJSON.has("genres") && filterJSON.has("languages"))
+						
+						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						if(filterJSON.has("genre") && filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
-									for(String lang: filterJSON.getString("languages").split(","))
+									for(String lang: filterJSON.getString("language").split(","))
 									{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
@@ -3700,11 +3975,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("genres"))
+						else if(filterJSON.has("genre"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-							for(String genre: filterJSON.getString("genres").split(","))
+							for(String genre: filterJSON.getString("genre").split(","))
 							{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
@@ -3720,11 +3995,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								}
 							}
 						}
-						else if(filterJSON.has("languages"))
+						else if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 							Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-							for(String lang: filterJSON.getString("languages").split(","))
+							for(String lang: filterJSON.getString("language").split(","))
 							{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
@@ -3775,6 +4050,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_chapters()");
 			System.out.println("Something went wrong, while returning chapters from get_chapters  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -3782,6 +4058,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_chapters()");
 			System.out.println("Something went wrong, while returning chapters from get_chapters  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -3835,18 +4112,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("U_Num_Following",user.getDegree(USER_FOLLOW_USER, Direction.OUTGOING));
 		obj.put("U_Num_Subscribers",user.getDegree(USER_FOLLOW_USER, Direction.INCOMING));
 		if(req_user == null)
-			obj.put("U_Is_Following",false);
+			obj.put("U_Is_Following",0);
 		else
 		{
 
-			obj.put("U_Is_Following",false);
+			obj.put("U_Is_Following",0);
 			
 			Iterator<Relationship> followingRels = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
 			while(followingRels.hasNext())
 			{
 				if(followingRels.next().getEndNode().equals(req_user))
 				{
-					obj.put("U_Is_Following",true);
+					obj.put("U_Is_Following",1);
 					break;
 				}
 			}
@@ -3869,9 +4146,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return obj;
 	}
 	
-	private JSONObject getJSONForSeries(Node series)
+	private JSONObject getJSONForSeries(Node series, Node user)
 	{
-		JSONObject obj = new JSONObject();
+		JSONObject obj = new JSONObject();		
 		obj.put("P_Author_FullName",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
 		obj.put("P_Author",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
 		obj.put("P_Title_ID",series.getProperty(SERIES_TITLE_ID).toString());
@@ -3884,6 +4161,22 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Num_Views",0);
 		obj.put("P_Num_Fvrts",0);
 		obj.put("P_Rating",0);
+		if(user == null)
+			obj.put("Is_Subscribe",0);
+		else
+		{
+			obj.put("Is_Subscribe",0);			
+			Iterator<Relationship> followingRels = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING).iterator();
+			while(followingRels.hasNext())
+			{
+				if(followingRels.next().getEndNode().equals(series))
+				{
+					obj.put("Is_Subscribe",1);
+					break;
+				}
+			}
+		}
+
 		obj.put("Is_Neo4j",true);
 		return obj;
 	}
@@ -3906,6 +4199,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+
+			if(comment_id == null || comment_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty comment id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty chapter id");
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty user id");
+			if(parent_cmnt_id == null)
+				parent_cmnt_id = "";
+			if(content == null)
+				content = "";
+			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
@@ -3949,6 +4254,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_comment()");
 			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -3956,6 +4262,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_comment()");
 			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -3972,6 +4279,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(comment_id == null || comment_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty comment id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty chapter id");
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty user id");
+			if(parent_cmnt_id == null)
+				parent_cmnt_id = "";
+			if(content == null)
+				content = "";
 			aquireWriteLock(tx);
 			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
 			
@@ -3987,6 +4304,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_comment()");
 			System.out.println("Something went wrong, while editing comment from edit_comment  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -3994,6 +4312,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ edit_comment()");
 			System.out.println("Something went wrong, while editing comment from edit_comment  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -4007,6 +4326,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+
+			if(comment_id == null || comment_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty comment id");
 			aquireWriteLock(tx);
 			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
 			
@@ -4024,6 +4346,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_comment()");
 			System.out.println("Something went wrong, while deleting comment from delete_comment  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -4031,6 +4354,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ delete_comment()");
 			System.out.println("Something went wrong, while deleting comment from delete_comment  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -4045,6 +4369,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty chapter id");
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			
@@ -4074,15 +4400,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(KahaniyaCustomException ex)
 		{
-			System.out.println("Exception @ create_comment()");
-			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_comments()");
+			System.out.println("Something went wrong, while returning comments from get_comments  :"+ex.getMessage());
 //				ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
-			System.out.println("Exception @ create_comment()");
-			System.out.println("Something went wrong, while creating comment from create_comment  :"+ex.getMessage());
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_comments()");
+			System.out.println("Something went wrong, while returning comments from get_comments  :"+ex.getMessage());
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
@@ -4142,7 +4470,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Collections.sort(seriesList, TimeCreatedComparatorForNodes);
 			
 				for(Node series : seriesList)
-					jsonArray.put(getJSONForSeries(series));
+					jsonArray.put(getJSONForSeries(series, null));
 			}
 			else if(item_type.equalsIgnoreCase("A") || item_type.equalsIgnoreCase("U"))
 			{
@@ -4166,12 +4494,35 @@ public class Kahaniya implements KahaniyaService.Iface{
 				for(Node user : userList)
 					jsonArray.put(getJSONForUser(user, null));
 			}
+			else if(item_type.equalsIgnoreCase("R"))
+			{
+				int c = 0;
+
+				Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+				ResourceIterator<Node> reviewItr = reviewId_index.query(REVIEW_ID, "*").iterator();
+				LinkedList<Node> reviewList = new LinkedList<Node>();
+				while(reviewItr.hasNext())
+				{
+					if(c < prev_cnt)
+						continue;
+					else if ( c > prev_cnt+count)
+						break;
+					else
+						reviewList.addLast(reviewItr.next());
+				}
+				
+				Collections.sort(reviewList, TimeCreatedComparatorForNodes);
+			
+				for(Node review : reviewList)
+					jsonArray.put(getJSONForReview(review));
+			}
 			
 			tx.success();
 
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_all_items()");
 			System.out.println("Something went wrong, while returning items from get_all_items  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -4179,6 +4530,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_all_items()");
 			System.out.println("Something went wrong, while returning items from get_all_items  :"+ex.getMessage());
 			ex.printStackTrace();
@@ -4195,9 +4547,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
-			
+
 			if(item_type == null || item_type.equals(""))
 				throw new KahaniyaCustomException("Invalid item type");
+			if(item_id == null || item_id.equals(""))
+				throw new KahaniyaCustomException("Invalid item id");
+			
 			if(item_type.equalsIgnoreCase("C"))
 			{
 				Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
@@ -4212,7 +4567,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Node series = seriesId_index.get(SERIES_ID, item_id).getSingle();
 				if(series == null)
 					throw new KahaniyaCustomException("Invalid series id");
-				jsonObject = getJSONForSeries(series);
+				jsonObject = getJSONForSeries(series, null);
 			}
 			else if(item_type.equalsIgnoreCase("A") || item_type.equalsIgnoreCase("U"))
 			{
@@ -4222,11 +4577,20 @@ public class Kahaniya implements KahaniyaService.Iface{
 					throw new KahaniyaCustomException("Invalid user id");
 				jsonObject = getJSONForUser(user, null);
 			}
+			else if(item_type.equalsIgnoreCase("R"))
+			{
+				Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+				Node review = reviewId_index.get(REVIEW_ID, item_id).getSingle();
+				if(review == null)
+					throw new KahaniyaCustomException("Invalid review id");
+				jsonObject = getJSONForReview(review);
+			}
 			
 			tx.success();
 		}
 		catch(KahaniyaCustomException ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_item_details()");
 			System.out.println("Something went wrong, while returning item_details  :"+ex.getMessage());
 //				ex.printStackTrace();
@@ -4234,12 +4598,102 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		catch(Exception ex)
 		{
+			System.out.println(new Date().toString());
 			System.out.println("Exception @ get_item_details()");
 			System.out.println("Something went wrong, while returning item_details  :"+ex.getMessage());
 			ex.printStackTrace();
 			jsonObject = new JSONObject();
 		}
 		return jsonObject.toString();
+	}
+
+	@Override
+	public String get_subscriptions_for_user(String user_id, int prev_cnt,
+			int count) throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			if(user_id == null)
+				user_id = "";
+			
+			int c = 0;
+
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Node user = userId_index.get(USER_ID, user_id).getSingle();
+			
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			
+			ResourceIterator<Node> seriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+			
+			LinkedList<Node> seriesList = new LinkedList<Node>();
+			while(seriesItr.hasNext())
+				seriesList.addLast(seriesItr.next());
+			
+			Collections.sort(seriesList, TrendingComparatorForSeriesNodes);
+		
+			LinkedList<Node> outputNodes = new LinkedList<Node>();
+			if(user != null)
+			{
+				Iterator<Relationship> followingSeriesItr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES).iterator();
+				LinkedList<Node> followingSeriesList = new LinkedList<Node>();
+				while(followingSeriesItr.hasNext())
+					followingSeriesList.addLast(followingSeriesItr.next().getEndNode());
+				Collections.sort(followingSeriesList, TrendingComparatorForSeriesNodes);
+				for(Node series: followingSeriesList)
+				{
+					if(c < prev_cnt)
+					{
+						c ++;
+						continue;
+					}
+					if(c >= count + prev_cnt)
+						break;
+					outputNodes.addLast(series);
+				}
+			}
+			
+			for(Node series : seriesList)
+			{
+
+				if(outputNodes.contains(series))
+					continue;
+				if(c < prev_cnt)
+				{
+					c ++;
+					continue;
+				}
+				if(c >= count + prev_cnt)
+					break;
+				
+				outputNodes.addLast(series);
+			}
+			
+			for(Node series: outputNodes)
+				jsonArray.put(getJSONForSeries(series, user));
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_subscriptions_for_user()");
+			System.out.println("Something went wrong, while returning subscription suggestions from get_subscriptions_for_user  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_subscriptions_for_user()");
+			System.out.println("Something went wrong, while returning subscription suggestions get_subscriptions_for_user  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();		
+
 	}
 
 }

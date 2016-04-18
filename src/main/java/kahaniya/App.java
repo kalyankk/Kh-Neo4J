@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("15th April, 2016 - 05:00 P.M");
+		System.out.println("16th April, 2016 - 09:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -48,7 +48,15 @@ public class App
     		System.out.println(k.get_feed("S","G", "", 0, 10, "", "GEN2", ""));
     		System.out.println(k.get_feed("S","LNG", "", 0, 10, "", "", "LANG1"));
     		System.out.println(k.get_feed("S","LNG", "", 0, 10, "", "", "LANG2")); */
+    		//k.create_or_edit_chapter("c3", "s1", "series_type", "one", "c3", "c3", "feat_image", 104, 0, 0);
+    		//k.create_or_edit_chapter("c2", "s1", "series_type", "one", "c2", "c2", "feat_image", 103, 0, 0);
+    		//k.create_or_edit_chapter("c4", "s1", "series_type", "one", "c4", "c4", "feat_image", 105, 0, 0);
     		
+    		//System.out.println(k.get_feed("C", "L", "", 0, 10, "", "", ""));
+    		//System.out.println(k.get_feed("A","D", "", 0, 10, "", "", ""));
+    		//System.out.println(k.get_feed("S", "R", "", 0, 10, "", "", ""));
+    		//System.out.println(k.get_feed("S", "R", "", 0, 10, "one", "", ""));
+    		//System.out.println(k.get_feed("S", "R", "", 0, 10, "two", "", ""));
     	}catch(Exception te)
     	{
     		System.out.println("TException");
