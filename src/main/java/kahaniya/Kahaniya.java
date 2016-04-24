@@ -267,6 +267,33 @@ public class Kahaniya implements KahaniyaService.Iface{
 		    }
 		}; 
 
+	private static Comparator<Node> TrendingComparatorForAuthorNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   int t = (int)(new Date().getTime()/1000) - (30*24*60*60);
+		   Iterator<Relationship> chaptersItr1 = n1.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
+		   while(chaptersItr1.hasNext())
+		   {
+			   Relationship rel = chaptersItr1.next();
+			   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						   v1++;
+		   }
+		   Iterator<Relationship> chaptersItr2 = n2.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		   while(chaptersItr2.hasNext()) 
+		   {
+			   Relationship rel = chaptersItr2.next();
+			   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						   v2++;
+
+		   }
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
+				
+
     private Node User(String id, String full_name, String user_name, String email, String mobile, String dob, int privilege, int status, int time_created){
 		Node node = graphDb.createNode();
 		node.setProperty(USER_ID,id);
@@ -368,8 +395,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	{
 		//starting thrift server		
 		try{
-			
-			TServerSocket serverTransport = new TServerSocket(9779);
+			TServerSocket serverTransport = new TServerSocket(9777);
 			KahaniyaService.Processor<KahaniyaService.Iface> processor = new KahaniyaService.Processor<KahaniyaService.Iface>(this);
 			Args serverArgs = new Args(serverTransport);
 			serverArgs.processor(processor);
@@ -4074,10 +4100,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Author",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
 		obj.put("P_Title_ID",chapter.getProperty(CHAPTER_TITLE_ID).toString());
 		obj.put("P_Title",chapter.getProperty(CHAPTER_TITLE).toString());
-		obj.put("P_Feature_Image",chapter.getProperty(CHAPTER_FEAT_IMAGE));
 		obj.put("P_Id",chapter.getProperty(CHAPTER_ID).toString());
 		
 		Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+		
+		if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+			obj.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG));
+		else
+			obj.put("P_Feature_Image",chapter.getProperty(CHAPTER_FEAT_IMAGE));
 		
 		JSONObject seriesJSON = new JSONObject();
 		seriesJSON.put("Series_Id", series.getProperty(SERIES_ID).toString());
@@ -4161,6 +4191,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Num_Views",0);
 		obj.put("P_Num_Fvrts",0);
 		obj.put("P_Rating",0);
+		obj.put("P_Type", series.getProperty(SERIES_TYPE).toString());
+		obj.put("P_Num_Chapters", series.getDegree(CHAPTER_BELONGS_TO_SERIES));
 		if(user == null)
 			obj.put("Is_Subscribe",0);
 		else
@@ -4693,6 +4725,174 @@ public class Kahaniya implements KahaniyaService.Iface{
 			jsonArray = new JSONArray();
 		}
 		return jsonArray.toString();		
+
+	}
+	
+
+
+	public String get_top_authors(String user_id, int prev_cnt,
+			int count) throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			if(user_id == null)
+				user_id = "";
+			
+			int c = 0;
+
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Node user = userId_index.get(USER_ID, user_id).getSingle();
+
+			ResourceIterator<Node> allUsersItr = userId_index.get(USER_ID, "*").iterator();
+			
+			
+			
+			LinkedList<Node> authorsList = new LinkedList<Node>();
+			while(allUsersItr.hasNext())
+			{
+				Node n = allUsersItr.next();
+				if(n.getDegree(USER_WRITTEN_A_CHAPTER) > 0 && !n.equals(user))
+					authorsList.addLast(n);
+			}
+			
+			Collections.sort(authorsList, TrendingComparatorForAuthorNodes);
+		
+			LinkedList<Node> outputNodes = new LinkedList<Node>();
+			for(Node author : authorsList)
+			{
+				if(c < prev_cnt)
+				{
+					c ++;
+					continue;
+				}
+				if(c >= count + prev_cnt)
+					break;
+				outputNodes.addLast(author);				
+			}
+			
+			for(Node author: outputNodes)
+				jsonArray.put(getJSONForUser(author, user));
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_top_authors()");
+			System.out.println("Something went wrong, while returning top authors from get_top_authors  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_top_authors()");
+			System.out.println("Something went wrong, while returning top authors from get_top_authors  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();		
+
+	}
+
+	public String get_stats() throws TException {
+		JSONObject jsonObj = new JSONObject();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			ResourceIterator<Node> allUsersItr = userId_index.get(USER_ID, "*").iterator();
+			int tot_users = 0;
+			int tot_authors = 0;
+			while(allUsersItr.hasNext())
+			{
+				tot_users++;
+				if(allUsersItr.next().hasRelationship(USER_WRITTEN_A_CHAPTER))
+					tot_authors++;
+			}
+			
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			ResourceIterator<Node> allSeriesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+			int tot_series = 0;
+			int tot_short_series = 0;
+			int tot_series_without_any_chapters = 0;
+			int tot_chapters = 0;
+			int tot_reviews = 0;
+			while(allSeriesItr.hasNext())
+			{
+				tot_series++;
+				Node series = allSeriesItr.next();
+				if(series.getProperty(SERIES_TYPE).toString().equals("1"))
+					tot_short_series++;
+				if(series.getDegree(CHAPTER_BELONGS_TO_SERIES) == 0)
+					tot_series_without_any_chapters++;
+				tot_chapters = tot_chapters + series.getDegree(CHAPTER_BELONGS_TO_SERIES);
+				tot_reviews = tot_reviews + series.getDegree(REVIEW_BELONGS_TO_SERIES);
+			}
+
+			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+			ResourceIterator<Node> allCommentsItr = commentId_index.get(COMMENT_ID, "*").iterator();
+			int tot_comments = 0;
+			while(allCommentsItr.hasNext())
+			{
+				tot_comments++;
+			}
+			
+			JSONObject langInfo = new JSONObject();
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			ResourceIterator<Node> allLangsItr = lang_index.get(LANG_NAME, "*").iterator();
+			while(allLangsItr.hasNext())
+			{
+				Node l = allLangsItr.next();
+				langInfo.put(l.getProperty(LANG_NAME).toString(), l.getDegree(USER_INTERESTED_LANGUAGE));
+			}
+			
+			JSONObject genreInfo = new JSONObject();
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			ResourceIterator<Node> allGenresItr = genre_index.get(GENRE_NAME, "*").iterator();
+			while(allGenresItr.hasNext())
+			{
+				Node g = allGenresItr.next();
+				genreInfo.put(g.getProperty(GENRE_NAME).toString(), g.getDegree(USER_INTERESTED_GENRE));
+			}
+			
+			
+
+			jsonObj.put("Total_Num_Of_Series", tot_series);
+			jsonObj.put("Total_Num_Of_Short_Series", tot_short_series);
+			jsonObj.put("Total_Num_Of_Chapters", tot_chapters);
+			jsonObj.put("Total_Num_Of_Series_Without_Stories", tot_series_without_any_chapters);
+			jsonObj.put("Total_Num_Of_Users", tot_users);
+			jsonObj.put("Total_Num_Of_Users_Started_Writing", tot_authors);
+			jsonObj.put("Total_Num_Of_Reviews", tot_reviews);
+			jsonObj.put("Total_Num_Of_Comments", tot_comments);
+			jsonObj.put("lang", langInfo);
+			jsonObj.put("genre", genreInfo);
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_stats()");
+			System.out.println("Something went wrong, while returning stats from get_stats  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonObj = new JSONObject();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_stats()");
+			System.out.println("Something went wrong, while returning stats from get_stats  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonObj = new JSONObject();
+		}
+		return jsonObj.toString();		
 
 	}
 
