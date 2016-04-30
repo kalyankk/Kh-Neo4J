@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("16th April, 2016 - 09:00 P.M");
+		System.out.println("30th April, 2016 - 12:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
