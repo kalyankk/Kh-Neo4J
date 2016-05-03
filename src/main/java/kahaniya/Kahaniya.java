@@ -95,6 +95,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String STATUS = "status";
 	public static final String TIME_CREATED = "time_created";
 	public static final String TIME_EDITED = "time_edited";
+	public static final String IS_DELETED = "is_deleted";
 	
 	//genre node related keys
 	public static final String GENRE_NAME = "genre_name";
@@ -544,6 +545,28 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println(new Date().toString());
 			System.out.println("Exception @ add_neo4j_lock_nodes()");
 			System.out.println("Failed to create lock nodes : " + e.getMessage());}
+		finally{}
+	}
+	
+	public void add_additional_properties() 
+	{
+		try (Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> userNodeIndex = graphDb.index().forNodes( USER_ID_INDEX );
+				
+			ResourceIterator<Node> userItr = userNodeIndex.query(USER_ID, "*").iterator();
+			while(userItr.hasNext())
+			{
+				Node user = userItr.next();
+				if(!user.hasProperty(MOBILE_DIAL_CODE))
+					user.setProperty(MOBILE_DIAL_CODE, "");
+			}
+			tx.success();
+		}
+		catch(Exception e){
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ add_additional_properties()");
+			System.out.println("Failed to add additional properties : " + e.getMessage());}
 		finally{}
 	}
 	
@@ -1063,7 +1086,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
-
+			
 			if(id == null || id.length() == 0)
 				throw new KahaniyaCustomException("Null or empty string receieved for the parameter id");
 			if(full_name == null || full_name.length() == 0)
@@ -1086,6 +1109,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				genres = "";
 			if(languages == null)
 				languages = "";
+			
 			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
@@ -3233,12 +3257,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+											Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+											if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+												continue;
 											if(c < prev_cnt)
 											{
 												c++;
 												continue;
 											}
-											Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 											if(!outputUserNode.contains(auth))
 											{
 
@@ -3257,12 +3283,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
+									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+									if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+										continue;
 									if(c < prev_cnt)
 									{
 										c++;
 										continue;
 									}
-									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 									if(!outputUserNode.contains(auth))
 									{
 
@@ -3279,12 +3307,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
 								{
+									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+									if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+										continue;
 									if(c < prev_cnt)
 									{
 										c++;
 										continue;
 									}
-									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 									if(!outputUserNode.contains(auth))
 									{
 
@@ -3296,12 +3326,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
+							Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+							if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+								continue;
 							if(c < prev_cnt)
 							{
 								c++;
 								continue;
 							}
-							Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 							if(!outputUserNode.contains(auth))
 							{
 
@@ -3312,12 +3344,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 					else // i.e., no need to apply filter
 					{
+						Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
+						if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+							continue;
 						if(c < prev_cnt)
 						{
 							c++;
 							continue;
 						}
-						Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 						if(!outputUserNode.contains(auth))
 						{
 
@@ -5146,6 +5180,235 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return jsonObj.toString();		
 
+	}
+
+	@Override
+	public String delete_chapter(String chapter_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter chapter_id");
+
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
+			
+			Node chapter = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
+			
+			if(chapter == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+
+			deleteChapterRelationships(chapter);
+			
+			chapterId_index.remove(chapter);
+			chapterTitleId_index.remove(chapter);
+			chapter.delete();
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_chapter()");
+			System.out.println("Something went wrong, while deleting chapter from delete_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_chapter()");
+			System.out.println("Something went wrong, while deleting chapter from delete_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;	
+	}
+	
+	private void deleteChapterRelationships(Node chapter)
+	{
+
+		Index<Relationship> chapterViewsIndex = graphDb.index().forRelationships(USER_VIEWED_CHAPTER_REL_INDEX);
+		Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+		
+		Iterator<Relationship> relsItr = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+		while(relsItr.hasNext())
+			chapterViewsIndex.remove(relsItr.next());
+
+		relsItr = chapter.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
+		while(relsItr.hasNext())
+		{
+			Relationship rel =  relsItr.next();
+			Node cmntNode = rel.getStartNode();
+			rel.delete();
+			
+			commentId_index.remove(cmntNode);
+			deleteSubComments(cmntNode);
+			Iterator<Relationship> cmntRels = cmntNode.getRelationships().iterator();
+			while(cmntRels.hasNext())
+				cmntRels.next().delete();
+			cmntNode.delete();
+		}
+
+		
+		relsItr = chapter.getRelationships().iterator();
+		while(relsItr.hasNext())
+			relsItr.next().delete();
+	}
+	
+	private void deleteSeriesRelationships(Node series)
+	{
+
+		Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+		Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+
+		Iterator<Relationship> relsItr = series.getRelationships(REVIEW_BELONGS_TO_SERIES).iterator();
+		while(relsItr.hasNext())
+		{
+			Relationship rel =  relsItr.next();
+			Node reviewNode = rel.getStartNode();
+			rel.delete();
+			
+			reviewId_index.remove(reviewNode);
+			Iterator<Relationship> reviewRels = reviewNode.getRelationships().iterator();
+			while(reviewRels.hasNext())
+				reviewRels.next().delete();
+			reviewNode.delete();
+		}
+		
+		relsItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		while(relsItr.hasNext())
+		{
+			Relationship rel =  relsItr.next();
+			Node chapterNode = rel.getStartNode();
+			rel.delete();
+			
+			chapterId_index.remove(chapterNode);
+			deleteChapterRelationships(chapterNode);
+			chapterNode.delete();
+		}
+
+		
+		relsItr = series.getRelationships().iterator();
+		while(relsItr.hasNext())
+			relsItr.next().delete();
+	}
+	
+	private void deleteSubComments(Node comment)
+	{
+
+		Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+		
+		Iterator<Relationship> relItr = comment.getRelationships(REPLY_COMMENT_WRITTEN_ON_COMMENT).iterator();
+		while(relItr.hasNext())
+		{
+			Relationship rel = relItr.next();
+			Node cmntNode = rel.getStartNode();
+			rel.delete();
+			
+			deleteSubComments(cmntNode);
+			commentId_index.remove(cmntNode);
+
+			Iterator<Relationship> cmntRels = cmntNode.getRelationships().iterator();
+			while(cmntRels.hasNext())
+				cmntRels.next().delete();
+			
+			cmntNode.delete();
+		}
+		
+	}
+
+	@Override
+	public String delete_user(String user_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter user_id");
+
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node user = userId_index.get(USER_ID,user_id).getSingle();
+			
+			if(user == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			
+			userId_index.remove(user);
+			user.setProperty(IS_DELETED,"1");
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;	
+	}
+
+	@Override
+	public String delete_series(String series_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter series_id");
+
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
+			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
+			
+			Node series = seriesId_index.get(SERIES_ID,series_id).getSingle();
+			
+			if(series == null)
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
+			
+			deleteSeriesRelationships(series);
+
+			seriesId_index.remove(series);
+			seriesTitleId_index.remove(series);
+			seriesType_index.remove(series);
+			series.delete();
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;	
 	}
 
 }

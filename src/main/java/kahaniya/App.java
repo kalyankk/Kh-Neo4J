@@ -4,10 +4,11 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("30th April, 2016 - 12:00 P.M");
+		System.out.println("3rd May, 2016 - 04:30 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
+		kahaniya.add_additional_properties();
 		kahaniya.startThriftServer();
 
 		//test(kahaniya);
@@ -57,6 +58,8 @@ public class App
     		//System.out.println(k.get_feed("S", "R", "", 0, 10, "", "", ""));
     		//System.out.println(k.get_feed("S", "R", "", 0, 10, "one", "", ""));
     		//System.out.println(k.get_feed("S", "R", "", 0, 10, "two", "", ""));
+    		//k.create_user("three", "three", "three", "three", "three", "three", "three", "three", "three", "three", "GEN1,GEN2", "LANG1,LANG2", 2, 2, 105);
+    		
     	}catch(Exception te)
     	{
     		System.out.println("TException");
