@@ -4,20 +4,22 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("3rd May, 2016 - 04:30 P.M");
+		System.out.println("4th May, 2016 - 02:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
 		kahaniya.add_additional_properties();
 		kahaniya.startThriftServer();
 
-		//test(kahaniya);
+//		test(kahaniya);
 
     }
     
     public static void test( Kahaniya k)
     {
     	try{
+
+  //  		System.out.println(k.get_stats());
     		//k.create_genre("GEN1");
     		//k.create_genre("GEN2");
     		//k.create_language("LANG1");

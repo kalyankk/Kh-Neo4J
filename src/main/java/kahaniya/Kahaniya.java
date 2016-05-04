@@ -4493,6 +4493,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 			}
 		}
+		
+		obj.put("P_Lang", series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME));
 
 		obj.put("Is_Neo4j",true);
 		return obj;
@@ -5091,7 +5093,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			aquireWriteLock(tx);
 			
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
-			ResourceIterator<Node> allUsersItr = userId_index.get(USER_ID, "*").iterator();
+			ResourceIterator<Node> allUsersItr = userId_index.query(USER_ID, "*").iterator();
 			int tot_users = 0;
 			int tot_authors = 0;
 			while(allUsersItr.hasNext())
@@ -5102,7 +5104,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 			
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
-			ResourceIterator<Node> allSeriesItr = seriesId_index.get(SERIES_ID, "*").iterator();
+			ResourceIterator<Node> allSeriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
 			int tot_series = 0;
 			int tot_short_series = 0;
 			int tot_series_without_any_chapters = 0;
@@ -5121,7 +5123,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 
 			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
-			ResourceIterator<Node> allCommentsItr = commentId_index.get(COMMENT_ID, "*").iterator();
+			ResourceIterator<Node> allCommentsItr = commentId_index.query(COMMENT_ID, "*").iterator();
 			int tot_comments = 0;
 			while(allCommentsItr.hasNext())
 			{
@@ -5130,7 +5132,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			JSONObject langInfo = new JSONObject();
 			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
-			ResourceIterator<Node> allLangsItr = lang_index.get(LANG_NAME, "*").iterator();
+			ResourceIterator<Node> allLangsItr = lang_index.query(LANG_NAME, "*").iterator();
 			while(allLangsItr.hasNext())
 			{
 				Node l = allLangsItr.next();
@@ -5139,7 +5141,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			JSONObject genreInfo = new JSONObject();
 			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
-			ResourceIterator<Node> allGenresItr = genre_index.get(GENRE_NAME, "*").iterator();
+			ResourceIterator<Node> allGenresItr = genre_index.query(GENRE_NAME, "*").iterator();
 			while(allGenresItr.hasNext())
 			{
 				Node g = allGenresItr.next();
