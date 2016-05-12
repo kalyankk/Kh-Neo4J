@@ -54,10 +54,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SERIES_TYPE_INDEX = "series_index_by_type";
 	
 	public static final String USER_VIEWED_CHAPTER_REL_INDEX = "user_viewed_chapter_relation_index";
-	
+
 	public static final String KEYWORD_INDEX = "keyword_index_by_name";
 	
+	public static final String SEARCH_INDEX = "search_index";
+	
 	public static final String LOCK_INDEX = "lock_index";
+	
+	//search related keys
+	public static final String SEARCH_USER = "search_user";
+	public static final String SEARCH_CHAPTER = "search_chapter";
+	public static final String SEARCH_SERIES = "search_series";
 	
 	//lock related keys
 	public static final String LockName = "lock_node";
@@ -553,6 +560,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try (Transaction tx = graphDb.beginTx())
 		{
 			Index<Node> userNodeIndex = graphDb.index().forNodes( USER_ID_INDEX );
+			Index<Node> seriesNodeIndex = graphDb.index().forNodes( SERIES_ID_INDEX );
+			Index<Node> chapterNodeIndex = graphDb.index().forNodes( CHAPTER_ID_INDEX );
+			Index<Node> searchIndex = graphDb.index().forNodes( SEARCH_INDEX );
 				
 			ResourceIterator<Node> userItr = userNodeIndex.query(USER_ID, "*").iterator();
 			while(userItr.hasNext())
@@ -560,6 +570,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Node user = userItr.next();
 				if(!user.hasProperty(MOBILE_DIAL_CODE))
 					user.setProperty(MOBILE_DIAL_CODE, "");
+				searchIndex.remove(user);
+				searchIndex.add(user, SEARCH_USER, user.getProperty(USER_NAME).toString().toLowerCase() + " " + user.getProperty(FULL_NAME).toString().toLowerCase());
+			}
+
+			ResourceIterator<Node> seriesItr = seriesNodeIndex.query(SERIES_ID, "*").iterator();
+			while(seriesItr.hasNext())
+			{
+				Node series = seriesItr.next();
+				searchIndex.remove(series);
+				searchIndex.add(series, SEARCH_SERIES, series.getProperty(SERIES_TITLE_ID).toString().toLowerCase());
+			}
+			
+			ResourceIterator<Node> chapterItr = chapterNodeIndex.query(CHAPTER_ID, "*").iterator();
+			while(chapterItr.hasNext())
+			{
+				Node chapter = chapterItr.next();
+				searchIndex.remove(chapter);
+				searchIndex.add(chapter, SEARCH_CHAPTER, chapter.getProperty(CHAPTER_TITLE_ID).toString().toLowerCase());
 			}
 			tx.success();
 		}
@@ -1115,6 +1143,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
 			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
@@ -1147,6 +1176,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			//Indexing newly created user node
 			userId_index.add(user_node, USER_ID, id);
 			userName_index.add(user_node, USER_NAME, user_name.toLowerCase());
+			search_index.add(user_node, SEARCH_USER, user_name.toLowerCase() + " " + full_name.toLowerCase());
 			
 			if(!email.equals(""))
 				userEmail_index.add(user_node, EMAIL, email.toLowerCase());
@@ -1174,7 +1204,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 	
 	}
-	
 
 	@Override
 	public String edit_user_basic_info(String id, String full_name,
@@ -1193,6 +1222,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
@@ -1201,6 +1231,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			user_node.setProperty(FULL_NAME, full_name);
 			user_node.setProperty(GENDER, gender);
 			user_node.setProperty(DOB, dob);
+			
+			search_index.remove(user_node);
+			search_index.add(user_node, SEARCH_USER, user_node.getProperty(USER_NAME).toString().toLowerCase() + " " + full_name.toLowerCase());
 			
 			res = "true";
 			tx.success();
@@ -1282,7 +1315,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 	}
 	
-
 	@Override
 	public String edit_user_security_details(String id, String user_name)
 			throws TException {
@@ -1298,6 +1330,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node user_node = userId_index.get(USER_ID,id).getSingle();
 			if(user_node == null)
@@ -1307,7 +1340,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			userName_index.remove(user_node);
 			userName_index.add(user_node, USER_NAME, user_name.toLowerCase());
-			
+			search_index.remove(user_node);
+			search_index.add(user_node, SEARCH_USER, user_name.toLowerCase() + " " + user_node.getProperty(FULL_NAME).toString().toLowerCase());
+						
 			res = "true";
 			tx.success();
 
@@ -1331,7 +1366,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 	}
 	
-
 	@Override
 	public String edit_user_languages(String id, String languages)
 			throws TException {
@@ -1383,7 +1417,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 	}
 	
-
 	@Override
 	public String edit_user_genres(String id, String genres)
 			throws TException {
@@ -1495,7 +1528,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return null;
 	}
 
-
 	private JSONObject getJSONForGenre(Node genre)
 	{
 		JSONObject ret = new JSONObject();
@@ -1583,6 +1615,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
 			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
+
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
@@ -1640,6 +1674,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			seriesTitleId_index.add(series_node, SERIES_TITLE_ID, title_id.toLowerCase());
 			seriesType_index.add(series_node, SERIES_TYPE, series_type);
 
+			search_index.add(series_node, SEARCH_SERIES, title_id.toLowerCase());
+			
 			res = "true";
 			tx.success();
 
@@ -1761,7 +1797,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			series_node.setProperty(SERIES_DD_IMG, dd_img);
 			series_node.setProperty(SERIES_DD_SUMMARY, dd_summary);
 			series_node.setProperty(SERIES_TYPE, series_type);
-			
 			
 			//update indexing for the edited series node
 			seriesType_index.remove(series_node);
@@ -2015,6 +2050,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
@@ -2042,6 +2078,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			//Indexing newly created series node
 			chapterId_index.add(chapter_node, CHAPTER_ID, chapter_id);
 			chapterTitleId_index.add(chapter_node, CHAPTER_TITLE_ID, title_id.toLowerCase());
+			search_index.add(chapter_node, SEARCH_CHAPTER, title_id.toLowerCase());
 			
 			res = "true";
 			tx.success();
@@ -4510,8 +4547,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			return edit_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time);
 		else return "false";		
 	}
-	
-	
+		
 	public String create_comment(String chapter_id, String comment_id,
 			String content, String parent_cmnt_id, String user_id, int time)
 			throws TException {
@@ -4590,7 +4626,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 
 	}
-
 	
 	public String edit_comment(String chapter_id, String comment_id,
 			String content, String parent_cmnt_id, String user_id, int time)
@@ -5015,7 +5050,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	}
 	
-
 	@Override
 	public String get_top_authors( int prev_cnt, int count,
 			String user_id) throws TException {
@@ -5086,80 +5120,119 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 
 	@Override
-	public String get_stats() throws TException {
+	public String get_stats( String stats_type) throws TException {
 		JSONObject jsonObj = new JSONObject();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
 			
-			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
-			ResourceIterator<Node> allUsersItr = userId_index.query(USER_ID, "*").iterator();
 			int tot_users = 0;
 			int tot_authors = 0;
-			while(allUsersItr.hasNext())
-			{
-				tot_users++;
-				if(allUsersItr.next().hasRelationship(USER_WRITTEN_A_CHAPTER))
-					tot_authors++;
-			}
 			
-			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
-			ResourceIterator<Node> allSeriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
 			int tot_series = 0;
 			int tot_short_series = 0;
 			int tot_series_without_any_chapters = 0;
 			int tot_chapters = 0;
 			int tot_reviews = 0;
-			while(allSeriesItr.hasNext())
-			{
-				tot_series++;
-				Node series = allSeriesItr.next();
-				if(series.getProperty(SERIES_TYPE).toString().equals("1"))
-					tot_short_series++;
-				if(series.getDegree(CHAPTER_BELONGS_TO_SERIES) == 0)
-					tot_series_without_any_chapters++;
-				tot_chapters = tot_chapters + series.getDegree(CHAPTER_BELONGS_TO_SERIES);
-				tot_reviews = tot_reviews + series.getDegree(REVIEW_BELONGS_TO_SERIES);
-			}
-
-			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
-			ResourceIterator<Node> allCommentsItr = commentId_index.query(COMMENT_ID, "*").iterator();
+			
 			int tot_comments = 0;
-			while(allCommentsItr.hasNext())
-			{
-				tot_comments++;
-			}
 			
 			JSONObject langInfo = new JSONObject();
-			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
-			ResourceIterator<Node> allLangsItr = lang_index.query(LANG_NAME, "*").iterator();
-			while(allLangsItr.hasNext())
-			{
-				Node l = allLangsItr.next();
-				langInfo.put(l.getProperty(LANG_NAME).toString(), l.getDegree(USER_INTERESTED_LANGUAGE));
-			}
-			
 			JSONObject genreInfo = new JSONObject();
-			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
-			ResourceIterator<Node> allGenresItr = genre_index.query(GENRE_NAME, "*").iterator();
-			while(allGenresItr.hasNext())
+			
+			if("U".equalsIgnoreCase(stats_type))
 			{
-				Node g = allGenresItr.next();
-				genreInfo.put(g.getProperty(GENRE_NAME).toString(), g.getDegree(USER_INTERESTED_GENRE));
-			}
-			
-			
 
-			jsonObj.put("Total_Num_Of_Series", tot_series);
-			jsonObj.put("Total_Num_Of_Short_Series", tot_short_series);
-			jsonObj.put("Total_Num_Of_Chapters", tot_chapters);
-			jsonObj.put("Total_Num_Of_Series_Without_Stories", tot_series_without_any_chapters);
-			jsonObj.put("Total_Num_Of_Users", tot_users);
-			jsonObj.put("Total_Num_Of_Users_Started_Writing", tot_authors);
-			jsonObj.put("Total_Num_Of_Reviews", tot_reviews);
-			jsonObj.put("Total_Num_Of_Comments", tot_comments);
-			jsonObj.put("lang", langInfo);
-			jsonObj.put("genre", genreInfo);
+				Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+				ResourceIterator<Node> allUsersItr = userId_index.query(USER_ID, "*").iterator();
+			
+				while(allUsersItr.hasNext())
+				{
+					tot_users++;
+					if(allUsersItr.next().hasRelationship(USER_WRITTEN_A_CHAPTER))
+						tot_authors++;
+				}
+				jsonObj.put("Total_Num_Of_Users", tot_users);
+				jsonObj.put("Total_Num_Of_Users_Started_Writing", tot_authors);
+
+			}
+			else if("S".equalsIgnoreCase(stats_type))
+			{
+				Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+				ResourceIterator<Node> allSeriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+				while(allSeriesItr.hasNext())
+				{
+					tot_series++;
+					Node series = allSeriesItr.next();
+					if(series.getProperty(SERIES_TYPE).toString().equals("1"))
+						tot_short_series++;
+					if(series.getDegree(CHAPTER_BELONGS_TO_SERIES) == 0)
+						tot_series_without_any_chapters++;
+				}
+				jsonObj.put("Total_Num_Of_Series", tot_series);
+				jsonObj.put("Total_Num_Of_Short_Series", tot_short_series);
+				jsonObj.put("Total_Num_Of_Series_Without_Stories", tot_series_without_any_chapters);
+
+			}
+			else if("CH".equalsIgnoreCase(stats_type))
+			{
+				Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				ResourceIterator<Node> allChaptersItr = chapterId_index.query(CHAPTER_ID, "*").iterator();
+				while(allChaptersItr.hasNext())
+				{
+					tot_chapters ++;
+					allChaptersItr.next();
+				}
+				jsonObj.put("Total_Num_Of_Chapters", tot_chapters);
+			}
+			else if("R".equalsIgnoreCase(stats_type))
+			{
+				Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
+				ResourceIterator<Node> allReviewsItr = reviewId_index.query(REVIEW_ID, "*").iterator();
+				while(allReviewsItr.hasNext())
+				{
+					tot_reviews ++;
+					allReviewsItr.next();
+				}
+				jsonObj.put("Total_Num_Of_Reviews", tot_reviews);
+			}
+			else if("C".equalsIgnoreCase(stats_type))
+			{
+				Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+				ResourceIterator<Node> allCommentsItr = commentId_index.query(COMMENT_ID, "*").iterator();
+				while(allCommentsItr.hasNext())
+				{
+					tot_comments++;
+					allCommentsItr.next();
+				}
+				jsonObj.put("Total_Num_Of_Comments", tot_comments);
+
+			}
+			else if("L".equalsIgnoreCase(stats_type))
+			{
+			
+				Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+				ResourceIterator<Node> allLangsItr = lang_index.query(LANG_NAME, "*").iterator();
+				while(allLangsItr.hasNext())
+				{
+					Node l = allLangsItr.next();
+					langInfo.put(l.getProperty(LANG_NAME).toString(), l.getDegree(USER_INTERESTED_LANGUAGE));
+				}
+				jsonObj.put("lang", langInfo);
+			}
+			else if("G".equalsIgnoreCase(stats_type))
+			{
+			
+				Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+				ResourceIterator<Node> allGenresItr = genre_index.query(GENRE_NAME, "*").iterator();
+				while(allGenresItr.hasNext())
+				{
+					Node g = allGenresItr.next();
+					genreInfo.put(g.getProperty(GENRE_NAME).toString(), g.getDegree(USER_INTERESTED_GENRE));
+				}
+				jsonObj.put("genre", genreInfo);
+			}
+
 			
 			tx.success();
 
@@ -5195,6 +5268,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node chapter = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
 			
@@ -5205,6 +5279,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			chapterId_index.remove(chapter);
 			chapterTitleId_index.remove(chapter);
+			search_index.remove(chapter);
 			chapter.delete();
 			
 			res = "true";
@@ -5333,6 +5408,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("Null or empty string receieved for the parameter user_id");
 
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node user = userId_index.get(USER_ID,user_id).getSingle();
 			
@@ -5340,6 +5416,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 			
 			userId_index.remove(user);
+			search_index.remove(user);
 			user.setProperty(IS_DELETED,"1");
 			
 			res = "true";
@@ -5377,6 +5454,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> seriesTitleId_index = graphDb.index().forNodes(SERIES_TITLE_ID_INDEX);
 			Index<Node> seriesType_index = graphDb.index().forNodes(SERIES_TYPE_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node series = seriesId_index.get(SERIES_ID,series_id).getSingle();
 			
@@ -5388,6 +5466,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			seriesId_index.remove(series);
 			seriesTitleId_index.remove(series);
 			seriesType_index.remove(series);
+			search_index.remove(series);
 			series.delete();
 			
 			res = "true";
@@ -5413,4 +5492,152 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;	
 	}
 
+	@Override
+	public String search(String query, int tp, String user_id, int prev_cnt, int count)
+			throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+
+			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
+			ResourceIterator<Node> userItr = null;
+			ResourceIterator<Node> seriesItr = null;
+			ResourceIterator<Node> chapterItr = null;
+			
+			if(tp == 0) //all
+			{
+				userItr = search_index.query(SEARCH_USER, query.toLowerCase()).iterator();
+				seriesItr = search_index.query(SEARCH_SERIES, query.toLowerCase()).iterator();
+				chapterItr = search_index.query(SEARCH_CHAPTER, query.toLowerCase()).iterator();
+				int  i = 0;
+				JSONArray usersArray = new JSONArray();
+				while(userItr.hasNext() && i < 3)
+				{
+					JSONObject obj = new JSONObject();
+					Node user = userItr.next();
+					obj.put("FullName", user.getProperty(FULL_NAME).toString());
+					obj.put("UserId", user.getProperty(USER_ID).toString());
+					usersArray.put(obj);
+					i++;
+				}
+				JSONObject usersData = new JSONObject();
+				usersData.put("tp", 0);
+				usersData.put("data", usersArray);
+				
+				i = 0;
+				JSONArray seriesArray = new JSONArray();
+				while(seriesItr.hasNext() && i < 3)
+				{
+					JSONObject obj = new JSONObject();
+					Node series = seriesItr.next();
+					obj.put("P_Title", series.getProperty(SERIES_TITLE).toString());
+					obj.put("P_Id", series.getProperty(SERIES_ID).toString());
+					obj.put("P_Title_ID", series.getProperty(SERIES_TITLE_ID).toString());
+					seriesArray.put(obj);
+					i++;
+				}
+				JSONObject seriesData = new JSONObject();
+				seriesData.put("tp", 1);
+				seriesData.put("data", seriesArray);
+					
+				i = 0;
+				JSONArray chapterArray = new JSONArray();
+				while(chapterItr.hasNext() && i < 3)
+				{
+					JSONObject obj = new JSONObject();
+					Node chapter = chapterItr.next();
+					obj.put("P_Title", chapter.getProperty(CHAPTER_TITLE).toString());
+					obj.put("P_Id", chapter.getProperty(CHAPTER_ID).toString());
+					obj.put("P_Title_ID", chapter.getProperty(CHAPTER_TITLE_ID).toString());
+					obj.put("S_Title_ID", chapter.getProperty(CHAPTER_TITLE).toString());
+					usersArray.put(obj);
+					i++;
+				}
+				JSONObject chaptersData = new JSONObject();
+				chaptersData.put("tp", 2);
+				chaptersData.put("data", chapterArray);
+
+				jsonArray.put(usersData);
+				jsonArray.put(seriesData);
+				jsonArray.put(chaptersData);
+			}
+			else if(tp == 1) // users
+			{
+				userItr = search_index.query(SEARCH_USER, query.toLowerCase()).iterator();
+				Node s_user = user_index.get(USER_ID, user_id).getSingle();
+				
+				int c = 0;
+				while(c < prev_cnt && userItr.hasNext())
+				{
+					c++;
+					userItr.next();
+				}
+				c = 0;
+				while(userItr.hasNext() && c < count)
+				{
+					c++;
+					jsonArray.put(getJSONForUser(userItr.next(),s_user)); 
+				}
+			}
+			else if(tp == 2) // series
+			{
+				seriesItr = search_index.query(SEARCH_SERIES, query.toLowerCase()).iterator();
+				Node s_user = user_index.get(USER_ID, user_id).getSingle();
+				
+				int c = 0;
+				while(c < prev_cnt && seriesItr.hasNext())
+				{
+					c++;
+					seriesItr.next();
+				}
+				c = 0;
+				while(seriesItr.hasNext() && c < count)
+				{
+					c++;
+					jsonArray.put(getJSONForSeries(seriesItr.next(),s_user)); 
+				}
+			}
+			else if(tp == 3) // chapters
+			{
+				chapterItr = search_index.query(SEARCH_CHAPTER, query.toLowerCase()).iterator();
+				Node s_user = user_index.get(USER_ID, user_id).getSingle();
+
+				int c = 0;
+				while(c < prev_cnt && chapterItr.hasNext())
+				{
+					c++;
+					chapterItr.next();
+				}
+				c = 0;
+				while(chapterItr.hasNext() && c < count)
+				{
+					c++;
+					jsonArray.put(getJSONForChapter(chapterItr.next(),s_user)); 
+				}
+			}
+			
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ search()");
+			System.out.println("Something went wrong, while returning search  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ search()");
+			System.out.println("Something went wrong, while returning search  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();	
+	}
+
+	
 }
