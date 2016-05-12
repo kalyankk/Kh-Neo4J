@@ -2457,35 +2457,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			for(Node n : lang_genres)
 			{
-				JSONObject jobj = new JSONObject();
-				JSONArray jarray = new JSONArray();
-				
 				Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
-				LinkedList<Node> chapterList = new LinkedList<Node>();
 				while(seriesRelItr.hasNext())
 				{
 					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 					while(chapterRelItr.hasNext())
-					{
-						Node t = chapterRelItr.next().getStartNode();
-						chapterList.addLast(t);
-						allChapterList.addLast(t);
-					}
-				}
-				
-				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
-				for(int i=0; i< 3; i++)
-				{
-					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterList.get(i), user_node));
-				}
-				if(jarray.length() > 0)
-				{
-					jobj.put("tp",2);
-					jobj.put("ttl", n.getProperty(GENRE_NAME));
-					jobj.put("data", jarray);
-
-					jsonArrayForGenres.put(jobj);
+						allChapterList.addLast(chapterRelItr.next().getStartNode());
+					
 				}
 				
 			}
@@ -2508,7 +2486,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 				jsonArray.put(jRecObj);
 			} 
-				
 
 			for(Node n : langs)
 			{
@@ -2541,9 +2518,38 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				
 			}
-			
-			for(int i=0; i<jsonArrayForGenres.length(); i++)
-				jsonArray.put(jsonArrayForGenres.get(i));
+
+			for(Node g : genres)
+			{
+				JSONObject jobj = new JSONObject();
+				JSONArray jarray = new JSONArray();
+				
+				Iterator<Relationship> seriesRelItr = g.getRelationships(SERIES_BELONGS_TO_GENRE).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(seriesRelItr.hasNext())
+				{
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+					{
+						chapterList.addLast(chapterRelItr.next().getStartNode());
+					}
+				}
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				for(int i=0; i< 3; i++)
+				{
+					if(chapterList.size() > i)
+						jarray.put(getJSONForChapter(chapterList.get(i), user_node));
+				}
+				if(jarray.length() > 0)
+				{
+					jobj.put("tp",2);
+					jobj.put("ttl", g.getProperty(GENRE_NAME));
+					jobj.put("data", jarray);
+
+					jsonArray.put(jobj);
+				}
+				
+			}
 			
 			
 			tx.success();
@@ -3297,6 +3303,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 											Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 											if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 												continue;
+											if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, auth))
+												continue;
 											if(c < prev_cnt)
 											{
 												c++;
@@ -3323,6 +3331,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 									if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 										continue;
+									if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, auth))
+										continue;
 									if(c < prev_cnt)
 									{
 										c++;
@@ -3347,6 +3357,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 									Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 									if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 										continue;
+									if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, auth))
+										continue;
 									if(c < prev_cnt)
 									{
 										c++;
@@ -3366,6 +3378,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 							Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 							if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 								continue;
+							if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, auth))
+								continue;
 							if(c < prev_cnt)
 							{
 								c++;
@@ -3383,6 +3397,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Node auth = series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode();
 						if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+							continue;
+						if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, auth))
 							continue;
 						if(c < prev_cnt)
 						{
