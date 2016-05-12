@@ -3713,6 +3713,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+											if(i < prev_cnt)
+											{
+												i++;
+												continue;
+											}
+											
 											i++;
 											outputChaptersNode.addLast(chapter);
 	
@@ -3730,6 +3736,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3744,6 +3756,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3751,12 +3769,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
 					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -3798,6 +3828,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3805,12 +3841,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
 					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -3856,6 +3904,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(langNode != null && seriesGenreNode.equals(genreNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3863,12 +3917,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
 					{
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -3916,6 +3982,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+											if(i < prev_cnt)
+											{
+												i++;
+												continue;
+											}
+											
 											i++;
 											outputChaptersNode.addLast(chapter);
 	
@@ -3934,6 +4006,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
 								if(genreNode != null && seriesGenreNode.equals(genreNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3949,6 +4027,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 								if(langNode != null && seriesLangNode.equals(langNode))
 								{
+									if(i < prev_cnt)
+									{
+										i++;
+										continue;
+									}
+									
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3956,14 +4040,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else // i.e., no need to apply filter
 						{
-
+							if(i < prev_cnt)
+							{
+								i++;
+								continue;
+							}
+							
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
 					}
 					else // i.e., no need to apply filter
 					{
-
+						if(i < prev_cnt)
+						{
+							i++;
+							continue;
+						}
+						
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -4792,11 +4886,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(chaptersItr.hasNext())
 				{
 					if(c < prev_cnt)
+					{
+						c++;
 						continue;
+					}
 					else if ( c > prev_cnt+count)
 						break;
 					else
 						chaptersList.addLast(chaptersItr.next());
+					c++;
 				}
 				
 				Collections.sort(chaptersList, TimeCreatedComparatorForNodes);
@@ -4814,11 +4912,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(seriesItr.hasNext())
 				{
 					if(c < prev_cnt)
+					{
+						c++;
 						continue;
+					}
 					else if ( c > prev_cnt+count)
 						break;
 					else
 						seriesList.addLast(seriesItr.next());
+					c++;
 				}
 				
 				Collections.sort(seriesList, TimeCreatedComparatorForNodes);
@@ -4836,11 +4938,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(userItr.hasNext())
 				{
 					if(c < prev_cnt)
+					{
+						c++;
 						continue;
+					}
 					else if ( c > prev_cnt+count)
 						break;
 					else
 						userList.addLast(userItr.next());
+					c++;
 				}
 				
 				Collections.sort(userList, TimeCreatedComparatorForNodes);
@@ -4858,11 +4964,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(reviewItr.hasNext())
 				{
 					if(c < prev_cnt)
+					{
+						c++;
 						continue;
+					}
 					else if ( c > prev_cnt+count)
 						break;
 					else
 						reviewList.addLast(reviewItr.next());
+					c++;
 				}
 				
 				Collections.sort(reviewList, TimeCreatedComparatorForNodes);
@@ -5005,6 +5115,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(c >= count + prev_cnt)
 						break;
 					outputNodes.addLast(series);
+					c++;
 				}
 			}
 			
@@ -5022,6 +5133,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					break;
 				
 				outputNodes.addLast(series);
+				c++;
 			}
 			
 			for(Node series: outputNodes)
@@ -5090,7 +5202,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				if(c >= count + prev_cnt)
 					break;
-				outputNodes.addLast(author);				
+				outputNodes.addLast(author);
+				c++;
 			}
 			
 			for(Node author: outputNodes)
@@ -5492,6 +5605,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;	
 	}
 
+	
 	@Override
 	public String search(String query, int tp, String user_id, int prev_cnt, int count)
 			throws TException {
@@ -5639,5 +5753,4 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();	
 	}
 
-	
 }
