@@ -5630,6 +5630,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		{
 			aquireWriteLock(tx);
 
+			if(query == null || query.length() == 0)
+				throw new KahaniyaCustomException("Empty value receieved for the parameter query");
+
 			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			ResourceIterator<Node> userItr = null;
@@ -5653,7 +5656,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					i++;
 				}
 				JSONObject usersData = new JSONObject();
-				usersData.put("tp", 0);
+				usersData.put("tp", 1);
 				usersData.put("data", usersArray);
 				
 				i = 0;
@@ -5669,7 +5672,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					i++;
 				}
 				JSONObject seriesData = new JSONObject();
-				seriesData.put("tp", 1);
+				seriesData.put("tp", 2);
 				seriesData.put("data", seriesArray);
 
 				i = 0;
@@ -5681,12 +5684,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 					obj2.put("P_Title", chapter.getProperty(CHAPTER_TITLE).toString());
 					obj2.put("P_Id", chapter.getProperty(CHAPTER_ID).toString());
 					obj2.put("P_Title_ID", chapter.getProperty(CHAPTER_TITLE_ID).toString());
-					obj2.put("S_Title_ID", chapter.getProperty(CHAPTER_TITLE).toString());
+					obj2.put("S_Title_ID", chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID).toString());
 					chapterArray.put(obj2);
 					i++;
 				}
 				JSONObject chaptersData = new JSONObject();
-				chaptersData.put("tp", 2);
+				chaptersData.put("tp", 3);
 				chaptersData.put("data", chapterArray);
 				
 				jsonArray.put(usersData);

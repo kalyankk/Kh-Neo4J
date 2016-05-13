@@ -4,14 +4,14 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("13th May, 2016 - 01:00 P.M");
+		System.out.println("13th May, 2016 - 04:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
 		kahaniya.add_additional_properties();
 		kahaniya.startThriftServer();
 
-//		test(kahaniya);
+	//	test(kahaniya);
 
     }
     
@@ -19,8 +19,8 @@ public class App
     {
     	try{
 //    		System.out.println(k.get_all_items("U", 0, 100));
-//    		System.out.println(k.search("e", 0, "", 0, 100));
-//    		System.out.println(k.search("e", 1, "", 0, 100));
+    	//	System.out.println(k.search("e", 0, "", 0, 100));
+    		//System.out.println(k.search("e", 1, "", 0, 100));
     		
   //  		System.out.println(k.get_stats());
     		//k.create_genre("GEN1");
