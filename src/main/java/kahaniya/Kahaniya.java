@@ -481,13 +481,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 								USER_ID_INDEX,
 								USER_NAME_INDEX,
 								USER_EMAIL_INDEX,
+								COMMENT_ID_INDEX,
 								SERIES_ID_INDEX,
 								REVIEW_ID_INDEX,
 								CHAPTER_ID_INDEX,
+								CHAPTER_TITLE_ID_INDEX,
 								SERIES_TITLE_ID_INDEX,
 								SERIES_TYPE_INDEX,
 								KEYWORD_INDEX,
-								LOCK_INDEX
+								LOCK_INDEX,
+								SEARCH_INDEX
 									};	
 		
 		String[] relationshipIndexNames = {
@@ -2437,10 +2440,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				langs.addLast(lang_itr.next().getEndNode());
 			}
-			
-
-			JSONArray jsonArrayForGenres = new JSONArray();
-			
+						
 			for(Node gen : genres)
 			{
 				for(Node lang : langs)
