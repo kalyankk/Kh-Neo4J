@@ -5638,9 +5638,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			if(tp == 0) //all
 			{
-				userItr = search_index.query(SEARCH_USER, query.toLowerCase()).iterator();
-				seriesItr = search_index.query(SEARCH_SERIES, query.toLowerCase()).iterator();
-				chapterItr = search_index.query(SEARCH_CHAPTER, query.toLowerCase()).iterator();
+				userItr = search_index.query(SEARCH_USER, "*"+query.toLowerCase()+"*").iterator();
+				seriesItr = search_index.query(SEARCH_SERIES, "*"+query.toLowerCase()+"*").iterator();
+				chapterItr = search_index.query(SEARCH_CHAPTER, "*"+query.toLowerCase()+"*").iterator();
 				int  i = 0;
 				JSONArray usersArray = new JSONArray();
 				while(userItr.hasNext() && i < 3)
@@ -5660,42 +5660,43 @@ public class Kahaniya implements KahaniyaService.Iface{
 				JSONArray seriesArray = new JSONArray();
 				while(seriesItr.hasNext() && i < 3)
 				{
-					JSONObject obj = new JSONObject();
+					JSONObject obj1 = new JSONObject();
 					Node series = seriesItr.next();
-					obj.put("P_Title", series.getProperty(SERIES_TITLE).toString());
-					obj.put("P_Id", series.getProperty(SERIES_ID).toString());
-					obj.put("P_Title_ID", series.getProperty(SERIES_TITLE_ID).toString());
-					seriesArray.put(obj);
+					obj1.put("P_Title", series.getProperty(SERIES_TITLE).toString());
+					obj1.put("P_Id", series.getProperty(SERIES_ID).toString());
+					obj1.put("P_Title_ID", series.getProperty(SERIES_TITLE_ID).toString());
+					seriesArray.put(obj1);
 					i++;
 				}
 				JSONObject seriesData = new JSONObject();
 				seriesData.put("tp", 1);
 				seriesData.put("data", seriesArray);
-					
+
 				i = 0;
 				JSONArray chapterArray = new JSONArray();
 				while(chapterItr.hasNext() && i < 3)
 				{
-					JSONObject obj = new JSONObject();
+					JSONObject obj2 = new JSONObject();
 					Node chapter = chapterItr.next();
-					obj.put("P_Title", chapter.getProperty(CHAPTER_TITLE).toString());
-					obj.put("P_Id", chapter.getProperty(CHAPTER_ID).toString());
-					obj.put("P_Title_ID", chapter.getProperty(CHAPTER_TITLE_ID).toString());
-					obj.put("S_Title_ID", chapter.getProperty(CHAPTER_TITLE).toString());
-					usersArray.put(obj);
+					obj2.put("P_Title", chapter.getProperty(CHAPTER_TITLE).toString());
+					obj2.put("P_Id", chapter.getProperty(CHAPTER_ID).toString());
+					obj2.put("P_Title_ID", chapter.getProperty(CHAPTER_TITLE_ID).toString());
+					obj2.put("S_Title_ID", chapter.getProperty(CHAPTER_TITLE).toString());
+					chapterArray.put(obj2);
 					i++;
 				}
 				JSONObject chaptersData = new JSONObject();
 				chaptersData.put("tp", 2);
 				chaptersData.put("data", chapterArray);
-
+				
 				jsonArray.put(usersData);
 				jsonArray.put(seriesData);
 				jsonArray.put(chaptersData);
+				
 			}
 			else if(tp == 1) // users
 			{
-				userItr = search_index.query(SEARCH_USER, query.toLowerCase()).iterator();
+				userItr = search_index.query(SEARCH_USER, "*"+query.toLowerCase()+"*").iterator();
 				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				
 				int c = 0;
@@ -5713,7 +5714,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 			else if(tp == 2) // series
 			{
-				seriesItr = search_index.query(SEARCH_SERIES, query.toLowerCase()).iterator();
+				seriesItr = search_index.query(SEARCH_SERIES, "*"+query.toLowerCase()+"*").iterator();
 				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				
 				int c = 0;
@@ -5731,7 +5732,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 			else if(tp == 3) // chapters
 			{
-				chapterItr = search_index.query(SEARCH_CHAPTER, query.toLowerCase()).iterator();
+				chapterItr = search_index.query(SEARCH_CHAPTER, "*"+query.toLowerCase()+"*").iterator();
 				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 
 				int c = 0;
