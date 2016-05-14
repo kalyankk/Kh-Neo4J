@@ -4469,15 +4469,22 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Author_FullName",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
 		obj.put("P_Author",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
 		obj.put("P_Title_ID",chapter.getProperty(CHAPTER_TITLE_ID).toString());
-		obj.put("P_Title",chapter.getProperty(CHAPTER_TITLE).toString());
 		obj.put("P_Id",chapter.getProperty(CHAPTER_ID).toString());
 		
 		Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 		
 		if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+		{
 			obj.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG));
+			obj.put("P_Title",series.getProperty(SERIES_TITLE).toString());
+			
+		}
 		else
+		{
 			obj.put("P_Feature_Image",chapter.getProperty(CHAPTER_FEAT_IMAGE));
+			obj.put("P_Title",chapter.getProperty(CHAPTER_TITLE).toString());
+		}
+		obj.put("Free_Or_Paid", chapter.getProperty(CHAPTER_FREE_OR_PAID));
 		
 		JSONObject seriesJSON = new JSONObject();
 		seriesJSON.put("Series_Id", series.getProperty(SERIES_ID).toString());
