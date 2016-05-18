@@ -634,6 +634,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	private boolean isRelationExistsBetween(RelationshipType relType, Node srcNode, Node targetNode)
 	{
+		if(srcNode == null || targetNode == null || relType == null)
+			return false;
+		
 		Iterator<Relationship> itr = srcNode.getRelationships(Direction.OUTGOING, relType).iterator();
 		while(itr.hasNext())
 		{
@@ -3367,8 +3370,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 				}
 
-				Collections.sort(chaptersList, TrendingComparatorForChapterNodes);	
-
 				for(Node chapter : chaptersList)
 				{			
 					Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
@@ -3587,7 +3588,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 						
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
@@ -3700,7 +3703,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
@@ -3968,7 +3973,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
@@ -4072,33 +4079,38 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			else if(feedType.equalsIgnoreCase("L"))
 			{
-				
-				if(s_user_node == null)
-					throw new KahaniyaCustomException("No user found for the parameter session_user_id");
-				
-				Iterator<Relationship> followingLangRels = s_user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();
-				LinkedList<Node> followingLangs = new LinkedList<Node>();
-				while(followingLangRels.hasNext())
-					followingLangs.addLast(followingLangRels.next().getEndNode());
-				
-				
-				
 				LinkedList<Node> allChaptersList = new LinkedList<Node>();
-				
-				for(Node lang : followingLangs)
+				if(s_user_node == null)
 				{
-					Iterator<Relationship> followingLangSeriesItr = lang.getRelationships(SERIES_BELONGS_TO_LANGUAGE).iterator();
-					while(followingLangSeriesItr.hasNext())
+					//throw new KahaniyaCustomException("No user found for the parameter session_user_id");
+					Index<Node> chapter_id_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+					ResourceIterator<Node> allChapters = chapter_id_index.query(CHAPTER_ID, "*").iterator();
+					
+					while(allChapters.hasNext())
+						allChaptersList.addLast(allChapters.next());
+				}
+				else
+				{
+					Iterator<Relationship> followingLangRels = s_user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();
+					LinkedList<Node> followingLangs = new LinkedList<Node>();
+					while(followingLangRels.hasNext())
+						followingLangs.addLast(followingLangRels.next().getEndNode());				
+									
+					for(Node lang : followingLangs)
 					{
-						Node series = followingLangSeriesItr.next().getStartNode();
-						Iterator<Relationship> chaptersItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
-						while(chaptersItr.hasNext())
-							allChaptersList.addLast(chaptersItr.next().getStartNode());
+						Iterator<Relationship> followingLangSeriesItr = lang.getRelationships(SERIES_BELONGS_TO_LANGUAGE).iterator();
+						while(followingLangSeriesItr.hasNext())
+						{
+							Node series = followingLangSeriesItr.next().getStartNode();
+							Iterator<Relationship> chaptersItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+							while(chaptersItr.hasNext())
+								allChaptersList.addLast(chaptersItr.next().getStartNode());
+						}
 					}
 				}
 				
 				Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
-					
+				
 				int i = 0;
 				for(Node chapter : allChaptersList)
 				{
@@ -4109,7 +4121,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
@@ -4205,6 +4219,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 					
 				}
+				
 			}
 
 			else if(feedType.equalsIgnoreCase("H"))
@@ -4229,7 +4244,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
@@ -4349,7 +4366,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre") && filterJSON.has("language"))
