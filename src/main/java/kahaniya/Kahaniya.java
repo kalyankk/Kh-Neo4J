@@ -57,7 +57,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	public static final String KEYWORD_INDEX = "keyword_index_by_name";
 	
-	public static final String SEARCH_INDEX = "search_index";
+	public static final String SEARCH_INDEX = "search_index_new";
 	
 	public static final String LOCK_INDEX = "lock_index";
 	
@@ -497,7 +497,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		registerShutdownHook( graphDb );
 		
 		//create indexes if any (node index and relation index)
-		String[] nodeIndexNames = {
+		/*String[] nodeIndexNames = {
 								GENRE_NAME_INDEX,
 								LANG_NAME_INDEX,
 								GENRE_LANG_INDEX,
@@ -516,9 +516,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 								SEARCH_INDEX
 									};	
 		
+		
 		String[] relationshipIndexNames = {
 								USER_VIEWED_CHAPTER_REL_INDEX
 									};
+									
+		*/
+
+		//create full text indexes for search
+		String[] nodeIndexNames = {
+								SEARCH_INDEX
+									};	
+		
 		
 		//customConfiguration for indexes
 		Map<String, String> customConfig = new HashMap<String,String>();
@@ -532,14 +541,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				graphDb.index().forNodes(nodeIndexName, customConfig);
 			
 			//create indexes for relations
-			for(String relationIndexName: relationshipIndexNames)
+/*			for(String relationIndexName: relationshipIndexNames)
 				graphDb.index().forRelationships(relationIndexName, customConfig);
-				
+*/				
 			tx.success();
 		}
 		catch(Exception e){
 			System.out.println(new Date().toString());
 			System.out.println("Failed to create indexes");
+			e.printStackTrace();
 			}
 		finally{}
 	}
@@ -605,7 +615,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				Node series = seriesItr.next();
 				searchIndex.remove(series);
-				searchIndex.add(series, SEARCH_SERIES, series.getProperty(SERIES_TITLE_ID).toString().toLowerCase());
+				searchIndex.add(series, SEARCH_SERIES, series.getProperty(SERIES_TITLE_ID).toString().replaceAll("-"," ").toLowerCase());
 			}
 			
 			ResourceIterator<Node> chapterItr = chapterNodeIndex.query(CHAPTER_ID, "*").iterator();
@@ -613,7 +623,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				Node chapter = chapterItr.next();
 				searchIndex.remove(chapter);
-				searchIndex.add(chapter, SEARCH_CHAPTER, chapter.getProperty(CHAPTER_TITLE_ID).toString().toLowerCase());
+				searchIndex.add(chapter, SEARCH_CHAPTER, chapter.getProperty(CHAPTER_TITLE_ID).toString().replaceAll("-"," ").toLowerCase());
 			}
 			tx.success();
 		}
@@ -2513,6 +2523,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				jsonArray.put(jRecObj);
 			} 
 
+			LinkedList<Node> authors = new LinkedList<Node>();
 			for(Node n : langs)
 			{
 				JSONObject jobj = new JSONObject();
@@ -2529,10 +2540,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				authors.clear();
 				for(int i=0; i< 3; i++)
 				{
+					Node chapterNode = chapterList.get(i);
+					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
+					{
+						i--;
+						continue;
+					}
+					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
+
 					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterList.get(i), user_node));
+						jarray.put(getJSONForChapter(chapterNode, user_node));
 				}
 				if(jarray.length() > 0)
 				{
@@ -2561,10 +2581,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				authors.clear();
 				for(int i=0; i< 3; i++)
 				{
+					Node chapterNode = chapterList.get(i);
+					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
+					{
+						i--;
+						continue;
+					}
+					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
+
 					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterList.get(i), user_node));
+						jarray.put(getJSONForChapter(chapterNode, user_node));
 				}
 				if(jarray.length() > 0)
 				{
@@ -4109,7 +4138,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 				}
 				
-				Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
+				//TODO shuffeling for few days rather sorting based on created time
+				//Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
+				
+				Collections.shuffle(allChaptersList);
 				
 				int i = 0;
 				for(Node chapter : allChaptersList)

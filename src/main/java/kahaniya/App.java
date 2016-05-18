@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("18th May, 2016 - 4:30 P.M");
+		System.out.println("18th May, 2016 - 08:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -18,6 +18,7 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
+    	//	System.out.println(k.get_feed("C", "L", "", 0, 100, "one", "","",""));
 //    		System.out.println(k.get_all_items("U", 0, 100));
     	//	System.out.println(k.search("e", 0, "", 0, 100));
     		//System.out.println(k.search("e", 1, "", 0, 100));
