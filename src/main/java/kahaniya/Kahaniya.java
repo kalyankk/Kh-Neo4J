@@ -2441,7 +2441,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
-				return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
+			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
+		else if(tileType.equalsIgnoreCase("All"))
+			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
 		else return "";
 	}
 	

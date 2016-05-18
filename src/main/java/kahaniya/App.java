@@ -18,8 +18,13 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
-    		System.out.println(k.get_feed("C", "L", "", 0, 100, "one", "","",""));
-    		System.out.println(k.get_feed("C", "R", "", 0, 100, "one", "","",""));
+  //  		System.out.println(k.get_all_items("S", 0, 100));
+    		
+  //  		System.out.println(k.get_feed("A", "D", "", 0, 100, "", "","",""));
+  //  		System.out.println(k.get_feed("C", "D", "", 0, 100, "", "","",""));
+  //  		System.out.println(k.get_feed("S", "D", "", 0, 100, "", "","",""));
+  //  		System.out.println(k.get_feed("All", "D", "", 0, 100, "", "","",""));
+  //  		System.out.println(k.get_feed("All", "L", "", 0, 100, "one", "","",""));
 //    		System.out.println(k.get_all_items("U", 0, 100));
     	//	System.out.println(k.search("e", 0, "", 0, 100));
     		//System.out.println(k.search("e", 1, "", 0, 100));
