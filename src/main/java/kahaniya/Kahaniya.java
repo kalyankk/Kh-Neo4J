@@ -2541,18 +2541,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
 				authors.clear();
-				for(int i=0; i< 3; i++)
+				for(Node chapterNode : chapterList)
 				{
-					Node chapterNode = chapterList.get(i);
 					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
-					{
-						i--;
 						continue;
-					}
+					
 					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
+					jarray.put(getJSONForChapter(chapterNode, user_node));
 
-					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterNode, user_node));
+					if(authors.size() == 3)
+						break;
 				}
 				if(jarray.length() > 0)
 				{
@@ -2582,18 +2580,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
 				authors.clear();
-				for(int i=0; i< 3; i++)
+				for(Node chapterNode : chapterList)
 				{
-					Node chapterNode = chapterList.get(i);
 					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
-					{
-						i--;
 						continue;
-					}
 					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
 
-					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterNode, user_node));
+					jarray.put(getJSONForChapter(chapterNode, user_node));
+					if(authors.size() == 3)
+						 break;
 				}
 				if(jarray.length() > 0)
 				{
