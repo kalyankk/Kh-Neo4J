@@ -52,8 +52,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_TITLE_ID_INDEX = "chapter_index_by_title_id";
 	public static final String SERIES_TITLE_ID_INDEX = "series_index_by_title_id";
 	public static final String SERIES_TYPE_INDEX = "series_index_by_type";
-	
+
 	public static final String USER_VIEWED_CHAPTER_REL_INDEX = "user_viewed_chapter_relation_index";
+	public static final String USER_READ_CHAPTER_REL_INDEX = "user_read_chapter_relation_index";
 
 	public static final String KEYWORD_INDEX = "keyword_index_by_name";
 	
@@ -79,13 +80,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_TITLE_ID = "chapter_title_id";
 	public static final String CHAPTER_FEAT_IMAGE = "chapter_feat_image";
 	public static final String CHAPTER_FREE_OR_PAID = "chapter_free_or_paid";
+	public static final String TOTAL_CHAPTER_VIEWS = "chapter_total_view_count";
+	public static final String TOTAL_CHAPTER_READS = "chapter_total_read_count";
 	
 	//chapter - user relationship properties
-	public static final String CHAPTER_RATING = "chapter_rating";
-	public static final String CHAPTER_VIEWS = "chapter_views";
-	
-	//user viewed a chapter related key
-	public static final String USER_VIEWED_A_CHAPTER_ID = "user_viewer_a_chapter_id";
+	public static final String CHAPTER_RATING = "chapter_rating"; // user has given a rating for a chapter
+	public static final String CHAPTER_VIEWS = "chapter_views"; // number of times a logged in user has vied a chapter
+	public static final String CHAPTER_READS = "chapter_reads"; // number of times, a logged in user has read a chapter
+	public static final String CHAPTER_PURCHASED_PRICE = "chapter_purchased_price"; // price that a user has paid to purchase a chapter 
+
+	//user viewed a chapter related key // Note: do not correct this spelling mistake, as the mistake was observed after staging
+	public static final String USER_VIEWED_A_CHAPTER_ID = "user_viewer_a_chapter_id"; 
+	//user read a chapter related key
+	public static final String USER_READ_A_CHAPTER_ID = "user_read_a_chapter_id";
 		
 	//user related keys
 	public static final String USER_ID = "user_id";
@@ -166,6 +173,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType USER_BOOKMARK_CHAPTER = DynamicRelationshipType.withName("USER_BOOKMARK_CHAPTER");
 	public static final RelationshipType USER_RATED_A_CHAPTER = DynamicRelationshipType.withName("USER_RATED_A_CHAPTER");
 	public static final RelationshipType USER_VIEWED_A_CHAPTER = DynamicRelationshipType.withName("USER_VIEWED_A_CHAPTER");	
+	public static final RelationshipType USER_READ_A_CHAPTER = DynamicRelationshipType.withName("USER_READ_A_CHAPTER");	
+	public static final RelationshipType USER_PURCHASED_A_CHAPTER = DynamicRelationshipType.withName("USER_PURCHASED_A_CHAPTER");	
 	public static final RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
 	public static final RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
 
@@ -192,7 +201,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			public int compare(Node n1, Node n2) {
 			   int v1 = 0;
 			   int v2 = 0;
-			   int t = (int)(new Date().getTime()/1000) - (24*60*60);
+			   int t = (int)(new Date().getTime()/1000) - (7*24*60*60);
 			   if(n1.hasRelationship(USER_VIEWED_A_CHAPTER))
 			   {
 				   Iterator<Relationship> views = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
@@ -204,6 +213,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 						   v1++;
 				   }
 			   }
+			   if(n1.hasRelationship(USER_RATED_A_CHAPTER))
+			   {
+				   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();
+				   
+				   while(ratings.hasNext())
+				   {
+					   Relationship rel = ratings.next();
+					   v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
+				   }
+			   }
+			   
 			   if(n2.hasRelationship(USER_VIEWED_A_CHAPTER))
 			   {
 				   Iterator<Relationship> views = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
@@ -213,6 +233,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 					   Relationship rel = views.next();
 					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
 						   v2++;
+				   }
+			   }
+			   if(n2.hasRelationship(USER_RATED_A_CHAPTER))
+			   {
+				   Iterator<Relationship> ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();
+				   
+				   while(ratings.hasNext())
+				   {
+					   Relationship rel = ratings.next();
+					   v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
 				   }
 			   }
 			   //ascending order
@@ -229,13 +259,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 				   Iterator<Relationship> chapters1 = n1.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
 				   while(chapters1.hasNext())
 				   {
-					   v1 = v1 + chapters1.next().getEndNode().getDegree(USER_VIEWED_A_CHAPTER);
+					   v1 = v1 + Integer.parseInt(chapters1.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
 				   }
 				   
 				   Iterator<Relationship> chapters2 = n2.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
 				   while(chapters2.hasNext())
 				   {
-					   v2 = v2 + chapters2.next().getEndNode().getDegree(USER_VIEWED_A_CHAPTER);
+					   v2 = v2 + Integer.parseInt(chapters2.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
 				   }
 				   
 				   //ascending order
@@ -248,39 +278,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
 		   int v2 = 0;
-		   int t = (int)(new Date().getTime()/1000) - (24*60*60);
+		   int t = (int)(new Date().getTime()/1000) - (7*24*60*60);
 		   Iterator<Relationship> chaptersItr1 = n1.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 		   while(chaptersItr1.hasNext())
 		   {
-			   Node chapter = chaptersItr1.next().getStartNode();
-			   if(chapter.hasRelationship(USER_VIEWED_A_CHAPTER))
-			   {
-				   Iterator<Relationship> views = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
-				   
-				   while(views.hasNext())
-				   {
-					   Relationship rel = views.next();
-					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						   v1++;
-				   }
-			   }
+			   v1 = v1 + Integer.parseInt(chaptersItr1.next().getStartNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
 		   }
+		   v1 = v1 + (10*n1.getDegree(USER_SUBSCRIBED_TO_SERIES));
 		   Iterator<Relationship> chaptersItr2 = n2.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 		   while(chaptersItr2.hasNext()) 
 		   {
-			   Node chapter = chaptersItr2.next().getStartNode();
-			   if(chapter.hasRelationship(USER_VIEWED_A_CHAPTER))
-			   {
-				   Iterator<Relationship> views = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
-			   
-				   while(views.hasNext())
-				   {
-					   Relationship rel = views.next();
-					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						   v2++;
-				   }
-			   }
+			   v2 = v2 + Integer.parseInt(chaptersItr2.next().getStartNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
 		   }
+		   v2 = v2 + (10*n2.getDegree(USER_SUBSCRIBED_TO_SERIES));
 		   //ascending order
 		   //return v1-v2;
 		   //descending order
@@ -306,7 +316,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
 		   int v2 = 0;
-		   int t = (int)(new Date().getTime()/1000) - (30*24*60*60);
+		   int t = (int)(new Date().getTime()/1000) - (7*24*60*60);
 		   Iterator<Relationship> chaptersItr1 = n1.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
 		   while(chaptersItr1.hasNext())
 		   {
@@ -426,6 +436,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
 		node.setProperty(TIME_CREATED, time_created);
 		node.setProperty(NODE_TYPE, CHAPTER_NODE);
+		node.setProperty(TOTAL_CHAPTER_VIEWS, 0);
+		node.setProperty(TOTAL_CHAPTER_READS, 0);
 		return node;
 	}
 	
@@ -518,7 +530,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		
 		
 		String[] relationshipIndexNames = {
-								USER_VIEWED_CHAPTER_REL_INDEX
+								USER_VIEWED_CHAPTER_REL_INDEX,
+								USER_READ_CHAPTER_REL_INDEX,
+								USER_PURCHASED_CHAPTER_REL_INDEX
 									};
 									
 		*/
@@ -622,6 +636,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			while(chapterItr.hasNext())
 			{
 				Node chapter = chapterItr.next();
+
+				if(!chapter.hasProperty(TOTAL_CHAPTER_VIEWS))
+					chapter.setProperty(TOTAL_CHAPTER_VIEWS, 0);
+				if(!chapter.hasProperty(TOTAL_CHAPTER_READS))
+					chapter.setProperty(TOTAL_CHAPTER_READS, 0);
+				
 				searchIndex.remove(chapter);
 				searchIndex.add(chapter, SEARCH_CHAPTER, chapter.getProperty(CHAPTER_TITLE_ID).toString().replaceAll("-"," ").toLowerCase());
 			}
@@ -2245,6 +2265,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;
 	}
+	
 	@Override
 	public String bookmark_chapter(String chapter_id, String series_id,
 			String user_id, int time) throws TException {
@@ -2325,10 +2346,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			if(isRelationExistsBetween(USER_RATED_A_CHAPTER, user_node, chapter_node))
 				deleteRelation(USER_RATED_A_CHAPTER, user_node, chapter_node);
-			else
-			{
-				createRelation(USER_RATED_A_CHAPTER, user_node, chapter_node, time).setProperty(CHAPTER_RATING, rating);
-			}			
+			
+			createRelation(USER_RATED_A_CHAPTER, user_node, chapter_node, time).setProperty(CHAPTER_RATING, rating);
+						
 			res = "true";
 			tx.success();
 
@@ -2336,16 +2356,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 		catch(KahaniyaCustomException ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ favourite_chapter()");
-			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			System.out.println("Exception @ rate_chapter()");
+			System.out.println("Something went wrong, while rating a chapter from rate_chapter  :"+ex.getMessage());
 //				ex.printStackTrace();
 			res = "false";
 		}
 		catch(Exception ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ favourite_chapter()");
-			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			System.out.println("Exception @ rate_chapter()");
+			System.out.println("Something went wrong, while rating a chapter from rate_chapter  :"+ex.getMessage());
 			ex.printStackTrace();
 			res = "false";
 		}
@@ -2353,7 +2373,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 
 	@Override
-	public String recored_chapter_view(String chapter_id, String series_id,
+	public String purchase_chapter(String chapter_id, String series_id, int price,
 			String user_id, int time) throws TException {
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -2368,7 +2388,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
-			Index<Relationship> userViewedChapterRelIndex = graphDb.index().forRelationships(USER_VIEWED_CHAPTER_REL_INDEX);
 			
 			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
 			if(chapter_node == null)
@@ -2377,6 +2396,65 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(USER_PURCHASED_A_CHAPTER, user_node, chapter_node))
+				throw new KahaniyaCustomException("User :"+user_id+" already purchased this chapter :"+chapter_id);
+			else
+			{
+				createRelation(USER_PURCHASED_A_CHAPTER, user_node, chapter_node, time).setProperty(CHAPTER_PURCHASED_PRICE, price);
+			}			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ purchase_chapter()");
+			System.out.println("Something went wrong, while purchasing a chapter from purchase_chapter  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ purchase_chapter()");
+			System.out.println("Something went wrong, while purchasing a chapter from purchase_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String recored_chapter_view(String chapter_id, String series_id,
+			String user_id, int time) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null)
+				user_id = "";
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Relationship> userViewedChapterRelIndex = graphDb.index().forRelationships(USER_VIEWED_CHAPTER_REL_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			int totalView = Integer.parseInt(chapter_node.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+			chapter_node.setProperty(TOTAL_CHAPTER_VIEWS, totalView + 1);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+			{
+				tx.success();
+				return "true";
+			}
 			
 			Relationship rel = userViewedChapterRelIndex.get(USER_VIEWED_A_CHAPTER_ID, user_id+"_view_"+chapter_id).getSingle();
 			if(rel != null)
@@ -2396,16 +2474,80 @@ public class Kahaniya implements KahaniyaService.Iface{
 		catch(KahaniyaCustomException ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ favourite_chapter()");
-			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			System.out.println("Exception @ record_chapter_view()");
+			System.out.println("Something went wrong, while viewing a chapter from record_chapter_view  :"+ex.getMessage());
 //				ex.printStackTrace();
 			res = "false";
 		}
 		catch(Exception ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ favourite_chapter()");
-			System.out.println("Something went wrong, while favourite a chapter from favourite_chapter  :"+ex.getMessage());
+			System.out.println("Exception @ record_chapter_view()");
+			System.out.println("Something went wrong, while voewing a chapter from record_chapter_view  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String recored_chapter_read(String chapter_id, String series_id,
+			String user_id, int time) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null)
+				user_id = "";
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Relationship> userViewedChapterRelIndex = graphDb.index().forRelationships(USER_READ_CHAPTER_REL_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			int totalView = Integer.parseInt(chapter_node.getProperty(TOTAL_CHAPTER_READS).toString());
+			chapter_node.setProperty(TOTAL_CHAPTER_READS, totalView + 1);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+			{
+				tx.success();
+				return "true";
+			}
+			
+			Relationship rel = userViewedChapterRelIndex.get(USER_READ_A_CHAPTER_ID, user_id+"_read_"+chapter_id).getSingle();
+			if(rel != null)
+			{
+				rel.setProperty(CHAPTER_READS, Integer.parseInt(rel.getProperty(CHAPTER_READS).toString())+1);
+			}
+			else
+			{
+				rel = createRelation(USER_READ_A_CHAPTER, user_node, chapter_node, time);
+				rel.setProperty(CHAPTER_READS, 1);
+				userViewedChapterRelIndex.add(rel, USER_READ_A_CHAPTER_ID, user_id+"_read_"+chapter_id);
+			}			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ record_chapter_read()");
+			System.out.println("Something went wrong, while reading a chapter from record_chapter_read  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ record_chapter_read()");
+			System.out.println("Something went wrong, while reading a chapter from record_chapter_read  :"+ex.getMessage());
 			ex.printStackTrace();
 			res = "false";
 		}
