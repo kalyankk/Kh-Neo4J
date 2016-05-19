@@ -531,8 +531,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		
 		String[] relationshipIndexNames = {
 								USER_VIEWED_CHAPTER_REL_INDEX,
-								USER_READ_CHAPTER_REL_INDEX,
-								USER_PURCHASED_CHAPTER_REL_INDEX
+								USER_READ_CHAPTER_REL_INDEX
 									};
 									
 		*/
@@ -609,29 +608,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 	{
 		try (Transaction tx = graphDb.beginTx())
 		{
-			Index<Node> userNodeIndex = graphDb.index().forNodes( USER_ID_INDEX );
-			Index<Node> seriesNodeIndex = graphDb.index().forNodes( SERIES_ID_INDEX );
 			Index<Node> chapterNodeIndex = graphDb.index().forNodes( CHAPTER_ID_INDEX );
-			Index<Node> searchIndex = graphDb.index().forNodes( SEARCH_INDEX );
 				
-			ResourceIterator<Node> userItr = userNodeIndex.query(USER_ID, "*").iterator();
-			while(userItr.hasNext())
-			{
-				Node user = userItr.next();
-				if(!user.hasProperty(MOBILE_DIAL_CODE))
-					user.setProperty(MOBILE_DIAL_CODE, "");
-				searchIndex.remove(user);
-				searchIndex.add(user, SEARCH_USER, user.getProperty(USER_NAME).toString().toLowerCase() + " " + user.getProperty(FULL_NAME).toString().toLowerCase());
-			}
-
-			ResourceIterator<Node> seriesItr = seriesNodeIndex.query(SERIES_ID, "*").iterator();
-			while(seriesItr.hasNext())
-			{
-				Node series = seriesItr.next();
-				searchIndex.remove(series);
-				searchIndex.add(series, SEARCH_SERIES, series.getProperty(SERIES_TITLE_ID).toString().replaceAll("-"," ").toLowerCase());
-			}
-			
 			ResourceIterator<Node> chapterItr = chapterNodeIndex.query(CHAPTER_ID, "*").iterator();
 			while(chapterItr.hasNext())
 			{
@@ -642,8 +620,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 				if(!chapter.hasProperty(TOTAL_CHAPTER_READS))
 					chapter.setProperty(TOTAL_CHAPTER_READS, 0);
 				
-				searchIndex.remove(chapter);
-				searchIndex.add(chapter, SEARCH_CHAPTER, chapter.getProperty(CHAPTER_TITLE_ID).toString().replaceAll("-"," ").toLowerCase());
 			}
 			tx.success();
 		}
