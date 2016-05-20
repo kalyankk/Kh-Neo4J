@@ -2629,12 +2629,28 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			JSONObject jRecObj = new JSONObject();
 			JSONArray jRecArray = new JSONArray();
+
+			LinkedList<Node> authors = new LinkedList<Node>();
 			
-			for(int i=0; i< 3; i++)
+/*			for(int i=0; i< 3; i++)
 			{
 				if(allChapterList.size() > i)
 					jRecArray.put(getJSONForChapter(allChapterList.get(i), user_node));
 			}
+*/			
+			for(Node chapterNode : allChapterList)
+			{
+				Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+				if( auth.equals(user_node) || authors.contains(auth))
+					continue;
+				
+				authors.addLast(auth);
+				jRecArray.put(getJSONForChapter(chapterNode, user_node));
+
+				if(authors.size() == 3)
+					break;
+			}
+
 			if(jRecArray.length() > 0)
 			{
 				jRecObj.put("tp",0);
@@ -2642,8 +2658,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 				jsonArray.put(jRecObj);
 			} 
+			
+			authors.clear();
 
-			LinkedList<Node> authors = new LinkedList<Node>();
 			for(Node n : langs)
 			{
 				JSONObject jobj = new JSONObject();
@@ -2663,10 +2680,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 				authors.clear();
 				for(Node chapterNode : chapterList)
 				{
-					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
+					Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+					if( auth.equals(user_node) || authors.contains(auth))
 						continue;
 					
-					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
+					authors.addLast(auth);
 					jarray.put(getJSONForChapter(chapterNode, user_node));
 
 					if(authors.size() == 3)
@@ -2702,9 +2720,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 				authors.clear();
 				for(Node chapterNode : chapterList)
 				{
-					if(authors.contains(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode()))
+					Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+					if( auth.equals(user_node) || authors.contains(auth))
 						continue;
-					authors.addLast(chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode());
+					authors.addLast(auth);
 
 					jarray.put(getJSONForChapter(chapterNode, user_node));
 					if(authors.size() == 3)
@@ -5296,31 +5315,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Collections.sort(seriesList, TrendingComparatorForSeriesNodes);
 		
 			LinkedList<Node> outputNodes = new LinkedList<Node>();
+			LinkedList<Node> followingSeriesList = new LinkedList<Node>();
 			if(user != null)
 			{
-				Iterator<Relationship> followingSeriesItr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES).iterator();
-				LinkedList<Node> followingSeriesList = new LinkedList<Node>();
+				Iterator<Relationship> followingSeriesItr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, USER_STARTED_SERIES).iterator();
 				while(followingSeriesItr.hasNext())
 					followingSeriesList.addLast(followingSeriesItr.next().getEndNode());
-				Collections.sort(followingSeriesList, TrendingComparatorForSeriesNodes);
-				for(Node series: followingSeriesList)
-				{
-					if(c < prev_cnt)
-					{
-						c ++;
-						continue;
-					}
-					if(c >= count + prev_cnt)
-						break;
-					outputNodes.addLast(series);
-					c++;
-				}
+				
 			}
 			
 			for(Node series : seriesList)
 			{
 
-				if(outputNodes.contains(series) || series.getProperty(SERIES_TYPE).toString().equals("1"))
+				if(followingSeriesList.contains(series) || series.getProperty(SERIES_TYPE).toString().equals("1"))
 					continue;
 				if(c < prev_cnt)
 				{
