@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("20th May, 2016 - 07:00 P.M");
+		System.out.println("27th May, 2016 - 11:00 A.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -18,6 +18,24 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
+/*    		k.create_genre("GEN1");
+    		k.create_genre("GEN2");
+    		k.create_language("LANG1");
+    		k.create_language("LANG2");
+    		k.create_user("one", "one", "one", "one", "one", "one", "one", "one", "one", "one", "GEN1,GEN2", "LANG1,LANG2", 2, 2, 100);
+    		k.create_user("two", "two", "two", "two", "two", "two", "two", "two", "two", "two", "GEN1,GEN2", "LANG1,LANG2", 2, 2, 100);
+    		k.create_or_edit_series("s1", "one", "s1", "s1", "s1", "feature_image", "GEN1", "LANG2", "keywords", "copyrights", "dd_img", "dd_summary", 1, 101, 0);
+    		k.create_or_edit_series("s2", "one", "s2", "s2", "s2", "feature_image", "GEN2", "LANG2", "keywords", "copyrights", "dd_img", "dd_summary", 1, 102, 0);
+    		k.create_or_edit_chapter("c1", "s1", "series_type", "one", "c1", "c1", "feat_image", 102, 0, 0);
+    		
+    		k.create_or_edit_chapter("cp0", "s1", "series_type", "one", "cp0", "cp0", "feat_image", 108, 0, 0);
+    		k.create_or_edit_chapter("cp2", "s2", "series_type", "one", "cp2", "cp2", "feat_image", 109, 2, 0);
+  
+    		System.out.println(k.get_feed("C", "LNG", "{price:\"0\"}", 0, 100, "","","LANG1",""));
+    		System.out.println(k.get_feed("C", "LNG", "{price:\"0\"}", 0, 100, "","","LANG2",""));
+    		System.out.println(k.get_feed("C", "G", "{price:\"0\"}", 0, 100, "","GEN1","",""));
+    		System.out.println(k.get_feed("C", "G", "{price:\"0\"}", 0, 100, "","GEN2","",""));
+  */  		
   //  		System.out.println(k.get_all_items("S", 0, 100));
     		
   //  		System.out.println(k.get_feed("A", "D", "", 0, 100, "", "","",""));

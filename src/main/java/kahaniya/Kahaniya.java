@@ -86,7 +86,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 	//chapter - user relationship properties
 	public static final String CHAPTER_RATING = "chapter_rating"; // user has given a rating for a chapter
 	public static final String CHAPTER_VIEWS = "chapter_views"; // number of times a logged in user has vied a chapter
-	public static final String CHAPTER_READS = "chapter_reads"; // number of times, a logged in user has read a chapter
+	public static final String CHAPTER_READ_WORD_COUNT = "chapter_read_word_count"; // number of words, a logged in user has read in a chapter
+	public static final String CHAPTER_READ_STATUS = "chapter_read_status"; // chapter read status of a logged in user
 	public static final String CHAPTER_PURCHASED_PRICE = "chapter_purchased_price"; // price that a user has paid to purchase a chapter 
 
 	//user viewed a chapter related key // Note: do not correct this spelling mistake, as the mistake was observed after staging
@@ -2468,7 +2469,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	@Override
 	public String recored_chapter_read(String chapter_id, String series_id,
-			String user_id, int time) throws TException {
+			String user_id, int time, int read_status, int read_word_count) throws TException {
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
@@ -2486,8 +2487,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(chapter_node == null)
 				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
 			
-			int totalView = Integer.parseInt(chapter_node.getProperty(TOTAL_CHAPTER_READS).toString());
-			chapter_node.setProperty(TOTAL_CHAPTER_READS, totalView + 1);
+			int totalReads = Integer.parseInt(chapter_node.getProperty(TOTAL_CHAPTER_READS).toString());
+			if(read_status == 2)
+				chapter_node.setProperty(TOTAL_CHAPTER_READS, totalReads + 1);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
@@ -2499,12 +2501,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Relationship rel = userViewedChapterRelIndex.get(USER_READ_A_CHAPTER_ID, user_id+"_read_"+chapter_id).getSingle();
 			if(rel != null)
 			{
-				rel.setProperty(CHAPTER_READS, Integer.parseInt(rel.getProperty(CHAPTER_READS).toString())+1);
+				rel.setProperty(CHAPTER_READ_WORD_COUNT, read_word_count);
+				if(Integer.parseInt(rel.getProperty(CHAPTER_READ_STATUS).toString()) != 2)
+					rel.setProperty(CHAPTER_READ_STATUS, read_status);
 			}
 			else
 			{
 				rel = createRelation(USER_READ_A_CHAPTER, user_node, chapter_node, time);
-				rel.setProperty(CHAPTER_READS, 1);
+				rel.setProperty(CHAPTER_READ_WORD_COUNT, read_word_count);
+				rel.setProperty(CHAPTER_READ_STATUS, read_status);
 				userViewedChapterRelIndex.add(rel, USER_READ_A_CHAPTER_ID, user_id+"_read_"+chapter_id);
 			}			
 			res = "true";
@@ -3992,6 +3997,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 					if(filter != null && !filter.equals(""))
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
+
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+
 						if(filterJSON.has("language"))
 						{
 							Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
@@ -4065,7 +4076,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						JSONObject filterJSON = new JSONObject(filter);	
 						
-						if(filterJSON.has("price") && !filterJSON.getString("price").equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
 							continue;
 						
 						if(filterJSON.has("genre"))
@@ -4691,6 +4704,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
 		obj.put("P_TimeCreated",chapter.getProperty(TIME_CREATED).toString());
 		obj.put("P_Num_Views",chapter.getDegree(USER_VIEWED_A_CHAPTER, Direction.INCOMING));
+		obj.put("P_Num_Reads",chapter.getProperty(TOTAL_CHAPTER_READS).toString());
 		obj.put("P_Num_Fvrts",chapter.getDegree(USER_FAV_CHAPTER, Direction.INCOMING));
 		obj.put("Is_Neo4j",true);
 		

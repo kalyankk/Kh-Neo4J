@@ -83,7 +83,7 @@ public class KahaniyaService {
 
     public String recored_chapter_view(String chapter_id, String series_id, String user_id, int time) throws org.apache.thrift.TException;
 
-    public String recored_chapter_read(String chapter_id, String series_id, String user_id, int time) throws org.apache.thrift.TException;
+    public String recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count) throws org.apache.thrift.TException;
 
     public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id) throws org.apache.thrift.TException;
 
@@ -167,7 +167,7 @@ public class KahaniyaService {
 
     public void recored_chapter_view(String chapter_id, String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.recored_chapter_view_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void recored_chapter_read(String chapter_id, String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.recored_chapter_read_call> resultHandler) throws org.apache.thrift.TException;
+    public void recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.recored_chapter_read_call> resultHandler) throws org.apache.thrift.TException;
 
     public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_feed_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -885,19 +885,21 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "recored_chapter_view failed: unknown result");
     }
 
-    public String recored_chapter_read(String chapter_id, String series_id, String user_id, int time) throws org.apache.thrift.TException
+    public String recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count) throws org.apache.thrift.TException
     {
-      send_recored_chapter_read(chapter_id, series_id, user_id, time);
+      send_recored_chapter_read(chapter_id, series_id, user_id, time, reading_status, read_words_count);
       return recv_recored_chapter_read();
     }
 
-    public void send_recored_chapter_read(String chapter_id, String series_id, String user_id, int time) throws org.apache.thrift.TException
+    public void send_recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count) throws org.apache.thrift.TException
     {
       recored_chapter_read_args args = new recored_chapter_read_args();
       args.setChapter_id(chapter_id);
       args.setSeries_id(series_id);
       args.setUser_id(user_id);
       args.setTime(time);
+      args.setReading_status(reading_status);
+      args.setRead_words_count(read_words_count);
       sendBase("recored_chapter_read", args);
     }
 
@@ -2297,9 +2299,9 @@ public class KahaniyaService {
       }
     }
 
-    public void recored_chapter_read(String chapter_id, String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<recored_chapter_read_call> resultHandler) throws org.apache.thrift.TException {
+    public void recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count, org.apache.thrift.async.AsyncMethodCallback<recored_chapter_read_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      recored_chapter_read_call method_call = new recored_chapter_read_call(chapter_id, series_id, user_id, time, resultHandler, this, ___protocolFactory, ___transport);
+      recored_chapter_read_call method_call = new recored_chapter_read_call(chapter_id, series_id, user_id, time, reading_status, read_words_count, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -2309,12 +2311,16 @@ public class KahaniyaService {
       private String series_id;
       private String user_id;
       private int time;
-      public recored_chapter_read_call(String chapter_id, String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<recored_chapter_read_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private int reading_status;
+      private int read_words_count;
+      public recored_chapter_read_call(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count, org.apache.thrift.async.AsyncMethodCallback<recored_chapter_read_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.chapter_id = chapter_id;
         this.series_id = series_id;
         this.user_id = user_id;
         this.time = time;
+        this.reading_status = reading_status;
+        this.read_words_count = read_words_count;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -2324,6 +2330,8 @@ public class KahaniyaService {
         args.setSeries_id(series_id);
         args.setUser_id(user_id);
         args.setTime(time);
+        args.setReading_status(reading_status);
+        args.setRead_words_count(read_words_count);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -3318,7 +3326,7 @@ public class KahaniyaService {
 
       protected recored_chapter_read_result getResult(I iface, recored_chapter_read_args args) throws org.apache.thrift.TException {
         recored_chapter_read_result result = new recored_chapter_read_result();
-        result.success = iface.recored_chapter_read(args.chapter_id, args.series_id, args.user_id, args.time);
+        result.success = iface.recored_chapter_read(args.chapter_id, args.series_id, args.user_id, args.time, args.reading_status, args.read_words_count);
         return result;
       }
     }
@@ -28807,6 +28815,8 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField SERIES_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("series_id", org.apache.thrift.protocol.TType.STRING, (short)2);
     private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)3);
     private static final org.apache.thrift.protocol.TField TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("time", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField READING_STATUS_FIELD_DESC = new org.apache.thrift.protocol.TField("reading_status", org.apache.thrift.protocol.TType.I32, (short)5);
+    private static final org.apache.thrift.protocol.TField READ_WORDS_COUNT_FIELD_DESC = new org.apache.thrift.protocol.TField("read_words_count", org.apache.thrift.protocol.TType.I32, (short)6);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -28818,13 +28828,17 @@ public class KahaniyaService {
     public String series_id; // required
     public String user_id; // required
     public int time; // required
+    public int reading_status; // required
+    public int read_words_count; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       CHAPTER_ID((short)1, "chapter_id"),
       SERIES_ID((short)2, "series_id"),
       USER_ID((short)3, "user_id"),
-      TIME((short)4, "time");
+      TIME((short)4, "time"),
+      READING_STATUS((short)5, "reading_status"),
+      READ_WORDS_COUNT((short)6, "read_words_count");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -28847,6 +28861,10 @@ public class KahaniyaService {
             return USER_ID;
           case 4: // TIME
             return TIME;
+          case 5: // READING_STATUS
+            return READING_STATUS;
+          case 6: // READ_WORDS_COUNT
+            return READ_WORDS_COUNT;
           default:
             return null;
         }
@@ -28888,7 +28906,9 @@ public class KahaniyaService {
 
     // isset id assignments
     private static final int __TIME_ISSET_ID = 0;
-    private BitSet __isset_bit_vector = new BitSet(1);
+    private static final int __READING_STATUS_ISSET_ID = 1;
+    private static final int __READ_WORDS_COUNT_ISSET_ID = 2;
+    private BitSet __isset_bit_vector = new BitSet(3);
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -28899,6 +28919,10 @@ public class KahaniyaService {
       tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.TIME, new org.apache.thrift.meta_data.FieldMetaData("time", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.READING_STATUS, new org.apache.thrift.meta_data.FieldMetaData("reading_status", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.READ_WORDS_COUNT, new org.apache.thrift.meta_data.FieldMetaData("read_words_count", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(recored_chapter_read_args.class, metaDataMap);
@@ -28911,7 +28935,9 @@ public class KahaniyaService {
       String chapter_id,
       String series_id,
       String user_id,
-      int time)
+      int time,
+      int reading_status,
+      int read_words_count)
     {
       this();
       this.chapter_id = chapter_id;
@@ -28919,6 +28945,10 @@ public class KahaniyaService {
       this.user_id = user_id;
       this.time = time;
       setTimeIsSet(true);
+      this.reading_status = reading_status;
+      setReading_statusIsSet(true);
+      this.read_words_count = read_words_count;
+      setRead_words_countIsSet(true);
     }
 
     /**
@@ -28937,6 +28967,8 @@ public class KahaniyaService {
         this.user_id = other.user_id;
       }
       this.time = other.time;
+      this.reading_status = other.reading_status;
+      this.read_words_count = other.read_words_count;
     }
 
     public recored_chapter_read_args deepCopy() {
@@ -28950,6 +28982,10 @@ public class KahaniyaService {
       this.user_id = null;
       setTimeIsSet(false);
       this.time = 0;
+      setReading_statusIsSet(false);
+      this.reading_status = 0;
+      setRead_words_countIsSet(false);
+      this.read_words_count = 0;
     }
 
     public String getChapter_id() {
@@ -29047,6 +29083,52 @@ public class KahaniyaService {
       __isset_bit_vector.set(__TIME_ISSET_ID, value);
     }
 
+    public int getReading_status() {
+      return this.reading_status;
+    }
+
+    public recored_chapter_read_args setReading_status(int reading_status) {
+      this.reading_status = reading_status;
+      setReading_statusIsSet(true);
+      return this;
+    }
+
+    public void unsetReading_status() {
+      __isset_bit_vector.clear(__READING_STATUS_ISSET_ID);
+    }
+
+    /** Returns true if field reading_status is set (has been assigned a value) and false otherwise */
+    public boolean isSetReading_status() {
+      return __isset_bit_vector.get(__READING_STATUS_ISSET_ID);
+    }
+
+    public void setReading_statusIsSet(boolean value) {
+      __isset_bit_vector.set(__READING_STATUS_ISSET_ID, value);
+    }
+
+    public int getRead_words_count() {
+      return this.read_words_count;
+    }
+
+    public recored_chapter_read_args setRead_words_count(int read_words_count) {
+      this.read_words_count = read_words_count;
+      setRead_words_countIsSet(true);
+      return this;
+    }
+
+    public void unsetRead_words_count() {
+      __isset_bit_vector.clear(__READ_WORDS_COUNT_ISSET_ID);
+    }
+
+    /** Returns true if field read_words_count is set (has been assigned a value) and false otherwise */
+    public boolean isSetRead_words_count() {
+      return __isset_bit_vector.get(__READ_WORDS_COUNT_ISSET_ID);
+    }
+
+    public void setRead_words_countIsSet(boolean value) {
+      __isset_bit_vector.set(__READ_WORDS_COUNT_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case CHAPTER_ID:
@@ -29081,6 +29163,22 @@ public class KahaniyaService {
         }
         break;
 
+      case READING_STATUS:
+        if (value == null) {
+          unsetReading_status();
+        } else {
+          setReading_status((Integer)value);
+        }
+        break;
+
+      case READ_WORDS_COUNT:
+        if (value == null) {
+          unsetRead_words_count();
+        } else {
+          setRead_words_count((Integer)value);
+        }
+        break;
+
       }
     }
 
@@ -29097,6 +29195,12 @@ public class KahaniyaService {
 
       case TIME:
         return Integer.valueOf(getTime());
+
+      case READING_STATUS:
+        return Integer.valueOf(getReading_status());
+
+      case READ_WORDS_COUNT:
+        return Integer.valueOf(getRead_words_count());
 
       }
       throw new IllegalStateException();
@@ -29117,6 +29221,10 @@ public class KahaniyaService {
         return isSetUser_id();
       case TIME:
         return isSetTime();
+      case READING_STATUS:
+        return isSetReading_status();
+      case READ_WORDS_COUNT:
+        return isSetRead_words_count();
       }
       throw new IllegalStateException();
     }
@@ -29167,6 +29275,24 @@ public class KahaniyaService {
         if (!(this_present_time && that_present_time))
           return false;
         if (this.time != that.time)
+          return false;
+      }
+
+      boolean this_present_reading_status = true;
+      boolean that_present_reading_status = true;
+      if (this_present_reading_status || that_present_reading_status) {
+        if (!(this_present_reading_status && that_present_reading_status))
+          return false;
+        if (this.reading_status != that.reading_status)
+          return false;
+      }
+
+      boolean this_present_read_words_count = true;
+      boolean that_present_read_words_count = true;
+      if (this_present_read_words_count || that_present_read_words_count) {
+        if (!(this_present_read_words_count && that_present_read_words_count))
+          return false;
+        if (this.read_words_count != that.read_words_count)
           return false;
       }
 
@@ -29226,6 +29352,26 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetReading_status()).compareTo(typedOther.isSetReading_status());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetReading_status()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.reading_status, typedOther.reading_status);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetRead_words_count()).compareTo(typedOther.isSetRead_words_count());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetRead_words_count()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.read_words_count, typedOther.read_words_count);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -29272,6 +29418,14 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("time:");
       sb.append(this.time);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("reading_status:");
+      sb.append(this.reading_status);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("read_words_count:");
+      sb.append(this.read_words_count);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -29349,6 +29503,22 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 5: // READING_STATUS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.reading_status = iprot.readI32();
+                struct.setReading_statusIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 6: // READ_WORDS_COUNT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.read_words_count = iprot.readI32();
+                struct.setRead_words_countIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -29382,6 +29552,12 @@ public class KahaniyaService {
         oprot.writeFieldBegin(TIME_FIELD_DESC);
         oprot.writeI32(struct.time);
         oprot.writeFieldEnd();
+        oprot.writeFieldBegin(READING_STATUS_FIELD_DESC);
+        oprot.writeI32(struct.reading_status);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(READ_WORDS_COUNT_FIELD_DESC);
+        oprot.writeI32(struct.read_words_count);
+        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -29412,7 +29588,13 @@ public class KahaniyaService {
         if (struct.isSetTime()) {
           optionals.set(3);
         }
-        oprot.writeBitSet(optionals, 4);
+        if (struct.isSetReading_status()) {
+          optionals.set(4);
+        }
+        if (struct.isSetRead_words_count()) {
+          optionals.set(5);
+        }
+        oprot.writeBitSet(optionals, 6);
         if (struct.isSetChapter_id()) {
           oprot.writeString(struct.chapter_id);
         }
@@ -29425,12 +29607,18 @@ public class KahaniyaService {
         if (struct.isSetTime()) {
           oprot.writeI32(struct.time);
         }
+        if (struct.isSetReading_status()) {
+          oprot.writeI32(struct.reading_status);
+        }
+        if (struct.isSetRead_words_count()) {
+          oprot.writeI32(struct.read_words_count);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, recored_chapter_read_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(4);
+        BitSet incoming = iprot.readBitSet(6);
         if (incoming.get(0)) {
           struct.chapter_id = iprot.readString();
           struct.setChapter_idIsSet(true);
@@ -29446,6 +29634,14 @@ public class KahaniyaService {
         if (incoming.get(3)) {
           struct.time = iprot.readI32();
           struct.setTimeIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.reading_status = iprot.readI32();
+          struct.setReading_statusIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.read_words_count = iprot.readI32();
+          struct.setRead_words_countIsSet(true);
         }
       }
     }
