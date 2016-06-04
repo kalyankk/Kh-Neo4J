@@ -4,20 +4,30 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("27th May, 2016 - 11:00 A.M");
+		System.out.println("04th June, 2016 - 02:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
 		kahaniya.add_additional_properties();
 		kahaniya.startThriftServer();
 
-	//	test(kahaniya);
+		//test(kahaniya);
 
     }
     
     public static void test( Kahaniya k)
     {
     	try{
+    		System.out.println(k.get_item_details("C", "cp0"));
+    		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 2, 100));
+    		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 1, 40));
+    		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 1, 50));
+    		System.out.println(k.get_item_details("C", "cp0"));
+    		System.out.println(k.get_item_details("C", "cp2"));
+    		System.out.println(k.recored_chapter_read("cp2", "s2", "", 111, 1, 60));
+    		System.out.println(k.recored_chapter_read("cp2", "s2", "", 111, 2, 100));
+    		System.out.println(k.recored_chapter_read("cp2", "s2", "", 111, 2, 100));
+    		System.out.println(k.get_item_details("C", "cp2"));
 /*    		k.create_genre("GEN1");
     		k.create_genre("GEN2");
     		k.create_language("LANG1");

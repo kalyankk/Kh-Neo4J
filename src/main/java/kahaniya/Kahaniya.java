@@ -202,7 +202,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			public int compare(Node n1, Node n2) {
 			   int v1 = 0;
 			   int v2 = 0;
-			   int t = (int)(new Date().getTime()/1000) - (7*24*60*60);
+			   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
 			   if(n1.hasRelationship(USER_VIEWED_A_CHAPTER))
 			   {
 				   Iterator<Relationship> views = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
@@ -2663,8 +2663,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 				jsonArray.put(jRecObj);
 			} 
-			
-			authors.clear();
+				
+			// removed lang based recommended listing
+/*			authors.clear();
 
 			for(Node n : langs)
 			{
@@ -2704,7 +2705,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					jsonArray.put(jobj);
 				}
 				
-			}
+			} */
 
 			for(Node g : genres)
 			{
@@ -3860,7 +3861,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(allChapters.hasNext())
 					allChaptersList.addLast(allChapters.next());
 				Collections.sort(allChaptersList, TrendingComparatorForChapterNodes);
-					
+				
+				LinkedList<Node> authors = new LinkedList<Node>();
+
+				
 				int i = 0;
 				for(Node chapter : allChaptersList)
 				{
@@ -3891,13 +3895,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
 										if(langNode != null && seriesLangNode.equals(langNode))
 										{
+
 											if(i < prev_cnt)
 											{
 												i++;
 												continue;
 											}
-											
-											i++;
+
+											Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+											if(authors.contains(auth))
+												continue;
+											authors.addLast(auth);
+
 											outputChaptersNode.addLast(chapter);
 	
 										}
@@ -3920,6 +3929,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 										continue;
 									}
 									
+									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+									if(authors.contains(auth))
+										continue;
+									authors.addLast(auth);
+
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3939,7 +3953,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 										i++;
 										continue;
 									}
-									
+
+									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+									if(authors.contains(auth))
+										continue;
+									authors.addLast(auth);
+
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3953,6 +3972,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								continue;
 							}
 							
+							Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+							if(authors.contains(auth))
+								continue;
+							authors.addLast(auth);
+
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
@@ -3965,6 +3989,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 							continue;
 						}
 						
+						Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+						if(authors.contains(auth))
+							continue;
+						authors.addLast(auth);
+
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
@@ -4285,11 +4314,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 					}
 				}
 				
-				//TODO shuffeling for few days rather sorting based on created time
-				//Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
+				// removed - shuffeling for few days rather sorting based on created time
+				//Collections.shuffle(allChaptersList);
 				
-				Collections.shuffle(allChaptersList);
-				
+				Collections.sort(allChaptersList, TimeCreatedComparatorForNodes);
 				int i = 0;
 				for(Node chapter : allChaptersList)
 				{
