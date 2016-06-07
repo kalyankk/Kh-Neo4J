@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("04th June, 2016 - 02:00 P.M");
+		System.out.println("07th June, 2016 - 01:30 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -18,7 +18,25 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
-    		System.out.println(k.get_item_details("C", "cp0"));
+    		
+    	//	System.out.println(k.get_all_items("C", 0, 100));
+    		//System.out.println(k.get_feed("C", "LNG", "{price:\"0\"}", 0, 100, "","","LANG1",""));
+    /*		System.out.println(k.get_all_items("C", 0, 100));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "one", "", "", ""));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "two", "", "", ""));
+    		System.out.println(k.edit_user_languages("one", "LANG1,LANG2"));
+    		System.out.println(k.edit_user_languages("two", "LANG1,LANG2"));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "one", "", "", ""));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "two", "", "", ""));
+    		System.out.println(k.edit_user_languages("one", "LANG1"));
+    		System.out.println(k.edit_user_languages("two", "LANG1"));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "one", "", "", ""));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "two", "", "", ""));
+    		System.out.println(k.edit_user_languages("one", "LANG2"));
+    		System.out.println(k.edit_user_languages("two", "LANG2"));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "one", "", "", ""));
+    		System.out.println(k.get_feed("C","R", "", 0 , 100, "two", "", "", "")); */
+/*    		System.out.println(k.get_item_details("C", "cp0"));
     		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 2, 100));
     		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 1, 40));
     		System.out.println(k.recored_chapter_read("cp0", "s1", "", 111, 1, 50));
@@ -28,7 +46,7 @@ public class App
     		System.out.println(k.recored_chapter_read("cp2", "s2", "", 111, 2, 100));
     		System.out.println(k.recored_chapter_read("cp2", "s2", "", 111, 2, 100));
     		System.out.println(k.get_item_details("C", "cp2"));
-/*    		k.create_genre("GEN1");
+    		k.create_genre("GEN1");
     		k.create_genre("GEN2");
     		k.create_language("LANG1");
     		k.create_language("LANG2");

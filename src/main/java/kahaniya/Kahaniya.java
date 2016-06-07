@@ -2707,12 +2707,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 			} */
 
-			for(Node g : genres)
+			for(Node g : lang_genres)
 			{
 				JSONObject jobj = new JSONObject();
 				JSONArray jarray = new JSONArray();
 				
-				Iterator<Relationship> seriesRelItr = g.getRelationships(SERIES_BELONGS_TO_GENRE).iterator();
+				Iterator<Relationship> seriesRelItr = g.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
 				LinkedList<Node> chapterList = new LinkedList<Node>();
 				while(seriesRelItr.hasNext())
 				{
@@ -2745,7 +2745,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				
 			}
-			
 			
 			tx.success();
 
@@ -5332,27 +5331,32 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	@Override
 	public String get_subscriptions_for_user(String user_id, int prev_cnt,
-			int count) throws TException {
+			int count, String lang) throws TException {
 		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
-			
+
 			if(user_id == null)
 				user_id = "";
+			if(lang == null)
+				lang = "";
 			
 			int c = 0;
 
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
 			Node user = userId_index.get(USER_ID, user_id).getSingle();
+			Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();			
 			
-			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
-			
-			ResourceIterator<Node> seriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+			if(langNode == null)
+				throw new KahaniyaCustomException("No language node found with the given lang name:"+lang);
 			
 			LinkedList<Node> seriesList = new LinkedList<Node>();
+			
+			Iterator<Relationship> seriesItr = langNode.getRelationships(SERIES_BELONGS_TO_LANGUAGE).iterator();
 			while(seriesItr.hasNext())
-				seriesList.addLast(seriesItr.next());
+				seriesList.addLast(seriesItr.next().getStartNode());
 			
 			Collections.sort(seriesList, TrendingComparatorForSeriesNodes);
 		
