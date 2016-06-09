@@ -4730,7 +4730,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().getProperty(GENRE_NAME).toString());
 		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
 		obj.put("P_TimeCreated",chapter.getProperty(TIME_CREATED).toString());
-		obj.put("P_Num_Views",chapter.getDegree(USER_VIEWED_A_CHAPTER, Direction.INCOMING));
+		obj.put("P_Num_Views",chapter.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 		obj.put("P_Num_Reads",chapter.getProperty(TOTAL_CHAPTER_READS).toString());
 		obj.put("P_Num_Fvrts",chapter.getDegree(USER_FAV_CHAPTER, Direction.INCOMING));
 		obj.put("Is_Neo4j",true);
