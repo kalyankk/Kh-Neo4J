@@ -207,7 +207,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   if(n1.hasProperty(CHAPTER_LAST_VIEWED_TIME) && Integer.parseInt(n1.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
 				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			   else
-				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+				   v1 = Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			   
 			   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();   
 			   while(ratings.hasNext())
@@ -3854,7 +3854,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				int i = 0;
 				for(Node chapter : allChaptersList)
 				{
-					if(i >= 10) // break the loop, if we got enough / required nodes to return
+					if(i >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
 						break;
 					
 					if(filter != null && !filter.equals(""))
