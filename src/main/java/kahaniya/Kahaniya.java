@@ -204,7 +204,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   int v1 = 0;
 			   int v2 = 0;
 			   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
-			   if(Integer.parseInt(n1.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
+			   if(n1.hasProperty(CHAPTER_LAST_VIEWED_TIME) && Integer.parseInt(n1.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
 				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			   else
 				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
@@ -423,6 +423,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(NODE_TYPE, CHAPTER_NODE);
 		node.setProperty(TOTAL_CHAPTER_VIEWS, 0);
 		node.setProperty(TOTAL_CHAPTER_READS, 0);
+		node.setProperty(CHAPTER_LAST_VIEWED_TIME, 0);
 		return node;
 	}
 	
