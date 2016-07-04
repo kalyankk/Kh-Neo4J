@@ -82,6 +82,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_FREE_OR_PAID = "chapter_free_or_paid";
 	public static final String TOTAL_CHAPTER_VIEWS = "chapter_total_view_count";
 	public static final String TOTAL_CHAPTER_READS = "chapter_total_read_count";
+	public static final String CHAPTER_LAST_VIEWED_TIME = "chapter_last_viewed_time";
 	
 	//chapter - user relationship properties
 	public static final String CHAPTER_RATING = "chapter_rating"; // user has given a rating for a chapter
@@ -203,49 +204,32 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   int v1 = 0;
 			   int v2 = 0;
 			   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
-			   if(n1.hasRelationship(USER_VIEWED_A_CHAPTER))
+			   if(Integer.parseInt(n1.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
+				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+			   else
+				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+			   
+			   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();   
+			   while(ratings.hasNext())
 			   {
-				   Iterator<Relationship> views = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
-				   
-				   while(views.hasNext())
-				   {
-					   Relationship rel = views.next();
-					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						   v1++;
-				   }
-			   }
-			   if(n1.hasRelationship(USER_RATED_A_CHAPTER))
-			   {
-				   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();
-				   
-				   while(ratings.hasNext())
-				   {
-					   Relationship rel = ratings.next();
-					   v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
-				   }
+					Relationship rel = ratings.next();
+					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
 			   }
 			   
-			   if(n2.hasRelationship(USER_VIEWED_A_CHAPTER))
+			   if(Integer.parseInt(n2.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
+				   v2 = 10000000 + Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+			   else
+				   v2 = Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
+				
+			   ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
+			   while(ratings.hasNext())
 			   {
-				   Iterator<Relationship> views = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
-				   
-				   while(views.hasNext())
-				   {
-					   Relationship rel = views.next();
-					   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						   v2++;
-				   }
+					Relationship rel = ratings.next();
+					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
 			   }
-			   if(n2.hasRelationship(USER_RATED_A_CHAPTER))
-			   {
-				   Iterator<Relationship> ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();
-				   
-				   while(ratings.hasNext())
-				   {
-					   Relationship rel = ratings.next();
-					   v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
-				   }
-			   }
+			   
 			   //ascending order
 			   //return v1-v2;
 			   //descending order
@@ -2425,6 +2409,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			int totalView = Integer.parseInt(chapter_node.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			chapter_node.setProperty(TOTAL_CHAPTER_VIEWS, totalView + 1);
+			chapter_node.setProperty(CHAPTER_LAST_VIEWED_TIME, (int)(new Date().getTime()/1000));
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			if(user_node == null)
@@ -2646,7 +2631,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			for(Node chapterNode : allChapterList)
 			{
 				Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
-				if( auth.equals(user_node) || authors.contains(auth))
+				if( auth.equals(user_node) || authors.contains(auth) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user_node, chapterNode))
 					continue;
 				
 				authors.addLast(auth);
@@ -2707,6 +2692,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 			} */
 
+			//TODO sort the lang_genres node list, so that if a story is added to genere now, it should be on top (remove the genre if the latest chapter is read)
 			for(Node g : lang_genres)
 			{
 				JSONObject jobj = new JSONObject();
@@ -4833,7 +4819,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Genre",series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode().getProperty(GENRE_NAME).toString());
 		obj.put("P_Lang",series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
 		obj.put("P_TimeCreated",series.getProperty(TIME_CREATED).toString());
-		obj.put("P_Num_Views",0);
+		obj.put("P_Num_Views",getAccumulatedSeriesViews(series));
 		obj.put("P_Num_Fvrts",0);
 		obj.put("P_Rating",0);
 		obj.put("P_Type", series.getProperty(SERIES_TYPE).toString());
@@ -4857,6 +4843,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 		obj.put("Is_Neo4j",true);
 		return obj;
+	}
+	
+	private int getAccumulatedSeriesViews(Node series)
+	{
+		Iterator<Relationship> chaptersRelItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		int views = 0;
+		while(chaptersRelItr.hasNext())
+			views = views + Integer.parseInt(chaptersRelItr.next().getProperty(TOTAL_CHAPTER_VIEWS).toString());
+		return views;
 	}
 	
 	private JSONObject getShortJSONForSeries(Node series, Node user)
