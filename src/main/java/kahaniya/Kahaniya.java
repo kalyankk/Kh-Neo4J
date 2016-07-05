@@ -3888,11 +3888,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 												continue;
 											}
 
-											Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+/*											Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 											if(authors.contains(auth))
 												continue;
 											authors.addLast(auth);
-
+*/
 											outputChaptersNode.addLast(chapter);
 	
 										}
@@ -3915,11 +3915,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 										continue;
 									}
 									
-									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+/*									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 									if(authors.contains(auth))
 										continue;
 									authors.addLast(auth);
-
+*/
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3940,11 +3940,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 										continue;
 									}
 
-									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+/*									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 									if(authors.contains(auth))
 										continue;
 									authors.addLast(auth);
-
+*/
 									i++;
 									outputChaptersNode.addLast(chapter);
 								}
@@ -3958,11 +3958,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 								continue;
 							}
 							
-							Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+/*							Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 							if(authors.contains(auth))
 								continue;
 							authors.addLast(auth);
-
+*/
 							i++;
 							outputChaptersNode.addLast(chapter);
 						}
@@ -3975,11 +3975,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 							continue;
 						}
 						
-						Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+/*						Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 						if(authors.contains(auth))
 							continue;
 						authors.addLast(auth);
-
+*/
 						i++;
 						outputChaptersNode.addLast(chapter);
 					}
