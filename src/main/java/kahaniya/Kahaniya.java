@@ -217,7 +217,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 						v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
 			   }
 			   
-			   if(Integer.parseInt(n2.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
+			   if(n2.hasProperty(CHAPTER_LAST_VIEWED_TIME) && Integer.parseInt(n2.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
 				   v2 = 10000000 + Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			   else
 				   v2 = Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
