@@ -3887,7 +3887,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 												i++;
 												continue;
 											}
-
+//Suggestion given by SM
 /*											Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 											if(authors.contains(auth))
 												continue;
@@ -3914,7 +3914,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 										i++;
 										continue;
 									}
-									
+//Suggestion given by SM									
 /*									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 									if(authors.contains(auth))
 										continue;
@@ -3939,7 +3939,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 										i++;
 										continue;
 									}
-
+//Suggestion given by SM
 /*									Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 									if(authors.contains(auth))
 										continue;
@@ -3957,7 +3957,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 								i++;
 								continue;
 							}
-							
+//Suggestion given by SM							
 /*							Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 							if(authors.contains(auth))
 								continue;
@@ -3974,7 +3974,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 							i++;
 							continue;
 						}
-						
+//Suggestion given by SM						
 /*						Node auth = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 						if(authors.contains(auth))
 							continue;
@@ -4851,7 +4851,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		Iterator<Relationship> chaptersRelItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 		int views = 0;
 		while(chaptersRelItr.hasNext())
-			views = views + Integer.parseInt(chaptersRelItr.next().getProperty(TOTAL_CHAPTER_VIEWS).toString());
+			views = views + Integer.parseInt(chaptersRelItr.next().getStartNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
 		return views;
 	}
 	
