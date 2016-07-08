@@ -204,12 +204,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 			   int v1 = 0;
 			   int v2 = 0;
 			   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
-			   if(n1.hasProperty(CHAPTER_LAST_VIEWED_TIME) && Integer.parseInt(n1.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
-				   v1 = 10000000 + Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
-			   else
-				   v1 = Integer.parseInt(n1.getProperty(TOTAL_CHAPTER_VIEWS).toString());
 			   
-			   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();   
+			   Iterator<Relationship> loggedInViews = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
+			   while(loggedInViews.hasNext())
+			   {
+					Relationship rel = loggedInViews.next();
+					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						v1++;
+			   }
+			   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
 			   while(ratings.hasNext())
 			   {
 					Relationship rel = ratings.next();
@@ -217,19 +220,20 @@ public class Kahaniya implements KahaniyaService.Iface{
 						v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
 			   }
 			   
-			   if(n2.hasProperty(CHAPTER_LAST_VIEWED_TIME) && Integer.parseInt(n2.getProperty(CHAPTER_LAST_VIEWED_TIME).toString()) >= t)
-				   v2 = 10000000 + Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
-			   else
-				   v2 = Integer.parseInt(n2.getProperty(TOTAL_CHAPTER_VIEWS).toString());
-				
+			   loggedInViews = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
+			   while(loggedInViews.hasNext())
+			   {
+					Relationship rel = loggedInViews.next();
+					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+						v2 = v2+1;
+			   }
 			   ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
 			   while(ratings.hasNext())
 			   {
 					Relationship rel = ratings.next();
 					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
 						v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
-			   }
-			   
+			   }			   
 			   //ascending order
 			   //return v1-v2;
 			   //descending order
@@ -2422,6 +2426,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Relationship rel = userViewedChapterRelIndex.get(USER_VIEWED_A_CHAPTER_ID, user_id+"_view_"+chapter_id).getSingle();
 			if(rel != null)
 			{
+				rel.setProperty(TIME_CREATED, time);
 				rel.setProperty(CHAPTER_VIEWS, Integer.parseInt(rel.getProperty(CHAPTER_VIEWS).toString())+1);
 			}
 			else
@@ -2714,7 +2719,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				for(Node chapterNode : chapterList)
 				{
 					Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
-					if( auth.equals(user_node) || authors.contains(auth))
+					if( auth.equals(user_node) || authors.contains(auth) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user_node, chapterNode))
 						continue;
 					authors.addLast(auth);
 
@@ -3893,6 +3898,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 												continue;
 											authors.addLast(auth);
 */
+											i++;
 											outputChaptersNode.addLast(chapter);
 	
 										}
