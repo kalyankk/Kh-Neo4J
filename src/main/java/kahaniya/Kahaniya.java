@@ -1341,6 +1341,48 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 	
 	@Override
+	public String edit_user_status(String id, int status) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(id == null || id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param id");
+
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID,id).getSingle();
+			
+			if(user_node == null)
+				throw new KahaniyaCustomException("User does not exists with given id : "+id);
+			
+			
+			user_node.setProperty(STATUS, status);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_user_status()");
+			System.out.println("Something went wrong, while editing user from edit_user_status  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_user_status()");
+			System.out.println("Something went wrong, while editing user from edit_user_status  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
+	@Override
 	public String edit_user_security_details(String id, String user_name)
 			throws TException {
 		String res;		
@@ -4695,6 +4737,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		JSONObject obj = new JSONObject();
 		obj.put("P_Author_FullName",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
 		obj.put("P_Author",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Author_Status",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
 		obj.put("P_Title_ID",chapter.getProperty(CHAPTER_TITLE_ID).toString());
 		obj.put("P_Id",chapter.getProperty(CHAPTER_ID).toString());
 		
@@ -4776,6 +4819,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		JSONObject obj = new JSONObject();
 		obj.put("FullName",user.getProperty(FULL_NAME).toString());
 		obj.put("UserId",user.getProperty(USER_ID).toString());
+		obj.put("User_Status",user.getProperty(STATUS).toString());
 		obj.put("Mobile_Dial_Code",user.getProperty(MOBILE_DIAL_CODE).toString());
 		obj.put("U_Num_Following",user.getDegree(USER_FOLLOW_USER, Direction.OUTGOING));
 		obj.put("U_Num_Subscribers",user.getDegree(USER_FOLLOW_USER, Direction.INCOMING));
@@ -4805,6 +4849,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		JSONObject obj = new JSONObject();
 		obj.put("Cm_By_Fullname",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
 		obj.put("Cm_By_UserId",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("Cm_By_UserStatus",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
 		obj.put("Cm_ID",comment.getProperty(COMMENT_ID).toString());
 		obj.put("Cm_CID",comment.getSingleRelationship(COMMENT_WRITTEN_ON_CHAPTER, Direction.OUTGOING).getEndNode().getProperty(CHAPTER_ID).toString());
 		obj.put("Cm_Cntnt", comment.getProperty(COMMENT_CONTENT).toString());
@@ -4819,6 +4864,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		JSONObject obj = new JSONObject();		
 		obj.put("P_Author_FullName",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
 		obj.put("P_Author",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Author_Status",series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
 		obj.put("P_Title_ID",series.getProperty(SERIES_TITLE_ID).toString());
 		obj.put("P_Title",series.getProperty(SERIES_TITLE).toString());
 		obj.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG).toString());
