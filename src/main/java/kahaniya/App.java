@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("09th July, 2016 - 02:00 P.M");
+		System.out.println("15th July, 2016 - 03:00 A.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -16,14 +16,58 @@ public class App
     
     public static void test( Kahaniya k)
     {
-    	try{		
-/*    		System.out.println(k.edit_user_status("one", 3));
+    	try{
+
+/*    		System.out.println("stats");
+    		System.out.println(k.get_stats("U"));
+    		System.out.println(k.get_stats("S"));
+    		System.out.println(k.get_stats("CH"));
+    		System.out.println(k.get_stats("R"));
+    		System.out.println(k.get_stats("C"));
+    		System.out.println(k.get_stats("L"));
+    		System.out.println(k.get_stats("G"));
+    		System.out.println(k.delete_series("ss2"));
+    		k.create_genre("GEN3");
+    		k.create_genre("GEN4");
+    		k.create_language("LANG3");
+    		k.create_language("LANG4");
+    		k.create_user("n-one", "n-one", "n-one", "n-one", "n-one", "n-one","dob","gender","address","bio", "GEN2,GEN3", "LANG3,LANG4", 2, 2, 100);
+    		k.create_user("n-two", "n-two", "n-two", "n-two", "n-two", "n-two","dob","gender","address","bio", "GEN1,GEN3", "LANG2,LANG3", 2, 2, 100);
+    		k.create_or_edit_series("ss1", "n-one", "ss1", "ss1", "ss1", "feature_image", "GEN4", "LANG4", "keywords", "copyrights", "dd_img", "dd_summary", 1, 101, 0);
+    		k.create_or_edit_series("ss2", "n-one", "ss2", "ss2", "ss2", "feature_image", "GEN3", "LANG1", "keywords", "copyrights", "dd_img", "dd_summary", 1, 102, 0);
+    		k.create_or_edit_chapter("cc1", "ss2", "series_type", "n-one", "cc1", "cc1", "feat_image", 102, 0, 0);
+    		k.create_or_edit_series("ss3", "two", "ss3", "ss3", "ss3", "feature_image", "GEN4", "LANG2", "keywords22", "copyrights", "dd_img", "dd_summary", 1, 101, 0);
+    		k.create_or_edit_chapter("c2", "s2", "series_type", "two", "c2", "c2", "feat_image", 102, 2, 0);
+
+    		System.out.println(k.get_feed("C", "L", "", 0, 10, "", "", "",""));
+    		System.out.println(k.get_feed("C", "R", "", 0, 10, "", "", "",""));
+    		System.out.println(k.get_feed("A","D", "", 0, 10, "", "", "",""));
+    		System.out.println(k.get_feed("S", "R", "", 0, 10, "one", "", "",""));
+    		System.out.println(k.get_feed("S", "R", "", 0, 10, "two", "", "",""));
+
+    		System.out.println("all items");
+    		System.out.println(k.get_all_items("C",0,1000000));
+    		System.out.println(k.get_all_items("S",0,1000000));
+    		System.out.println(k.get_all_items("A",0,1000000));
+    		System.out.println(k.get_all_items("R",0,1000000));
+    		System.out.println(k.list_genres());
+    		System.out.println(k.list_languages());
+
+    		System.out.println("stats");
+    		System.out.println(k.get_stats("U"));
+    		System.out.println(k.get_stats("S"));
+    		System.out.println(k.get_stats("CH"));
+    		System.out.println(k.get_stats("R"));
+    		System.out.println(k.get_stats("C"));
+    		System.out.println(k.get_stats("L"));
+    		System.out.println(k.get_stats("G"));
+ 
+    		System.out.println(k.edit_user_status("one", 3));
     		System.out.println(k.get_all_items("A", 0, 10));
     		System.out.println(k.edit_user_status("two", 1));
     		System.out.println(k.get_all_items("A", 0, 10));
     		System.out.println(k.edit_user_status("three", 2));
     		System.out.println(k.get_all_items("A", 0, 10));
-
     		System.out.println(k.get_all_items("C", 0, 100));
     		System.out.println(k.get_all_items("S", 0, 100));
 */    		

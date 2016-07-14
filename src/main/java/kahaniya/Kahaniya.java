@@ -36,7 +36,6 @@ import kahaniya.KahaniyaCustomException;
 
 public class Kahaniya implements KahaniyaService.Iface{
 
-	
 	//Index names
 	public static final String GENRE_NAME_INDEX = "genre_index_by_name";
 	public static final String LANG_NAME_INDEX = "language_index_by_name";
@@ -45,9 +44,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String USER_NAME_INDEX = "user_index_by_uname";
 	public static final String USER_EMAIL_INDEX = "user_index_by_email";
 	public static final String COMMENT_ID_INDEX = "comment_index_by_id";
+	public static final String WRITING_STYLE_NAME_INDEX = "writing_style_index_by_name";
 
 	public static final String SERIES_ID_INDEX = "series_index_by_id";
 	public static final String REVIEW_ID_INDEX = "review_index_by_id";
+	public static final String CONTEST_ID_INDEX = "contest_index_by_id";
+	public static final String CONTEST_TITLE_ID_INDEX = "contest_index_by_title_id";
 	public static final String CHAPTER_ID_INDEX = "chapter_index_by_id";
 	public static final String CHAPTER_TITLE_ID_INDEX = "chapter_index_by_title_id";
 	public static final String SERIES_TITLE_ID_INDEX = "series_index_by_title_id";
@@ -66,9 +68,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SEARCH_USER = "search_user";
 	public static final String SEARCH_CHAPTER = "search_chapter";
 	public static final String SEARCH_SERIES = "search_series";
-	
+
 	//lock related keys
 	public static final String LockName = "lock_node";
+	//writing style node related keys
+	public static final String WRITING_STYLE_NAME = "writing_style_name";
 
 	//review related keys
 	public static final String REVIEW_ID = "review_id";
@@ -90,6 +94,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_READ_WORD_COUNT = "chapter_read_word_count"; // number of words, a logged in user has read in a chapter
 	public static final String CHAPTER_READ_STATUS = "chapter_read_status"; // chapter read status of a logged in user
 	public static final String CHAPTER_PURCHASED_PRICE = "chapter_purchased_price"; // price that a user has paid to purchase a chapter 
+	public static final String CHAPTER_CONTEST_STATUS = "chapter_contest_status"; // status of the chapter for the given contest 
 
 	//user viewed a chapter related key // Note: do not correct this spelling mistake, as the mistake was observed after staging
 	public static final String USER_VIEWED_A_CHAPTER_ID = "user_viewer_a_chapter_id"; 
@@ -138,11 +143,29 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SERIES_DD_SUMMARY = "series_dd_summary";
 	public static final String SERIES_TYPE = "series_type";
 	
+	//contest node related keys
+	public static final String CONTEST_ID = "contest_id";
+	public static final String CONTEST_TITLE = "contest_title";
+	public static final String CONTEST_TITLE_ID = "contest_title_id";
+	public static final String CONTEST_SUMMARY = "contest_summary";
+	public static final String CONTEST_DESCRIPTION = "contest_description";
+	public static final String CONTEST_FEAT_IMAGE = "contest_feat_image";
+	public static final String CONTEST_AWARD_INFO = "contest_award_info";
+	public static final String CONTEST_THEME_INFO= "contest_theme_info";
+	public static final String CONTEST_PARTNERS_INFO = "contest_partners_info";
+	public static final String CONTEST_START_DATE = "contest_start_date";
+	public static final String CONTEST_END_DATE = "contest_end_date";
+	public static final String CONTEST_LANGUAGE = "contest_language";
+	public static final String CONTEST_PRICE = "contest_price";
+	public static final String CONTEST_MODE = "contest_mode";
+
+	
 	//comment related keys
 	public static final String COMMENT_ID = "comment_id";
 	public static final String COMMENT_CONTENT = "comment_content";
 	
 	public static final String NODE_TYPE = "node_type";
+	public static final String LOCK_NODE = "lock_node";
 	public static final String USER_NODE = "user_node";
 	public static final String GENRE_NODE = "genre_node";
 	public static final String LANG_NODE = "language_node";
@@ -152,11 +175,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String REVIEW_NODE = "review_node";
 	public static final String CHAPTER_NODE = "chapter_node";
 	public static final String COMMENT_NODE = "comment_node";
-
+	public static final String CONTEST_NODE = "contest_node";
+	public static final String WRITING_STYLE_NODE = "writing_style_node";
 	
 	private static GraphDatabaseService graphDb = null;
-	
-	
+		
 	//Relationship names
 	public static final RelationshipType USER_INTERESTED_GENRE = DynamicRelationshipType.withName("USER_INTERESTED_GENRE");
 	public static final RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
@@ -179,12 +202,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType USER_PURCHASED_A_CHAPTER = DynamicRelationshipType.withName("USER_PURCHASED_A_CHAPTER");	
 	public static final RelationshipType USER_WRITTEN_A_CHAPTER = DynamicRelationshipType.withName("USER_WRITTEN_A_CHAPTER");	
 	public static final RelationshipType CHAPTER_BELONGS_TO_SERIES = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_SERIES");	
+	public static final RelationshipType CHAPTER_BELONGS_TO_WRITING_STYLE = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_WRITING_STYLE");	
+	public static final RelationshipType CONTEST_BELONGS_TO_WRITING_STYLE = DynamicRelationshipType.withName("CONTEST_BELONGS_TO_WRITING_STYLE");	
+	public static final RelationshipType CHAPTER_BELONGS_TO_CONTEST = DynamicRelationshipType.withName("CHAPTER_BELONGS_TO_CONTEST");	
+	public static final RelationshipType SERIES_BELONGS_TO_CONTEST = DynamicRelationshipType.withName("SERIES_BELONGS_TO_CONTEST");	
+	public static final RelationshipType USER_STARTED_CONTEST = DynamicRelationshipType.withName("SERIES_BELONGS_TO_CONTEST");	
 
 	public static final RelationshipType USER_WRITTEN_A_COMMENT = DynamicRelationshipType.withName("USER_WRITTEN_A_COMMENT");
 	public static final RelationshipType COMMENT_WRITTEN_ON_CHAPTER = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CHAPTER");
+	public static final RelationshipType COMMENT_WRITTEN_ON_CONTEST = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CONTEST");
 	public static final RelationshipType REPLY_COMMENT_WRITTEN_ON_COMMENT = DynamicRelationshipType.withName("REPLY_COMMENT_WRITTEN_ON_COMMENT");	
 	
-
 	private static Comparator<Node> TimeCreatedComparatorForNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
@@ -430,6 +458,30 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(CHAPTER_LAST_VIEWED_TIME, 0);
 		return node;
 	}
+
+	private Node Contest(String contest_id, String title, String title_id,
+			String summary, String description, String feat_image,
+			String award_info, String theme_info, String partners_info, int start_date,
+			int end_date, String language, int price, int mode, int time_created) {
+		Node node = graphDb.createNode();
+		node.setProperty(CONTEST_ID, contest_id);
+		node.setProperty(CONTEST_TITLE, title);
+		node.setProperty(CONTEST_TITLE_ID, title_id);
+		node.setProperty(CONTEST_SUMMARY, summary);
+		node.setProperty(CONTEST_DESCRIPTION, description);
+		node.setProperty(CONTEST_FEAT_IMAGE, feat_image);
+		node.setProperty(CONTEST_AWARD_INFO, award_info);
+		node.setProperty(CONTEST_THEME_INFO, theme_info);
+		node.setProperty(CONTEST_PARTNERS_INFO, partners_info);
+		node.setProperty(CONTEST_START_DATE, start_date);
+		node.setProperty(CONTEST_END_DATE, end_date);
+		node.setProperty(CONTEST_LANGUAGE, language);
+		node.setProperty(CONTEST_PRICE, price);
+		node.setProperty(CONTEST_MODE, mode);
+		node.setProperty(TIME_CREATED, time_created);
+		node.setProperty(NODE_TYPE, CONTEST_NODE);
+		return node;
+	}
 	
 	public void startThriftServer()
 	{
@@ -515,7 +567,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 								SERIES_TYPE_INDEX,
 								KEYWORD_INDEX,
 								LOCK_INDEX,
-								SEARCH_INDEX
+								SEARCH_INDEX,
+								WRITING_STYLE_NAME_INDEX
 									};	
 		
 		
@@ -582,7 +635,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 				if(lockNodeIndex.get(LockName, LockName).getSingle() == null){ //create node if and only if there no locknode with given name
 					Node lockNode = graphDb.createNode();  //creating a node
 					lockNode.setProperty( LockName, LockName ); //attach name to lock node
+					lockNode.setProperty( NODE_TYPE, LOCK_NODE ); //attach nod type to lock node
 					lockNodeIndex.add( lockNode, LockName, LockName ); //attach node to lock node index to retrieve later
+				}
+				else{
+					Node lockNode = lockNodeIndex.get(LockName, LockName).getSingle();
+					if(!lockNode.hasProperty(NODE_TYPE))
+						lockNode.setProperty(NODE_TYPE, LOCK_NODE);
 				}
 			
 			tx.success();
@@ -594,22 +653,38 @@ public class Kahaniya implements KahaniyaService.Iface{
 		finally{}
 	}
 	
+	private Node getWritingStyleNode(String name)
+	{
+		Index<Node> writingStyleIndex = graphDb.index().forNodes( WRITING_STYLE_NAME_INDEX );
+		if(writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle() == null){ //create node if and only if there no locknode with given name
+			Node writingStyleNode = graphDb.createNode();  //creating a node
+			writingStyleNode.setProperty( WRITING_STYLE_NAME, name ); //attach name to lock node
+			writingStyleNode.setProperty( NODE_TYPE, name ); //attach nod type to lock node
+			writingStyleIndex.add( writingStyleNode, WRITING_STYLE_NAME, name.toLowerCase() ); //attach node to lock node index to retrieve later
+			return writingStyleNode;
+		}
+		return writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle();
+	}
+		
 	public void add_additional_properties() 
 	{
 		try (Transaction tx = graphDb.beginTx())
 		{
 			Index<Node> chapterNodeIndex = graphDb.index().forNodes( CHAPTER_ID_INDEX );
-				
+			
+			Node proseNode = getWritingStyleNode("prose");
 			ResourceIterator<Node> chapterItr = chapterNodeIndex.query(CHAPTER_ID, "*").iterator();
 			while(chapterItr.hasNext())
 			{
 				Node chapter = chapterItr.next();
 
-				if(!chapter.hasProperty(TOTAL_CHAPTER_VIEWS))
-					chapter.setProperty(TOTAL_CHAPTER_VIEWS, 0);
-				if(!chapter.hasProperty(TOTAL_CHAPTER_READS))
-					chapter.setProperty(TOTAL_CHAPTER_READS, 0);
-				
+				if(!chapter.hasRelationship(CHAPTER_BELONGS_TO_WRITING_STYLE))
+				{
+					if(chapter.hasProperty(TIME_CREATED))
+						createRelation(CHAPTER_BELONGS_TO_WRITING_STYLE, chapter, proseNode, Integer.parseInt(chapter.getProperty(TIME_CREATED).toString()));
+					else
+						createRelation(CHAPTER_BELONGS_TO_WRITING_STYLE, chapter, proseNode);
+				}
 			}
 			tx.success();
 		}
@@ -1633,12 +1708,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String title, String title_id, String tag_line,
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
-			String dd_summary, int series_type, int time_created, int is_edit)
+			String dd_summary, int series_type, int time_created, int is_edit, String contestId)
 			throws TException {
 		if(is_edit == 0)
-			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created);
+			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, contestId);
 		else if(is_edit == 1)
-			return edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created);
+			return edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, contestId);
 		else return "false";
 	}
 	
@@ -1646,7 +1721,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String title, String title_id, String tag_line,
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
-			String dd_summary, int series_type, int time_created){
+			String dd_summary, int series_type, int time_created, String contestId){
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -1718,6 +1793,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 			//create relationship with user
 			createRelation(USER_STARTED_SERIES, userNode, series_node);
 			
+			if(contestId != null && contestId.length() != 0)
+			{
+				Index<Node> contestIdIndex = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				Node contestNode = contestIdIndex.get(CONTEST_ID, contestId).getSingle();
+				if(contestNode != null)
+					createRelation(SERIES_BELONGS_TO_CONTEST, series_node, contestNode);
+				else
+					throw new KahaniyaCustomException("Contest not found for the given contest id:"+contestId);
+			}
 			//create relationship with keywords
 			keywords = keywords.toLowerCase();
 			for(String keyword : keywords.split(","))
@@ -1771,7 +1855,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String title, String title_id, String tag_line,
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
-			String dd_summary, int series_type, int time_edited){
+			String dd_summary, int series_type, int time_edited, String contestId){
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -1836,6 +1920,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 				rel.delete();
 			for(Relationship rel : series_node.getRelationships(SERIES_KEYWORD))
 				rel.delete();
+			for(Relationship rel : series_node.getRelationships(SERIES_BELONGS_TO_CONTEST))
+				rel.delete();
+
+			if(contestId != null && contestId.length() != 0)
+			{
+				Index<Node> contestIdIndex = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				Node contestNode = contestIdIndex.get(CONTEST_ID, contestId).getSingle();
+				if(contestNode != null)
+					createRelation(SERIES_BELONGS_TO_CONTEST, series_node, contestNode);
+				else
+					throw new KahaniyaCustomException("Contest not found for the given contest id:"+contestId);
+			}
 
 			//create relationships with Genres and Languages
 			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode, Integer.parseInt(series_node.getProperty(TIME_CREATED).toString()));
@@ -2019,22 +2115,28 @@ public class Kahaniya implements KahaniyaService.Iface{
 	@Override
 	public String create_or_edit_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id, String title,
-			String feat_image, int time_created, int free_or_paid, int is_edit)
+			String feat_image, int time_created, int free_or_paid, int is_edit,
+			String writing_style, String contestId)
 			throws TException {
 		if(is_edit == 0)
-			return create_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created);
+			return create_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, writing_style, contestId);
 		else if(is_edit == 1)
-			return edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created);
+			return edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, writing_style, contestId);
 		else return "false";		
 	}
 	
 	private String edit_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id,
-			String title, String feat_image, int free_or_paid, int time_created) {
+			String title, String feat_image, int free_or_paid,
+			int time_created, String writing_style, String contestId) {
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(writing_style == null || writing_style.length() == 0)
+				writing_style = "prose";
+			else
+				writing_style = writing_style.toLowerCase();
 			if(user_id == null || user_id.length() == 0)
 				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
 			if(series_id == null || series_id.length() == 0)
@@ -2052,7 +2154,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
-			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
@@ -2063,6 +2164,29 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node chapterNode = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
 			if(chapterNode == null)
 				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+
+			Node writingStyleNode = getWritingStyleNode(writing_style);
+			if(!isRelationExistsBetween(CHAPTER_BELONGS_TO_WRITING_STYLE, chapterNode, writingStyleNode))
+			{
+				Iterator<Relationship> styles = chapterNode.getRelationships(CHAPTER_BELONGS_TO_WRITING_STYLE).iterator();
+				while(styles.hasNext())
+					styles.next().delete();
+				createRelation(CHAPTER_BELONGS_TO_WRITING_STYLE, chapterNode, writingStyleNode);
+			}
+
+			for(Relationship rel : chapterNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+				rel.delete();
+
+			if(contestId != null && contestId.length() != 0)
+			{
+				Index<Node> contestIdIndex = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				Node contestNode = contestIdIndex.get(CONTEST_ID, contestId).getSingle();
+				if(contestNode != null)
+					createRelation(CHAPTER_BELONGS_TO_CONTEST, chapterNode, contestNode);
+				else
+					throw new KahaniyaCustomException("Contest not found for the given contest id:"+contestId);
+				chapterNode.getSingleRelationship(CHAPTER_BELONGS_TO_CONTEST, Direction.OUTGOING).setProperty(CHAPTER_CONTEST_STATUS, 0);
+			}
 
 			chapterNode.setProperty(CHAPTER_TITLE, title);
 			chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
@@ -2093,11 +2217,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	private String create_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id,
-			String title, String feat_image, int free_or_paid, int time_created) {
+			String title, String feat_image, int free_or_paid, 
+			int time_created, String writing_style, String contestId) {
 		
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
 		{
+			if(writing_style == null || writing_style.length() == 0)
+				writing_style = "prose";
+			else
+				writing_style = writing_style.toLowerCase();
 			if(user_id == null || user_id.length() == 0)
 				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
 			if(series_id == null || series_id.length() == 0)
@@ -2141,6 +2270,21 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			//create relationships with Series
 			createRelation(CHAPTER_BELONGS_TO_SERIES, chapter_node, seriesNode, time_created);
+
+			Node writingStyleNode = getWritingStyleNode(writing_style);
+			createRelation(CHAPTER_BELONGS_TO_WRITING_STYLE, chapter_node, writingStyleNode);
+	
+			if(contestId != null && contestId.length() != 0)
+			{
+				Index<Node> contestIdIndex = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				Node contestNode = contestIdIndex.get(CONTEST_ID, contestId).getSingle();
+				if(contestNode != null)
+					createRelation(CHAPTER_BELONGS_TO_CONTEST, chapter_node, contestNode);
+				else
+					throw new KahaniyaCustomException("Contest not found for the given contest id:"+contestId);
+			}
+
+
 			
 			//Indexing newly created series node
 			chapterId_index.add(chapter_node, CHAPTER_ID, chapter_id);
@@ -2164,6 +2308,57 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println(new Date().toString());
 			System.out.println("Exception @ create_chapter()");
 			System.out.println("Something went wrong, while creating chapter from create_chapter  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	@Override
+	public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(contest_id == null || contest_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param contest_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			Node contest_node = contestId_index.get(CONTEST_ID, contest_id).getSingle();
+			if(contest_node == null)
+				throw new KahaniyaCustomException("Contest doesnot exists with given id : "+contest_id);
+			
+			if(isRelationExistsBetween(CHAPTER_BELONGS_TO_CONTEST, chapter_node, contest_node))
+			{
+				chapter_node.getSingleRelationship(CHAPTER_BELONGS_TO_CONTEST, Direction.OUTGOING).setProperty(CHAPTER_CONTEST_STATUS, status);
+			}
+			else
+				throw new KahaniyaCustomException("Given chapter does not belongs to the given contest");
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_chapter_contest_status()");
+			System.out.println("Something went wrong, while updating contest status of a chapter from update_chapter_contest_status  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_chapter_contest_status()");
+			System.out.println("Something went wrong, while updating contest status of a chapter from update_chapter_contest_status  :"+ex.getMessage());
 			ex.printStackTrace();
 			res = "false";
 		}
@@ -2570,7 +2765,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	@Override
 	public String get_feed(String tileType, String feedType, String filter,
-			int prev_cnt, int count, String s_user_id, String genre, String lang, String user_id) throws TException {
+			int prev_cnt, int count, String s_user_id, String genre, String lang, String user_id, String contestId, int status) throws TException {
 		if(feedType == null)
 			feedType = "";
 		if(tileType == null)
@@ -2594,12 +2789,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		else if(tileType.equalsIgnoreCase("A"))
 			return get_authors(feedType, filter, prev_cnt, count, s_user_id);
+		else if(tileType.equalsIgnoreCase("CN"))
+			return get_contests(feedType, filter, prev_cnt, count, s_user_id);
 		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
-			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
+			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, contestId, status);
 		else if(tileType.equalsIgnoreCase("All"))
-			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
+			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, "", 0)+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
 		else return "";
 	}
 	
@@ -3631,7 +3828,82 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
-	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String s_user_id, String genre_name, String lang_name, String user_id)
+	private String get_contests(String feedType, String filter, int prev_cnt, int count, String user_id)
+	{
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			if(user_id == null)
+				user_id = "";
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			
+			int c = 0;
+
+			if(feedType.equalsIgnoreCase("L"))
+			{
+
+				ResourceIterator<Node> contestNodesItr = contestId_index.query(CONTEST_ID, "*").iterator();
+				LinkedList<Node> contestsList = new LinkedList<Node>();
+				LinkedList<Node> outputList = new LinkedList<Node>();
+				while(contestNodesItr.hasNext())
+					contestsList.addLast(contestNodesItr.next());
+				
+				for(Node contest : contestsList)
+				{			
+					Node auth = contest.getSingleRelationship(USER_STARTED_CONTEST, Direction.INCOMING).getStartNode();
+					if(auth.equals(user_node))
+						continue;
+					if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+						continue;
+					outputList.addLast(contest);
+				}
+				
+				Collections.sort(outputList, TimeCreatedComparatorForNodes);
+				
+				for(Node contest : outputList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					else
+					{
+						c++;
+						jsonArray.put(getJSONForContest(contest, user_node));			
+					}
+				}
+			}				
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_authors()");
+			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_authors()");
+			System.out.println("Something went wrong, while returning authors from get_authors  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();
+	}
+	
+	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String s_user_id, String genre_name, String lang_name, String user_id, String contestId, int status)
 	{
 
 		JSONArray jsonArray = new JSONArray();		
@@ -3764,6 +4036,43 @@ public class Kahaniya implements KahaniyaService.Iface{
 						outputChaptersNode.addLast(chapter);
 					}
 					
+				}
+			}
+			else if(feedType.equalsIgnoreCase("CN"))
+			{
+				int c = 0;
+				if(contestId == null || contestId.length()==0)
+					throw new KahaniyaCustomException("Empty parameter receieved for contest id");
+				Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				Node contestNode = contestId_index.get(CONTEST_ID, contestId).getSingle();
+				if(contestNode == null)
+					throw new KahaniyaCustomException("Contest does not exists with given contest id"+contestId);
+
+				LinkedList<Relationship> contestChaptersRelsList = new LinkedList<Relationship>();
+				
+				for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+				{
+					if(Integer.parseInt(rel.getProperty(CHAPTER_CONTEST_STATUS).toString())>=status)
+						contestChaptersRelsList.addLast(rel);
+				}
+				
+				Collections.sort(contestChaptersRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : contestChaptersRelsList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getStartNode();
+					
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					outputChaptersNode.addLast(chapter);
+									
 				}
 			}
 			else if(feedType.equalsIgnoreCase("B"))
@@ -4851,7 +5160,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("Cm_By_UserId",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
 		obj.put("Cm_By_UserStatus",comment.getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
 		obj.put("Cm_ID",comment.getProperty(COMMENT_ID).toString());
-		obj.put("Cm_CID",comment.getSingleRelationship(COMMENT_WRITTEN_ON_CHAPTER, Direction.OUTGOING).getEndNode().getProperty(CHAPTER_ID).toString());
+		if(comment.hasRelationship(COMMENT_WRITTEN_ON_CHAPTER))
+			obj.put("Cm_CID",comment.getSingleRelationship(COMMENT_WRITTEN_ON_CHAPTER, Direction.OUTGOING).getEndNode().getProperty(CHAPTER_ID).toString());
+		else if(comment.hasRelationship(COMMENT_WRITTEN_ON_CONTEST))
+			obj.put("Cm_CID",comment.getSingleRelationship(COMMENT_WRITTEN_ON_CONTEST, Direction.OUTGOING).getEndNode().getProperty(CONTEST_ID).toString());
+		else
+			obj.put("Cm_CID","");
 		obj.put("Cm_Cntnt", comment.getProperty(COMMENT_CONTENT).toString());
 		obj.put("Cm_TimeCreated",comment.getProperty(TIME_CREATED).toString());
 		obj.put("Cm_Rply_Cnt",comment.getDegree(REPLY_COMMENT_WRITTEN_ON_COMMENT, Direction.INCOMING));
@@ -4898,6 +5212,24 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return obj;
 	}
 	
+	private JSONObject getJSONForContest(Node contest, Node user)
+	{
+		JSONObject obj = new JSONObject();		
+		obj.put("P_Author_FullName",contest.getSingleRelationship(USER_STARTED_CONTEST, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("P_Author",contest.getSingleRelationship(USER_STARTED_CONTEST, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Smry",contest.getProperty(CONTEST_SUMMARY).toString());
+		obj.put("P_Title_ID",contest.getProperty(CONTEST_TITLE_ID).toString());
+		obj.put("P_Title",contest.getProperty(CONTEST_TITLE).toString());
+		obj.put("P_Feature_Image",contest.getProperty(CONTEST_FEAT_IMAGE).toString());
+		obj.put("P_Id",contest.getProperty(CONTEST_ID).toString());
+		obj.put("P_Lang",contest.getProperty(CONTEST_LANGUAGE).toString());
+		obj.put("P_TimeCreated",contest.getProperty(TIME_CREATED).toString());
+		obj.put("P_EndDt",contest.getProperty(CONTEST_END_DATE).toString());
+		obj.put("P_Num_Chapters", contest.getDegree(CHAPTER_BELONGS_TO_CONTEST));
+		obj.put("Is_Neo4j",true);
+		return obj;
+	}
+	
 	private int getAccumulatedSeriesViews(Node series)
 	{
 		Iterator<Relationship> chaptersRelItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
@@ -4939,17 +5271,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	@Override
 	public String create_or_edit_comment(String chapter_id, String comment_id,
-			String content, String parent_cmnt_id, String user_id, int time, int is_edit)
+			String content, String parent_cmnt_id, String user_id, int time, int is_edit, String cmntType)
 			throws TException {
 		if(is_edit == 0)
-			return create_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time);
+			return create_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time, cmntType);
 		else if(is_edit == 1)
-			return edit_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time);
+			return edit_comment(chapter_id, comment_id, content, parent_cmnt_id, user_id, time, cmntType);
 		else return "false";		
 	}
 		
 	public String create_comment(String chapter_id, String comment_id,
-			String content, String parent_cmnt_id, String user_id, int time)
+			String content, String parent_cmnt_id, String user_id, int time, String cmntType)
 			throws TException {
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -4969,6 +5301,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			aquireWriteLock(tx);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
 			Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
 			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
@@ -4976,8 +5309,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
 
 			Node chapter_node = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
-			if(chapter_node == null)
+			
+			Node contest_node = contestId_index.get(CONTEST_ID,chapter_id).getSingle();
+			if(contest_node == null && cmntType.equalsIgnoreCase("CN"))
+				throw new KahaniyaCustomException("Contest does not exists with given id : "+chapter_id);
+			else if(chapter_node == null && cmntType.equalsIgnoreCase("C"))
 				throw new KahaniyaCustomException("Chapter does not exists with given id : "+chapter_id);
+			else if(!cmntType.equalsIgnoreCase("C") && !cmntType.equalsIgnoreCase("CN"))
+				throw new KahaniyaCustomException("Invalid cmntType "+cmntType);
 			
 			Node parentCommentNode = null;
 			if(parent_cmnt_id != null && !parent_cmnt_id.equals(""))
@@ -4993,8 +5332,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			//create relationship with user
 			createRelation(USER_WRITTEN_A_COMMENT, userNode, comment_node, time);
 			
-			//create relationships with Chapter
-			createRelation(COMMENT_WRITTEN_ON_CHAPTER, comment_node, chapter_node, time);
+			//create relationships with Chapter / Contest
+			if(cmntType.equalsIgnoreCase("CN") && contest_node != null)createRelation(COMMENT_WRITTEN_ON_CONTEST, comment_node, contest_node, time);
+			else if(cmntType.equalsIgnoreCase("C") && chapter_node != null)createRelation(COMMENT_WRITTEN_ON_CHAPTER, comment_node, chapter_node, time);
 
 			//create relationships with parent commment
 			if(parentCommentNode != null)
@@ -5028,7 +5368,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 	
 	public String edit_comment(String chapter_id, String comment_id,
-			String content, String parent_cmnt_id, String user_id, int time)
+			String content, String parent_cmnt_id, String user_id, int time, String cmntType)
 			throws TException {
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -5118,7 +5458,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 	
 	@Override
-	public String get_comments(String chapter_id, int prev_cnt, int count) throws TException {
+	public String get_comments(String chapter_id, int prev_cnt, int count, String cmntType) throws TException {
 
 		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
@@ -5127,12 +5467,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("Null or empty chapter id");
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
 			
 			Node chapter_node = chapterId_index.get(CHAPTER_ID,chapter_id).getSingle();
-			if(chapter_node == null)
+			Node contest_node = contestId_index.get(CONTEST_ID,chapter_id).getSingle();
+			if(chapter_node == null && cmntType.equalsIgnoreCase("C"))
 				throw new KahaniyaCustomException("Chapter does not exists with given id : "+chapter_id);
+			else if(contest_node == null && cmntType.equalsIgnoreCase("CN"))
+				throw new KahaniyaCustomException("Contest does not exists with given id : "+chapter_id);
+			else if(!cmntType.equalsIgnoreCase("C") && !cmntType.equalsIgnoreCase("CN")) throw new KahaniyaCustomException("Invalid cmntType : "+cmntType);
 			
-			Iterator<Relationship> cmntsRelItr = chapter_node.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
+			Iterator<Relationship> cmntsRelItr = chapter_node.getRelationships(COMMENT_WRITTEN_ON_CHAPTER,COMMENT_WRITTEN_ON_CONTEST).iterator();
 			LinkedList<Relationship> cmntsRelList = new LinkedList<Relationship>();
 			while(cmntsRelItr.hasNext())
 				cmntsRelList.addLast(cmntsRelItr.next());
@@ -5207,6 +5552,32 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 				for(Node chapter : chaptersList)
 					jsonArray.put(getJSONForChapter(chapter, null));
+			}
+			else if(item_type.equalsIgnoreCase("CN"))
+			{
+				int c = 0;
+
+				Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+				ResourceIterator<Node> contestsItr = contestId_index.query(CONTEST_ID, "*").iterator();
+				LinkedList<Node> contestsList = new LinkedList<Node>();
+				while(contestsItr.hasNext())
+				{
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					else if ( c > prev_cnt+count)
+						break;
+					else
+						contestsList.addLast(contestsItr.next());
+					c++;
+				}
+				
+				Collections.sort(contestsList, TimeCreatedComparatorForNodes);
+			
+				for(Node contest : contestsList)
+					jsonArray.put(getJSONForContest(contest, null));
 			}
 			else if(item_type.equalsIgnoreCase("S"))
 			{
@@ -5721,11 +6092,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 	{
 
 		Index<Relationship> chapterViewsIndex = graphDb.index().forRelationships(USER_VIEWED_CHAPTER_REL_INDEX);
+		Index<Relationship> chapterReadsIndex = graphDb.index().forRelationships(USER_READ_CHAPTER_REL_INDEX);
 		Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
 		
 		Iterator<Relationship> relsItr = chapter.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
 		while(relsItr.hasNext())
 			chapterViewsIndex.remove(relsItr.next());
+
+		relsItr = chapter.getRelationships(USER_READ_A_CHAPTER).iterator();
+		while(relsItr.hasNext())
+			chapterReadsIndex.remove(relsItr.next());
 
 		relsItr = chapter.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
 		while(relsItr.hasNext())
@@ -5748,10 +6124,37 @@ public class Kahaniya implements KahaniyaService.Iface{
 			relsItr.next().delete();
 	}
 	
+	private void deleteContestRelationships(Node contest)
+	{
+
+		Index<Node> commentId_index = graphDb.index().forNodes(COMMENT_ID_INDEX);
+		
+		Iterator<Relationship> relsItr = contest.getRelationships(COMMENT_WRITTEN_ON_CONTEST).iterator();
+		while(relsItr.hasNext())
+		{
+			Relationship rel =  relsItr.next();
+			Node cmntNode = rel.getStartNode();
+			rel.delete();
+			
+			commentId_index.remove(cmntNode);
+			deleteSubComments(cmntNode);
+			Iterator<Relationship> cmntRels = cmntNode.getRelationships().iterator();
+			while(cmntRels.hasNext())
+				cmntRels.next().delete();
+			cmntNode.delete();
+		}
+
+		
+		relsItr = contest.getRelationships().iterator();
+		while(relsItr.hasNext())
+			relsItr.next().delete();
+	}
+	
 	private void deleteSeriesRelationships(Node series)
 	{
 
 		Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+		Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
 		Index<Node> reviewId_index = graphDb.index().forNodes(REVIEW_ID_INDEX);
 
 		Iterator<Relationship> relsItr = series.getRelationships(REVIEW_BELONGS_TO_SERIES).iterator();
@@ -5774,8 +6177,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Relationship rel =  relsItr.next();
 			Node chapterNode = rel.getStartNode();
 			rel.delete();
-			
+
 			chapterId_index.remove(chapterNode);
+			chapterTitleId_index.remove(chapterNode);
 			deleteChapterRelationships(chapterNode);
 			chapterNode.delete();
 		}
@@ -5820,14 +6224,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("Null or empty string receieved for the parameter user_id");
 
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> userName_index = graphDb.index().forNodes(USER_NAME_INDEX);
+			Index<Node> userEmail_index = graphDb.index().forNodes(USER_EMAIL_INDEX);
 			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
 			Node user = userId_index.get(USER_ID,user_id).getSingle();
 			
 			if(user == null)
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
-			
+
 			userId_index.remove(user);
+			userName_index.remove(user);
+			userEmail_index.remove(user);
 			search_index.remove(user);
 			user.setProperty(IS_DELETED,"1");
 			
@@ -5838,16 +6246,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 		catch(KahaniyaCustomException ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ delete_series()");
-			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+			System.out.println("Exception @ delete_user()");
+			System.out.println("Something went wrong, while deleting user from delete_user  :"+ex.getMessage());
 //				ex.printStackTrace();
 			res = "false";
 		}
 		catch(Exception ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ delete_series()");
-			System.out.println("Something went wrong, while deleting series from delete_series  :"+ex.getMessage());
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_user()");
 			ex.printStackTrace();
 			res = "false";
 		}
@@ -5903,7 +6311,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;	
 	}
-
 	
 	@Override
 	public String search(String query, int tp, String user_id, int prev_cnt, int count)
@@ -6065,6 +6472,248 @@ public class Kahaniya implements KahaniyaService.Iface{
 			jsonArray = new JSONArray();
 		}
 		return jsonArray.toString();	
+	}
+
+	
+	@Override
+	public String create_or_edit_contest(String contest_id, String user_id,
+			String title, String title_id, String summary, String description,
+			String feat_image, String writing_style, String award_info,
+			String theme_info, String partners_info, int start_date,
+			int end_date, String language, int price, int mode,
+			int time_created, int is_edit) throws TException {
+		if(is_edit == 0)
+			return create_contest(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created);
+		else if(is_edit == 1)
+			return edit_contest(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created);
+		else return "false";		
+
+	}
+
+	private String create_contest(String contest_id, String user_id,
+			String title, String title_id, String summary, String description,
+			String feat_image, String writing_style, String award_info, String theme_info,
+			String partners_info, int start_date, int end_date,
+			String language, int price, int mode, int time_created) {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(writing_style == null || writing_style.length() == 0)
+				writing_style = "prose";
+			else
+				writing_style = writing_style.toLowerCase();
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(contest_id == null || contest_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param contest_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(feat_image == null)
+				feat_image = "";
+			if(summary == null)
+				summary = "";
+			if(description == null)
+				description = "";
+			if(award_info == null)
+				award_info = "";
+			if(theme_info == null)
+				theme_info = "";
+			if(partners_info == null)
+				partners_info = "";
+
+
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			Index<Node> contestTitleId_index = graphDb.index().forNodes(CONTEST_TITLE_ID_INDEX);
+			
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			if(contestId_index.get(CONTEST_ID,contest_id).getSingle()!=null)
+				throw new KahaniyaCustomException("Contest already exists with given id : "+contest_id);
+			
+			if(contestTitleId_index.get(CONTEST_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
+				throw new KahaniyaCustomException("Contest already exists with given title id : "+title_id);
+			
+			Node contest_node = Contest(contest_id, title, title_id, summary, description, feat_image, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created);  // Creating a new contest node
+			if(contest_node == null)
+				throw new KahaniyaCustomException("Something went wrong, while creating contest ");
+
+			//create relationship with user
+			createRelation(USER_STARTED_CONTEST, userNode, contest_node, time_created);
+			
+			Node writingStyleNode = getWritingStyleNode(writing_style);
+			createRelation(CONTEST_BELONGS_TO_WRITING_STYLE, contest_node, writingStyleNode);
+				
+			//Indexing newly created series node
+			contestId_index.add(contest_node, CONTEST_ID, contest_id);
+			contestTitleId_index.add(contest_node, CONTEST_TITLE_ID, title_id.toLowerCase());
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ create_contest()");
+			System.out.println("Something went wrong, while creating contest from create_contest  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ create_contest()");
+			System.out.println("Something went wrong, while creating contest from create_contest  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+
+	private String edit_contest(String contest_id, String user_id,
+			String title, String title_id, String summary, String description,
+			String feat_image, String writing_style, String award_info, String theme_info,
+			String partners_info, int start_date, int end_date,
+			String language, int price, int mode, int time_created) {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(writing_style == null || writing_style.length() == 0)
+				writing_style = "prose";
+			else
+				writing_style = writing_style.toLowerCase();
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(contest_id == null || contest_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param contest_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(feat_image == null)
+				feat_image = "";
+			if(summary == null)
+				summary = "";
+			if(description == null)
+				description = "";
+			if(award_info == null)
+				award_info = "";
+			if(theme_info == null)
+				theme_info = "";
+			if(partners_info == null)
+				partners_info = "";
+
+
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			Node contestNode = contestId_index.get(CONTEST_ID,contest_id).getSingle();
+			if(contestNode == null)
+				throw new KahaniyaCustomException("Contest doesnot exists with given id : "+contest_id);
+
+			Node writingStyleNode = getWritingStyleNode(writing_style);
+			if(!isRelationExistsBetween(CONTEST_BELONGS_TO_WRITING_STYLE, contestNode, writingStyleNode))
+			{
+				Iterator<Relationship> styles = contestNode.getRelationships(CONTEST_BELONGS_TO_WRITING_STYLE).iterator();
+				while(styles.hasNext())
+					styles.next().delete();
+				createRelation(CONTEST_BELONGS_TO_WRITING_STYLE, contestNode, writingStyleNode);
+			}
+
+			contestNode.setProperty(CONTEST_TITLE, title);
+			contestNode.setProperty(CONTEST_SUMMARY, summary);
+			contestNode.setProperty(CONTEST_DESCRIPTION, description);
+			contestNode.setProperty(CONTEST_FEAT_IMAGE, feat_image);
+			contestNode.setProperty(CONTEST_AWARD_INFO, award_info);
+			contestNode.setProperty(CONTEST_THEME_INFO, theme_info);
+			contestNode.setProperty(CONTEST_PARTNERS_INFO, partners_info);
+			contestNode.setProperty(CONTEST_START_DATE, start_date);
+			contestNode.setProperty(CONTEST_END_DATE, end_date);
+			contestNode.setProperty(CONTEST_LANGUAGE, language);
+			contestNode.setProperty(CONTEST_PRICE, price);
+			contestNode.setProperty(CONTEST_MODE, mode);
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_contest()");
+			System.out.println("Something went wrong, while editing contest from edit_contest  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_contest()");
+			System.out.println("Something went wrong, while editing contest from edit_contest  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+
+	@Override
+	public String delete_contest(String contest_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			
+			if(contest_id == null || contest_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter contest_id");
+
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			Index<Node> contestTitleId_index = graphDb.index().forNodes(CONTEST_TITLE_ID_INDEX);
+			
+			Node contest = contestId_index.get(CONTEST_ID,contest_id).getSingle();
+			
+			if(contest == null)
+				throw new KahaniyaCustomException("Contest doesnot exists with given id : "+contest_id);
+			
+			deleteContestRelationships(contest);
+
+			contestId_index.remove(contest);
+			contestTitleId_index.remove(contest);
+			contest.delete();
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_contest()");
+			System.out.println("Something went wrong, while deleting contest from delete_contest  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_contest()");
+			System.out.println("Something went wrong, while deleting contest from delete_contest  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;	
 	}
 
 }
