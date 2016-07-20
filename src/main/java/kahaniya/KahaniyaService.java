@@ -67,11 +67,11 @@ public class KahaniyaService {
 
     public String deactivate_user(String user_id) throws org.apache.thrift.TException;
 
-    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId) throws org.apache.thrift.TException;
+    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException;
 
     public String create_or_edit_review(String series_id, String review_id, String data, String user_id, int time_created, int is_edit) throws org.apache.thrift.TException;
 
-    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException;
+    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException;
 
     public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws org.apache.thrift.TException;
 
@@ -161,11 +161,11 @@ public class KahaniyaService {
 
     public void deactivate_user(String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.deactivate_user_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException;
+    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException;
 
     public void create_or_edit_review(String series_id, String review_id, String data, String user_id, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_review_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException;
+    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException;
 
     public void update_chapter_contest_status(String chapter_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_contest_status_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -675,13 +675,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "deactivate_user failed: unknown result");
     }
 
-    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId) throws org.apache.thrift.TException
+    public String create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException
     {
-      send_create_or_edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit, contestId);
+      send_create_or_edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit, writing_style, contestId);
       return recv_create_or_edit_series();
     }
 
-    public void send_create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId) throws org.apache.thrift.TException
+    public void send_create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException
     {
       create_or_edit_series_args args = new create_or_edit_series_args();
       args.setSeries_id(series_id);
@@ -699,6 +699,7 @@ public class KahaniyaService {
       args.setSeries_type(series_type);
       args.setTime_created(time_created);
       args.setIs_edit(is_edit);
+      args.setWriting_style(writing_style);
       args.setContestId(contestId);
       sendBase("create_or_edit_series", args);
     }
@@ -741,13 +742,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "create_or_edit_review failed: unknown result");
     }
 
-    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException
+    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException
     {
-      send_create_or_edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, writing_style, contestId);
+      send_create_or_edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId);
       return recv_create_or_edit_chapter();
     }
 
-    public void send_create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId) throws org.apache.thrift.TException
+    public void send_create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException
     {
       create_or_edit_chapter_args args = new create_or_edit_chapter_args();
       args.setChapter_id(chapter_id);
@@ -760,7 +761,6 @@ public class KahaniyaService {
       args.setTime_created(time_created);
       args.setFree_or_paid(free_or_paid);
       args.setIs_edit(is_edit);
-      args.setWriting_style(writing_style);
       args.setContestId(contestId);
       sendBase("create_or_edit_chapter", args);
     }
@@ -2070,9 +2070,9 @@ public class KahaniyaService {
       }
     }
 
-    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException {
+    public void create_or_edit_series(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      create_or_edit_series_call method_call = new create_or_edit_series_call(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit, contestId, resultHandler, this, ___protocolFactory, ___transport);
+      create_or_edit_series_call method_call = new create_or_edit_series_call(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, is_edit, writing_style, contestId, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -2093,8 +2093,9 @@ public class KahaniyaService {
       private int series_type;
       private int time_created;
       private int is_edit;
+      private String writing_style;
       private String contestId;
-      public create_or_edit_series_call(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public create_or_edit_series_call(String series_id, String user_id, String title, String title_id, String tag_line, String feature_image, String genre, String language, String keywords, String copyrights, String dd_img, String dd_summary, int series_type, int time_created, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_series_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.series_id = series_id;
         this.user_id = user_id;
@@ -2111,6 +2112,7 @@ public class KahaniyaService {
         this.series_type = series_type;
         this.time_created = time_created;
         this.is_edit = is_edit;
+        this.writing_style = writing_style;
         this.contestId = contestId;
       }
 
@@ -2132,6 +2134,7 @@ public class KahaniyaService {
         args.setSeries_type(series_type);
         args.setTime_created(time_created);
         args.setIs_edit(is_edit);
+        args.setWriting_style(writing_style);
         args.setContestId(contestId);
         args.write(prot);
         prot.writeMessageEnd();
@@ -2194,9 +2197,9 @@ public class KahaniyaService {
       }
     }
 
-    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException {
+    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      create_or_edit_chapter_call method_call = new create_or_edit_chapter_call(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, writing_style, contestId, resultHandler, this, ___protocolFactory, ___transport);
+      create_or_edit_chapter_call method_call = new create_or_edit_chapter_call(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -2212,9 +2215,8 @@ public class KahaniyaService {
       private int time_created;
       private int free_or_paid;
       private int is_edit;
-      private String writing_style;
       private String contestId;
-      public create_or_edit_chapter_call(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String writing_style, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public create_or_edit_chapter_call(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.chapter_id = chapter_id;
         this.series_id = series_id;
@@ -2226,7 +2228,6 @@ public class KahaniyaService {
         this.time_created = time_created;
         this.free_or_paid = free_or_paid;
         this.is_edit = is_edit;
-        this.writing_style = writing_style;
         this.contestId = contestId;
       }
 
@@ -2243,7 +2244,6 @@ public class KahaniyaService {
         args.setTime_created(time_created);
         args.setFree_or_paid(free_or_paid);
         args.setIs_edit(is_edit);
-        args.setWriting_style(writing_style);
         args.setContestId(contestId);
         args.write(prot);
         prot.writeMessageEnd();
@@ -3618,7 +3618,7 @@ public class KahaniyaService {
 
       protected create_or_edit_series_result getResult(I iface, create_or_edit_series_args args) throws org.apache.thrift.TException {
         create_or_edit_series_result result = new create_or_edit_series_result();
-        result.success = iface.create_or_edit_series(args.series_id, args.user_id, args.title, args.title_id, args.tag_line, args.feature_image, args.genre, args.language, args.keywords, args.copyrights, args.dd_img, args.dd_summary, args.series_type, args.time_created, args.is_edit, args.contestId);
+        result.success = iface.create_or_edit_series(args.series_id, args.user_id, args.title, args.title_id, args.tag_line, args.feature_image, args.genre, args.language, args.keywords, args.copyrights, args.dd_img, args.dd_summary, args.series_type, args.time_created, args.is_edit, args.writing_style, args.contestId);
         return result;
       }
     }
@@ -3650,7 +3650,7 @@ public class KahaniyaService {
 
       protected create_or_edit_chapter_result getResult(I iface, create_or_edit_chapter_args args) throws org.apache.thrift.TException {
         create_or_edit_chapter_result result = new create_or_edit_chapter_result();
-        result.success = iface.create_or_edit_chapter(args.chapter_id, args.series_id, args.series_type, args.user_id, args.title_id, args.title, args.feat_image, args.time_created, args.free_or_paid, args.is_edit, args.writing_style, args.contestId);
+        result.success = iface.create_or_edit_chapter(args.chapter_id, args.series_id, args.series_type, args.user_id, args.title_id, args.title, args.feat_image, args.time_created, args.free_or_paid, args.is_edit, args.contestId);
         return result;
       }
     }
@@ -19128,7 +19128,8 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField SERIES_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("series_type", org.apache.thrift.protocol.TType.I32, (short)13);
     private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)14);
     private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)15);
-    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)16);
+    private static final org.apache.thrift.protocol.TField WRITING_STYLE_FIELD_DESC = new org.apache.thrift.protocol.TField("writing_style", org.apache.thrift.protocol.TType.STRING, (short)16);
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)17);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -19151,6 +19152,7 @@ public class KahaniyaService {
     public int series_type; // required
     public int time_created; // required
     public int is_edit; // required
+    public String writing_style; // required
     public String contestId; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
@@ -19170,7 +19172,8 @@ public class KahaniyaService {
       SERIES_TYPE((short)13, "series_type"),
       TIME_CREATED((short)14, "time_created"),
       IS_EDIT((short)15, "is_edit"),
-      CONTEST_ID((short)16, "contestId");
+      WRITING_STYLE((short)16, "writing_style"),
+      CONTEST_ID((short)17, "contestId");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -19215,7 +19218,9 @@ public class KahaniyaService {
             return TIME_CREATED;
           case 15: // IS_EDIT
             return IS_EDIT;
-          case 16: // CONTEST_ID
+          case 16: // WRITING_STYLE
+            return WRITING_STYLE;
+          case 17: // CONTEST_ID
             return CONTEST_ID;
           default:
             return null;
@@ -19294,6 +19299,8 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.WRITING_STYLE, new org.apache.thrift.meta_data.FieldMetaData("writing_style", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contestId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -19319,6 +19326,7 @@ public class KahaniyaService {
       int series_type,
       int time_created,
       int is_edit,
+      String writing_style,
       String contestId)
     {
       this();
@@ -19340,6 +19348,7 @@ public class KahaniyaService {
       setTime_createdIsSet(true);
       this.is_edit = is_edit;
       setIs_editIsSet(true);
+      this.writing_style = writing_style;
       this.contestId = contestId;
     }
 
@@ -19388,6 +19397,9 @@ public class KahaniyaService {
       this.series_type = other.series_type;
       this.time_created = other.time_created;
       this.is_edit = other.is_edit;
+      if (other.isSetWriting_style()) {
+        this.writing_style = other.writing_style;
+      }
       if (other.isSetContestId()) {
         this.contestId = other.contestId;
       }
@@ -19417,6 +19429,7 @@ public class KahaniyaService {
       this.time_created = 0;
       setIs_editIsSet(false);
       this.is_edit = 0;
+      this.writing_style = null;
       this.contestId = null;
     }
 
@@ -19777,6 +19790,30 @@ public class KahaniyaService {
       __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
     }
 
+    public String getWriting_style() {
+      return this.writing_style;
+    }
+
+    public create_or_edit_series_args setWriting_style(String writing_style) {
+      this.writing_style = writing_style;
+      return this;
+    }
+
+    public void unsetWriting_style() {
+      this.writing_style = null;
+    }
+
+    /** Returns true if field writing_style is set (has been assigned a value) and false otherwise */
+    public boolean isSetWriting_style() {
+      return this.writing_style != null;
+    }
+
+    public void setWriting_styleIsSet(boolean value) {
+      if (!value) {
+        this.writing_style = null;
+      }
+    }
+
     public String getContestId() {
       return this.contestId;
     }
@@ -19923,6 +19960,14 @@ public class KahaniyaService {
         }
         break;
 
+      case WRITING_STYLE:
+        if (value == null) {
+          unsetWriting_style();
+        } else {
+          setWriting_style((String)value);
+        }
+        break;
+
       case CONTEST_ID:
         if (value == null) {
           unsetContestId();
@@ -19981,6 +20026,9 @@ public class KahaniyaService {
       case IS_EDIT:
         return Integer.valueOf(getIs_edit());
 
+      case WRITING_STYLE:
+        return getWriting_style();
+
       case CONTEST_ID:
         return getContestId();
 
@@ -20025,6 +20073,8 @@ public class KahaniyaService {
         return isSetTime_created();
       case IS_EDIT:
         return isSetIs_edit();
+      case WRITING_STYLE:
+        return isSetWriting_style();
       case CONTEST_ID:
         return isSetContestId();
       }
@@ -20176,6 +20226,15 @@ public class KahaniyaService {
         if (!(this_present_is_edit && that_present_is_edit))
           return false;
         if (this.is_edit != that.is_edit)
+          return false;
+      }
+
+      boolean this_present_writing_style = true && this.isSetWriting_style();
+      boolean that_present_writing_style = true && that.isSetWriting_style();
+      if (this_present_writing_style || that_present_writing_style) {
+        if (!(this_present_writing_style && that_present_writing_style))
+          return false;
+        if (!this.writing_style.equals(that.writing_style))
           return false;
       }
 
@@ -20354,6 +20413,16 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetWriting_style()).compareTo(typedOther.isSetWriting_style());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetWriting_style()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.writing_style, typedOther.writing_style);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetContestId()).compareTo(typedOther.isSetContestId());
       if (lastComparison != 0) {
         return lastComparison;
@@ -20490,6 +20559,14 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("is_edit:");
       sb.append(this.is_edit);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("writing_style:");
+      if (this.writing_style == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.writing_style);
+      }
       first = false;
       if (!first) sb.append(", ");
       sb.append("contestId:");
@@ -20663,7 +20740,15 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 16: // CONTEST_ID
+            case 16: // WRITING_STYLE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.writing_style = iprot.readString();
+                struct.setWriting_styleIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 17: // CONTEST_ID
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.contestId = iprot.readString();
                 struct.setContestIdIsSet(true);
@@ -20755,6 +20840,11 @@ public class KahaniyaService {
         oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
         oprot.writeI32(struct.is_edit);
         oprot.writeFieldEnd();
+        if (struct.writing_style != null) {
+          oprot.writeFieldBegin(WRITING_STYLE_FIELD_DESC);
+          oprot.writeString(struct.writing_style);
+          oprot.writeFieldEnd();
+        }
         if (struct.contestId != null) {
           oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
           oprot.writeString(struct.contestId);
@@ -20823,10 +20913,13 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           optionals.set(14);
         }
-        if (struct.isSetContestId()) {
+        if (struct.isSetWriting_style()) {
           optionals.set(15);
         }
-        oprot.writeBitSet(optionals, 16);
+        if (struct.isSetContestId()) {
+          optionals.set(16);
+        }
+        oprot.writeBitSet(optionals, 17);
         if (struct.isSetSeries_id()) {
           oprot.writeString(struct.series_id);
         }
@@ -20872,6 +20965,9 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           oprot.writeI32(struct.is_edit);
         }
+        if (struct.isSetWriting_style()) {
+          oprot.writeString(struct.writing_style);
+        }
         if (struct.isSetContestId()) {
           oprot.writeString(struct.contestId);
         }
@@ -20880,7 +20976,7 @@ public class KahaniyaService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_series_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(16);
+        BitSet incoming = iprot.readBitSet(17);
         if (incoming.get(0)) {
           struct.series_id = iprot.readString();
           struct.setSeries_idIsSet(true);
@@ -20942,6 +21038,10 @@ public class KahaniyaService {
           struct.setIs_editIsSet(true);
         }
         if (incoming.get(15)) {
+          struct.writing_style = iprot.readString();
+          struct.setWriting_styleIsSet(true);
+        }
+        if (incoming.get(16)) {
           struct.contestId = iprot.readString();
           struct.setContestIdIsSet(true);
         }
@@ -22515,8 +22615,7 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)8);
     private static final org.apache.thrift.protocol.TField FREE_OR_PAID_FIELD_DESC = new org.apache.thrift.protocol.TField("free_or_paid", org.apache.thrift.protocol.TType.I32, (short)9);
     private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)10);
-    private static final org.apache.thrift.protocol.TField WRITING_STYLE_FIELD_DESC = new org.apache.thrift.protocol.TField("writing_style", org.apache.thrift.protocol.TType.STRING, (short)11);
-    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)12);
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)11);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -22534,7 +22633,6 @@ public class KahaniyaService {
     public int time_created; // required
     public int free_or_paid; // required
     public int is_edit; // required
-    public String writing_style; // required
     public String contestId; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
@@ -22549,8 +22647,7 @@ public class KahaniyaService {
       TIME_CREATED((short)8, "time_created"),
       FREE_OR_PAID((short)9, "free_or_paid"),
       IS_EDIT((short)10, "is_edit"),
-      WRITING_STYLE((short)11, "writing_style"),
-      CONTEST_ID((short)12, "contestId");
+      CONTEST_ID((short)11, "contestId");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -22585,9 +22682,7 @@ public class KahaniyaService {
             return FREE_OR_PAID;
           case 10: // IS_EDIT
             return IS_EDIT;
-          case 11: // WRITING_STYLE
-            return WRITING_STYLE;
-          case 12: // CONTEST_ID
+          case 11: // CONTEST_ID
             return CONTEST_ID;
           default:
             return null;
@@ -22656,8 +22751,6 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
-      tmpMap.put(_Fields.WRITING_STYLE, new org.apache.thrift.meta_data.FieldMetaData("writing_style", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contestId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -22678,7 +22771,6 @@ public class KahaniyaService {
       int time_created,
       int free_or_paid,
       int is_edit,
-      String writing_style,
       String contestId)
     {
       this();
@@ -22695,7 +22787,6 @@ public class KahaniyaService {
       setFree_or_paidIsSet(true);
       this.is_edit = is_edit;
       setIs_editIsSet(true);
-      this.writing_style = writing_style;
       this.contestId = contestId;
     }
 
@@ -22729,9 +22820,6 @@ public class KahaniyaService {
       this.time_created = other.time_created;
       this.free_or_paid = other.free_or_paid;
       this.is_edit = other.is_edit;
-      if (other.isSetWriting_style()) {
-        this.writing_style = other.writing_style;
-      }
       if (other.isSetContestId()) {
         this.contestId = other.contestId;
       }
@@ -22756,7 +22844,6 @@ public class KahaniyaService {
       this.free_or_paid = 0;
       setIs_editIsSet(false);
       this.is_edit = 0;
-      this.writing_style = null;
       this.contestId = null;
     }
 
@@ -22997,30 +23084,6 @@ public class KahaniyaService {
       __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
     }
 
-    public String getWriting_style() {
-      return this.writing_style;
-    }
-
-    public create_or_edit_chapter_args setWriting_style(String writing_style) {
-      this.writing_style = writing_style;
-      return this;
-    }
-
-    public void unsetWriting_style() {
-      this.writing_style = null;
-    }
-
-    /** Returns true if field writing_style is set (has been assigned a value) and false otherwise */
-    public boolean isSetWriting_style() {
-      return this.writing_style != null;
-    }
-
-    public void setWriting_styleIsSet(boolean value) {
-      if (!value) {
-        this.writing_style = null;
-      }
-    }
-
     public String getContestId() {
       return this.contestId;
     }
@@ -23127,14 +23190,6 @@ public class KahaniyaService {
         }
         break;
 
-      case WRITING_STYLE:
-        if (value == null) {
-          unsetWriting_style();
-        } else {
-          setWriting_style((String)value);
-        }
-        break;
-
       case CONTEST_ID:
         if (value == null) {
           unsetContestId();
@@ -23178,9 +23233,6 @@ public class KahaniyaService {
       case IS_EDIT:
         return Integer.valueOf(getIs_edit());
 
-      case WRITING_STYLE:
-        return getWriting_style();
-
       case CONTEST_ID:
         return getContestId();
 
@@ -23215,8 +23267,6 @@ public class KahaniyaService {
         return isSetFree_or_paid();
       case IS_EDIT:
         return isSetIs_edit();
-      case WRITING_STYLE:
-        return isSetWriting_style();
       case CONTEST_ID:
         return isSetContestId();
       }
@@ -23323,15 +23373,6 @@ public class KahaniyaService {
         if (!(this_present_is_edit && that_present_is_edit))
           return false;
         if (this.is_edit != that.is_edit)
-          return false;
-      }
-
-      boolean this_present_writing_style = true && this.isSetWriting_style();
-      boolean that_present_writing_style = true && that.isSetWriting_style();
-      if (this_present_writing_style || that_present_writing_style) {
-        if (!(this_present_writing_style && that_present_writing_style))
-          return false;
-        if (!this.writing_style.equals(that.writing_style))
           return false;
       }
 
@@ -23460,16 +23501,6 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetWriting_style()).compareTo(typedOther.isSetWriting_style());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetWriting_style()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.writing_style, typedOther.writing_style);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
       lastComparison = Boolean.valueOf(isSetContestId()).compareTo(typedOther.isSetContestId());
       if (lastComparison != 0) {
         return lastComparison;
@@ -23566,14 +23597,6 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("is_edit:");
       sb.append(this.is_edit);
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("writing_style:");
-      if (this.writing_style == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.writing_style);
-      }
       first = false;
       if (!first) sb.append(", ");
       sb.append("contestId:");
@@ -23707,15 +23730,7 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 11: // WRITING_STYLE
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-                struct.writing_style = iprot.readString();
-                struct.setWriting_styleIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
-            case 12: // CONTEST_ID
+            case 11: // CONTEST_ID
               if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
                 struct.contestId = iprot.readString();
                 struct.setContestIdIsSet(true);
@@ -23782,11 +23797,6 @@ public class KahaniyaService {
         oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
         oprot.writeI32(struct.is_edit);
         oprot.writeFieldEnd();
-        if (struct.writing_style != null) {
-          oprot.writeFieldBegin(WRITING_STYLE_FIELD_DESC);
-          oprot.writeString(struct.writing_style);
-          oprot.writeFieldEnd();
-        }
         if (struct.contestId != null) {
           oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
           oprot.writeString(struct.contestId);
@@ -23840,13 +23850,10 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           optionals.set(9);
         }
-        if (struct.isSetWriting_style()) {
+        if (struct.isSetContestId()) {
           optionals.set(10);
         }
-        if (struct.isSetContestId()) {
-          optionals.set(11);
-        }
-        oprot.writeBitSet(optionals, 12);
+        oprot.writeBitSet(optionals, 11);
         if (struct.isSetChapter_id()) {
           oprot.writeString(struct.chapter_id);
         }
@@ -23877,9 +23884,6 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           oprot.writeI32(struct.is_edit);
         }
-        if (struct.isSetWriting_style()) {
-          oprot.writeString(struct.writing_style);
-        }
         if (struct.isSetContestId()) {
           oprot.writeString(struct.contestId);
         }
@@ -23888,7 +23892,7 @@ public class KahaniyaService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_chapter_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(12);
+        BitSet incoming = iprot.readBitSet(11);
         if (incoming.get(0)) {
           struct.chapter_id = iprot.readString();
           struct.setChapter_idIsSet(true);
@@ -23930,10 +23934,6 @@ public class KahaniyaService {
           struct.setIs_editIsSet(true);
         }
         if (incoming.get(10)) {
-          struct.writing_style = iprot.readString();
-          struct.setWriting_styleIsSet(true);
-        }
-        if (incoming.get(11)) {
           struct.contestId = iprot.readString();
           struct.setContestIdIsSet(true);
         }

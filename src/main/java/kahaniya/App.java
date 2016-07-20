@@ -4,13 +4,14 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("18th July, 2016 - 01:00 P.M");
+		System.out.println("20th July, 2016 - 11:00 A.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
 		kahaniya.add_additional_properties();
-		kahaniya.startThriftServer();
+		kahaniya.add_chapter_contest_status_properties();
 //		test(kahaniya);
+		kahaniya.startThriftServer();
 
     }
     
@@ -18,7 +19,36 @@ public class App
     {
     	try{
 
-/*    		System.out.println("stats");
+ /*   		k.create_genre("poetry");
+    		k.delete_contest("contest2");
+    		k.delete_series("cs2");
+    		k.delete_series("css2");
+    		System.out.println(k.create_or_edit_contest("contest2", "one", "contest title 2", "contest-title-id-2", "contest-summary", "", "feat_image", "prose", "", "", "", 1000, 1050, "LANG3", 0, 1, 900, 0));
+    		System.out.println(k.create_or_edit_series("cs2", "one", "cs2", "cs2", "cs2", "feature_image", "GEN2", "LANG2", "keywords", "copyrights", "dd_img", "dd_summary", 1, 102, 0,"prose","contest2"));
+    		System.out.println(k.create_or_edit_chapter("cc2", "cs2", "series_type", "two", "cc2", "cc2", "feat_image", 102, 2, 0,"contest2"));
+    		System.out.println(k.create_or_edit_series("css2", "n-one", "css2", "css2", "css2", "feature_image", "GEN3", "LANG1", "keywords", "copyrights", "dd_img", "dd_summary", 1, 102, 0,"prose","contest2"));
+    		System.out.println(k.create_or_edit_chapter("ccc1", "css2", "series_type", "n-one", "ccc1", "ccc1", "feat_image", 102, 0,0,"contest2"));
+
+    		System.out.println(k.update_chapter_contest_status("cc2","contest2",1));
+    		System.out.println(k.update_chapter_contest_status("ccc1","contest2",2));
+    		System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",0));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",1));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",2));
+
+    		System.out.println(k.update_chapter_contest_status("cc2","contest2",1));
+    		System.out.println(k.update_chapter_contest_status("ccc1","contest2",2));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",0));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",1));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",2));
+			
+    		System.out.println(k.update_chapter_contest_status("cc2","contest2",2));
+    		System.out.println(k.update_chapter_contest_status("ccc1","contest2",2));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",0));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",1));
+			System.out.println(k.get_feed("C","CN","",0,100,"","","","","contest2",2));
+*/
+/*
+    		System.out.println("stats");
     		System.out.println(k.get_stats("U"));
     		System.out.println(k.get_stats("S"));
     		System.out.println(k.get_stats("CH"));
