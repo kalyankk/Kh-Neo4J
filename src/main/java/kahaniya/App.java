@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("20th July, 2016 - 11:00 A.M");
+		System.out.println("22th July, 2016 - 03:00 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -18,8 +18,17 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
+ /*   		System.out.println(k.create_or_edit_contest("contest10", "one", "contest title 10", "contest-title-id-10", "contest-summary", "", "feat_image", "prose", "", "", "", 100, 1000, "LANG3", 0, 1, 900, 0));
+    		System.out.println(k.create_or_edit_contest("contest11", "one", "contest title 11", "contest-title-id-11", "contest-summary", "", "feat_image", "prose", "", "", "", 200, 1100, "LANG3", 0, 1, 900, 0));
+    		System.out.println(k.create_or_edit_contest("contest12", "one", "contest title 12", "contest-title-id-12", "contest-summary", "", "feat_image", "prose", "", "", "", 300, 1200, "LANG3", 0, 1, 900, 0));
+    		System.out.println(k.create_or_edit_contest("contest13", "one", "contest title 13", "contest-title-id-13", "contest-summary", "", "feat_image", "prose", "", "", "", 400, 1300, "LANG3", 0, 1, 900, 0));
+    		System.out.println(k.create_or_edit_contest("contest14", "one", "contest title 14", "contest-title-id-14", "contest-summary", "", "feat_image", "prose", "", "", "", 500, 1400, "LANG3", 0, 1, 900, 0));
+			System.out.println(k.get_feed("CN","L","{actv:\"0\"}",0,100,"","","","","",0));
+			System.out.println(k.get_feed("CN","L","{actv:\"1\"}",0,100,"","","","","",0));
+			System.out.println(k.get_feed("CN","L","{actv-:\"1\"}",0,100,"","","","","",0));
+			System.out.println(k.get_feed("CN","L","",0,100,"","","","","",0));
 
- /*   		k.create_genre("poetry");
+    		k.create_genre("poetry");
     		k.delete_contest("contest2");
     		k.delete_series("cs2");
     		k.delete_series("css2");

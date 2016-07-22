@@ -229,69 +229,83 @@ public class Kahaniya implements KahaniyaService.Iface{
 		   return v2-v1;
 	    }};
 	    
-		private static Comparator<Node> TrendingComparatorForChapterNodes = new Comparator<Node>() {
-			public int compare(Node n1, Node n2) {
-			   int v1 = 0;
-			   int v2 = 0;
-			   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
-			   
-			   Iterator<Relationship> loggedInViews = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
-			   while(loggedInViews.hasNext())
-			   {
-					Relationship rel = loggedInViews.next();
-					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						v1++;
-			   }
-			   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
-			   while(ratings.hasNext())
-			   {
-					Relationship rel = ratings.next();
-					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
-			   }
-			   
-			   loggedInViews = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
-			   while(loggedInViews.hasNext())
-			   {
-					Relationship rel = loggedInViews.next();
-					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						v2 = v2+1;
-			   }
-			   ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
-			   while(ratings.hasNext())
-			   {
-					Relationship rel = ratings.next();
-					if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
-						v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
-			   }			   
-			   //ascending order
-			   //return v1-v2;
-			   //descending order
-			   return v2-v1;
-		    }};
-			
-			private static Comparator<Node> DiscoverComparatorForUserNodes = new Comparator<Node>() {
-				public int compare(Node n1, Node n2) {
-				   int v1 = 0;
-				   int v2 = 0;
-				   
-				   Iterator<Relationship> chapters1 = n1.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
-				   while(chapters1.hasNext())
-				   {
-					   v1 = v1 + Integer.parseInt(chapters1.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
-				   }
-				   
-				   Iterator<Relationship> chapters2 = n2.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
-				   while(chapters2.hasNext())
-				   {
-					   v2 = v2 + Integer.parseInt(chapters2.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
-				   }
-				   
-				   //ascending order
-				   //return v1-v2;
-				   //descending order
-				   return v2-v1;
-			    }};
+	private static Comparator<Node> EndTimeComparatorForContestNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   if(n1.hasProperty(CONTEST_END_DATE))
+			   v1 = Integer.parseInt(n1.getProperty(CONTEST_END_DATE).toString());
+		   if(n2.hasProperty(CONTEST_END_DATE))
+			   v2 = Integer.parseInt(n2.getProperty(CONTEST_END_DATE).toString());
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
+	    
+	private static Comparator<Node> TrendingComparatorForChapterNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   int t = (int)(new Date().getTime()/1000) - (1*24*60*60); // made it to last 24 hours
+		   
+		   Iterator<Relationship> loggedInViews = n1.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
+		   while(loggedInViews.hasNext())
+		   {
+				Relationship rel = loggedInViews.next();
+				if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					v1++;
+		   }
+		   Iterator<Relationship> ratings = n1.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
+		   while(ratings.hasNext())
+		   {
+				Relationship rel = ratings.next();
+				if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					v1 = v1+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
+		   }
+		   
+		   loggedInViews = n2.getRelationships(USER_VIEWED_A_CHAPTER).iterator();   
+		   while(loggedInViews.hasNext())
+		   {
+				Relationship rel = loggedInViews.next();
+				if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					v2 = v2+1;
+		   }
+		   ratings = n2.getRelationships(USER_RATED_A_CHAPTER).iterator();			   
+		   while(ratings.hasNext())
+		   {
+				Relationship rel = ratings.next();
+				if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) >= t)
+					v2 = v2+Integer.parseInt(rel.getProperty(CHAPTER_RATING).toString());
+		   }			   
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
+		
+	private static Comparator<Node> DiscoverComparatorForUserNodes = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   
+		   Iterator<Relationship> chapters1 = n1.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
+		   while(chapters1.hasNext())
+		   {
+			   v1 = v1 + Integer.parseInt(chapters1.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
+		   }
+		   
+		   Iterator<Relationship> chapters2 = n2.getRelationships(USER_WRITTEN_A_CHAPTER).iterator();
+		   while(chapters2.hasNext())
+		   {
+			   v2 = v2 + Integer.parseInt(chapters2.next().getEndNode().getProperty(TOTAL_CHAPTER_VIEWS).toString());
+		   }
+		   
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
 				
 	private static Comparator<Node> TrendingComparatorForSeriesNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
@@ -3983,6 +3997,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(contestNodesItr.hasNext())
 					contestsList.addLast(contestNodesItr.next());
 				
+				int presentTime = (int)(System.currentTimeMillis()/1000);
+				int listType = 1;
+				if(filter != null && !filter.equals("")){
+					JSONObject filterJSON = new JSONObject(filter);
+					if(filterJSON.has("actv") && "0".equalsIgnoreCase(filterJSON.getString("actv")))
+						listType = 0;
+				}
+				
 				for(Node contest : contestsList)
 				{			
 					Node auth = contest.getSingleRelationship(USER_STARTED_CONTEST, Direction.INCOMING).getStartNode();
@@ -3990,10 +4012,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 	//					continue;
 					if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 						continue;
-					outputList.addLast(contest);
+					if(listType == 1 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) > presentTime)
+						outputList.addLast(contest);
+					else if(listType == 0 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) <= presentTime)
+						outputList.addLast(contest);
 				}
-				
-				Collections.sort(outputList, TimeCreatedComparatorForNodes);
+				if(listType == 1)
+					Collections.sort(outputList, TimeCreatedComparatorForNodes);
+				else
+					Collections.sort(outputList, EndTimeComparatorForContestNodes);
 				
 				for(Node contest : outputList)
 				{
