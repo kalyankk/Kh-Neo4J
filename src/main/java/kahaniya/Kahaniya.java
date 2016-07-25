@@ -4301,11 +4301,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						else if("2".equals(filterJSON.getString("sts")))
 						{
+							if(s_user_node == null)
+								throw new KahaniyaCustomException("User does not exists with given id" + s_user_id);
+							
 							for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
 							{
-								if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && !rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) )
+								if("1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && !rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) )
 									contestChaptersRelsList.addLast(rel);
-								else if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) && !rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString().contains(user_id))
+								else if("1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) && !rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString().contains(s_user_id))
 									contestChaptersRelsList.addLast(rel);
 							}
 						}
