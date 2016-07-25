@@ -4303,7 +4303,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 						{
 							for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
 							{
-								if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) && !rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString().contains(user_id))
+								if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && !rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) )
+									contestChaptersRelsList.addLast(rel);
+								else if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) && !rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString().contains(user_id))
 									contestChaptersRelsList.addLast(rel);
 							}
 						}
