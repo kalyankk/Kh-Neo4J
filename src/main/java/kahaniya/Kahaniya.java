@@ -95,6 +95,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_READ_STATUS = "chapter_read_status"; // chapter read status of a logged in user
 	public static final String CHAPTER_PURCHASED_PRICE = "chapter_purchased_price"; // price that a user has paid to purchase a chapter 
 	public static final String CHAPTER_CONTEST_STATUS = "chapter_contest_status"; // status of the chapter for the given contest 
+	public static final String CHAPTER_CONTEST_RATED_BY_JUDGES = "chapter_contest_rated_by_judges"; // status of the chapter for the given contest 
 
 	//user viewed a chapter related key // Note: do not correct this spelling mistake, as the mistake was observed after staging
 	public static final String USER_VIEWED_A_CHAPTER_ID = "user_viewer_a_chapter_id"; 
@@ -2417,6 +2418,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 				throw new KahaniyaCustomException("Null or empty string receieved for the param contest_id");
 			if(chapter_id == null || chapter_id.length() == 0)
 				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+			if(status != 0 && status != 1)
+				throw new KahaniyaCustomException("Valid status is either 0 or 1, receieved "+status+" for the param status ");
 
 			aquireWriteLock(tx);
 			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
@@ -2459,6 +2462,72 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return res;
 	}
 
+	@Override
+	public String record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(contest_id == null || contest_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param contest_id");
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+			Index<Node> contestId_index = graphDb.index().forNodes(CONTEST_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			Node contest_node = contestId_index.get(CONTEST_ID, contest_id).getSingle();
+			if(contest_node == null)
+				throw new KahaniyaCustomException("Contest doesnot exists with given id : "+contest_id);
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(CHAPTER_BELONGS_TO_CONTEST, chapter_node, contest_node))
+			{
+				Relationship rel = chapter_node.getSingleRelationship(CHAPTER_BELONGS_TO_CONTEST, Direction.OUTGOING);
+				if(!rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES))
+					rel.setProperty(CHAPTER_CONTEST_RATED_BY_JUDGES,user_id);
+				else
+				{
+					String judgeNames = rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString();
+					if(!judgeNames.contains(user_id))
+						rel.setProperty(CHAPTER_CONTEST_RATED_BY_JUDGES,judgeNames+user_id);
+				}
+			}
+			else
+				throw new KahaniyaCustomException("Given chapter does not belongs to the given contest");
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ record_contest_judge_rating_on_chapter()");
+			System.out.println("Something went wrong, while updating contest judge rating status of a chapter from update_chapter_contest_status  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ record_contest_judge_rating_on_chapter()");
+			System.out.println("Something went wrong, while updating contest judge rating status of a chapter from update_chapter_contest_status  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+	
 	@Override
 	public String subscribe_series(String series_id, String user_id, int time)
 			throws TException {
@@ -2911,7 +2980,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	@Override
 	public String get_feed(String tileType, String feedType, String filter,
-			int prev_cnt, int count, String s_user_id, String genre, String lang, String user_id, String contestId, int status) throws TException {
+			int prev_cnt, int count, String s_user_id, String genre, String lang, String user_id, String contestId) throws TException {
 		if(feedType == null)
 			feedType = "";
 		if(tileType == null)
@@ -2940,9 +3009,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
-			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, contestId, status);
+			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, contestId);
 		else if(tileType.equalsIgnoreCase("All"))
-			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, "", 0)+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
+			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, "")+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
 		else return "";
 	}
 	
@@ -4062,7 +4131,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
-	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String s_user_id, String genre_name, String lang_name, String user_id, String contestId, int status)
+	private String get_chapters(String feedType, String filter, int prev_cnt, int count, String s_user_id, String genre_name, String lang_name, String user_id, String contestId)
 	{
 
 		JSONArray jsonArray = new JSONArray();		
@@ -4209,12 +4278,52 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 				LinkedList<Relationship> contestChaptersRelsList = new LinkedList<Relationship>();
 				
-				for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+				if(filter != null && !filter.equals(""))
 				{
-					if(Integer.parseInt(rel.getProperty(CHAPTER_CONTEST_STATUS).toString())>=status)
+					JSONObject filterJSON = new JSONObject(filter);
+					if(filterJSON.has("sts"))
+					{
+						if("0".equals(filterJSON.getString("sts")))
+						{
+							for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+							{
+								if("0".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()))
+									contestChaptersRelsList.addLast(rel);
+							}	
+						}
+						else if("1".equals(filterJSON.getString("sts")))
+						{
+							for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+							{
+								if("1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()))
+									contestChaptersRelsList.addLast(rel);
+							}
+						}
+						else if("2".equals(filterJSON.getString("sts")))
+						{
+							for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+							{
+								if(user_node != null && "1".equals(rel.getProperty(CHAPTER_CONTEST_STATUS).toString()) && rel.hasProperty(CHAPTER_CONTEST_RATED_BY_JUDGES) && !rel.getProperty(CHAPTER_CONTEST_RATED_BY_JUDGES).toString().contains(user_id))
+									contestChaptersRelsList.addLast(rel);
+							}
+						}
+						else
+						{
+							throw new KahaniyaCustomException("Invalid sts value receieved" + filterJSON.getString("sts"));
+						}
+					}
+					else
+					{
+						for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
+							contestChaptersRelsList.addLast(rel);
+					}
+				}
+				else
+				{
+					for(Relationship rel: contestNode.getRelationships(CHAPTER_BELONGS_TO_CONTEST))
 						contestChaptersRelsList.addLast(rel);
 				}
-				
+
 				Collections.sort(contestChaptersRelsList, TimeCreatedComparatorForRelationships);
 								
 				for(Relationship rel : contestChaptersRelsList)

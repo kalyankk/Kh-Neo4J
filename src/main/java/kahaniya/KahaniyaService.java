@@ -75,6 +75,8 @@ public class KahaniyaService {
 
     public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws org.apache.thrift.TException;
 
+    public String record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws org.apache.thrift.TException;
+
     public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit) throws org.apache.thrift.TException;
 
     public String subscribe_series(String series_id, String user_id, int time) throws org.apache.thrift.TException;
@@ -93,7 +95,7 @@ public class KahaniyaService {
 
     public String recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count) throws org.apache.thrift.TException;
 
-    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status) throws org.apache.thrift.TException;
+    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId) throws org.apache.thrift.TException;
 
     public String create_or_edit_comment(String chapter_id, String comment_id, String content, String parent_cmnt_id, String user_id, int time, int is_edit, String type) throws org.apache.thrift.TException;
 
@@ -169,6 +171,8 @@ public class KahaniyaService {
 
     public void update_chapter_contest_status(String chapter_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_contest_status_call> resultHandler) throws org.apache.thrift.TException;
 
+    public void record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.record_contest_judge_rating_on_chapter_call> resultHandler) throws org.apache.thrift.TException;
+
     public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException;
 
     public void subscribe_series(String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.subscribe_series_call> resultHandler) throws org.apache.thrift.TException;
@@ -187,7 +191,7 @@ public class KahaniyaService {
 
     public void recored_chapter_read(String chapter_id, String series_id, String user_id, int time, int reading_status, int read_words_count, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.recored_chapter_read_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_feed_call> resultHandler) throws org.apache.thrift.TException;
+    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_feed_call> resultHandler) throws org.apache.thrift.TException;
 
     public void create_or_edit_comment(String chapter_id, String comment_id, String content, String parent_cmnt_id, String user_id, int time, int is_edit, String type, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_comment_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -800,6 +804,31 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_chapter_contest_status failed: unknown result");
     }
 
+    public String record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws org.apache.thrift.TException
+    {
+      send_record_contest_judge_rating_on_chapter(contest_id, chapter_id, user_id);
+      return recv_record_contest_judge_rating_on_chapter();
+    }
+
+    public void send_record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_chapter_args args = new record_contest_judge_rating_on_chapter_args();
+      args.setContest_id(contest_id);
+      args.setChapter_id(chapter_id);
+      args.setUser_id(user_id);
+      sendBase("record_contest_judge_rating_on_chapter", args);
+    }
+
+    public String recv_record_contest_judge_rating_on_chapter() throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_chapter_result result = new record_contest_judge_rating_on_chapter_result();
+      receiveBase(result, "record_contest_judge_rating_on_chapter");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "record_contest_judge_rating_on_chapter failed: unknown result");
+    }
+
     public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit) throws org.apache.thrift.TException
     {
       send_create_or_edit_contest(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, is_edit);
@@ -1050,13 +1079,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "recored_chapter_read failed: unknown result");
     }
 
-    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status) throws org.apache.thrift.TException
+    public String get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId) throws org.apache.thrift.TException
     {
-      send_get_feed(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang, s_user_id, contestId, status);
+      send_get_feed(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang, s_user_id, contestId);
       return recv_get_feed();
     }
 
-    public void send_get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status) throws org.apache.thrift.TException
+    public void send_get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId) throws org.apache.thrift.TException
     {
       get_feed_args args = new get_feed_args();
       args.setTitleType(titleType);
@@ -1069,7 +1098,6 @@ public class KahaniyaService {
       args.setLang(lang);
       args.setS_user_id(s_user_id);
       args.setContestId(contestId);
-      args.setStatus(status);
       sendBase("get_feed", args);
     }
 
@@ -2297,6 +2325,44 @@ public class KahaniyaService {
       }
     }
 
+    public void record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_chapter_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      record_contest_judge_rating_on_chapter_call method_call = new record_contest_judge_rating_on_chapter_call(contest_id, chapter_id, user_id, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class record_contest_judge_rating_on_chapter_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String contest_id;
+      private String chapter_id;
+      private String user_id;
+      public record_contest_judge_rating_on_chapter_call(String contest_id, String chapter_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_chapter_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.contest_id = contest_id;
+        this.chapter_id = chapter_id;
+        this.user_id = user_id;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("record_contest_judge_rating_on_chapter", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        record_contest_judge_rating_on_chapter_args args = new record_contest_judge_rating_on_chapter_args();
+        args.setContest_id(contest_id);
+        args.setChapter_id(chapter_id);
+        args.setUser_id(user_id);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_record_contest_judge_rating_on_chapter();
+      }
+    }
+
     public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       create_or_edit_contest_call method_call = new create_or_edit_contest_call(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, is_edit, resultHandler, this, ___protocolFactory, ___transport);
@@ -2714,9 +2780,9 @@ public class KahaniyaService {
       }
     }
 
-    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler) throws org.apache.thrift.TException {
+    public void get_feed(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      get_feed_call method_call = new get_feed_call(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang, s_user_id, contestId, status, resultHandler, this, ___protocolFactory, ___transport);
+      get_feed_call method_call = new get_feed_call(titleType, feedType, filter, prev_cnt, count, user_id, genre, lang, s_user_id, contestId, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -2732,8 +2798,7 @@ public class KahaniyaService {
       private String lang;
       private String s_user_id;
       private String contestId;
-      private int status;
-      public get_feed_call(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, int status, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public get_feed_call(String titleType, String feedType, String filter, int prev_cnt, int count, String user_id, String genre, String lang, String s_user_id, String contestId, org.apache.thrift.async.AsyncMethodCallback<get_feed_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.titleType = titleType;
         this.feedType = feedType;
@@ -2745,7 +2810,6 @@ public class KahaniyaService {
         this.lang = lang;
         this.s_user_id = s_user_id;
         this.contestId = contestId;
-        this.status = status;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -2761,7 +2825,6 @@ public class KahaniyaService {
         args.setLang(lang);
         args.setS_user_id(s_user_id);
         args.setContestId(contestId);
-        args.setStatus(status);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -3293,6 +3356,7 @@ public class KahaniyaService {
       processMap.put("create_or_edit_review", new create_or_edit_review());
       processMap.put("create_or_edit_chapter", new create_or_edit_chapter());
       processMap.put("update_chapter_contest_status", new update_chapter_contest_status());
+      processMap.put("record_contest_judge_rating_on_chapter", new record_contest_judge_rating_on_chapter());
       processMap.put("create_or_edit_contest", new create_or_edit_contest());
       processMap.put("subscribe_series", new subscribe_series());
       processMap.put("subscribe_contest", new subscribe_contest());
@@ -3671,6 +3735,22 @@ public class KahaniyaService {
       }
     }
 
+    private static class record_contest_judge_rating_on_chapter<I extends Iface> extends org.apache.thrift.ProcessFunction<I, record_contest_judge_rating_on_chapter_args> {
+      public record_contest_judge_rating_on_chapter() {
+        super("record_contest_judge_rating_on_chapter");
+      }
+
+      protected record_contest_judge_rating_on_chapter_args getEmptyArgsInstance() {
+        return new record_contest_judge_rating_on_chapter_args();
+      }
+
+      protected record_contest_judge_rating_on_chapter_result getResult(I iface, record_contest_judge_rating_on_chapter_args args) throws org.apache.thrift.TException {
+        record_contest_judge_rating_on_chapter_result result = new record_contest_judge_rating_on_chapter_result();
+        result.success = iface.record_contest_judge_rating_on_chapter(args.contest_id, args.chapter_id, args.user_id);
+        return result;
+      }
+    }
+
     private static class create_or_edit_contest<I extends Iface> extends org.apache.thrift.ProcessFunction<I, create_or_edit_contest_args> {
       public create_or_edit_contest() {
         super("create_or_edit_contest");
@@ -3826,7 +3906,7 @@ public class KahaniyaService {
 
       protected get_feed_result getResult(I iface, get_feed_args args) throws org.apache.thrift.TException {
         get_feed_result result = new get_feed_result();
-        result.success = iface.get_feed(args.titleType, args.feedType, args.filter, args.prev_cnt, args.count, args.user_id, args.genre, args.lang, args.s_user_id, args.contestId, args.status);
+        result.success = iface.get_feed(args.titleType, args.feedType, args.filter, args.prev_cnt, args.count, args.user_id, args.genre, args.lang, args.s_user_id, args.contestId);
         return result;
       }
     }
@@ -25200,6 +25280,912 @@ public class KahaniyaService {
 
   }
 
+  public static class record_contest_judge_rating_on_chapter_args implements org.apache.thrift.TBase<record_contest_judge_rating_on_chapter_args, record_contest_judge_rating_on_chapter_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_chapter_args");
+
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField CHAPTER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("chapter_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_chapter_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_chapter_argsTupleSchemeFactory());
+    }
+
+    public String contest_id; // required
+    public String chapter_id; // required
+    public String user_id; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      CONTEST_ID((short)1, "contest_id"),
+      CHAPTER_ID((short)2, "chapter_id"),
+      USER_ID((short)3, "user_id");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // CONTEST_ID
+            return CONTEST_ID;
+          case 2: // CHAPTER_ID
+            return CHAPTER_ID;
+          case 3: // USER_ID
+            return USER_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.CHAPTER_ID, new org.apache.thrift.meta_data.FieldMetaData("chapter_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_chapter_args.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_chapter_args() {
+    }
+
+    public record_contest_judge_rating_on_chapter_args(
+      String contest_id,
+      String chapter_id,
+      String user_id)
+    {
+      this();
+      this.contest_id = contest_id;
+      this.chapter_id = chapter_id;
+      this.user_id = user_id;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_chapter_args(record_contest_judge_rating_on_chapter_args other) {
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
+      if (other.isSetChapter_id()) {
+        this.chapter_id = other.chapter_id;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+    }
+
+    public record_contest_judge_rating_on_chapter_args deepCopy() {
+      return new record_contest_judge_rating_on_chapter_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.contest_id = null;
+      this.chapter_id = null;
+      this.user_id = null;
+    }
+
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public record_contest_judge_rating_on_chapter_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
+    public String getChapter_id() {
+      return this.chapter_id;
+    }
+
+    public record_contest_judge_rating_on_chapter_args setChapter_id(String chapter_id) {
+      this.chapter_id = chapter_id;
+      return this;
+    }
+
+    public void unsetChapter_id() {
+      this.chapter_id = null;
+    }
+
+    /** Returns true if field chapter_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetChapter_id() {
+      return this.chapter_id != null;
+    }
+
+    public void setChapter_idIsSet(boolean value) {
+      if (!value) {
+        this.chapter_id = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public record_contest_judge_rating_on_chapter_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
+      case CHAPTER_ID:
+        if (value == null) {
+          unsetChapter_id();
+        } else {
+          setChapter_id((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CONTEST_ID:
+        return getContest_id();
+
+      case CHAPTER_ID:
+        return getChapter_id();
+
+      case USER_ID:
+        return getUser_id();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case CONTEST_ID:
+        return isSetContest_id();
+      case CHAPTER_ID:
+        return isSetChapter_id();
+      case USER_ID:
+        return isSetUser_id();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_chapter_args)
+        return this.equals((record_contest_judge_rating_on_chapter_args)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_chapter_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
+          return false;
+      }
+
+      boolean this_present_chapter_id = true && this.isSetChapter_id();
+      boolean that_present_chapter_id = true && that.isSetChapter_id();
+      if (this_present_chapter_id || that_present_chapter_id) {
+        if (!(this_present_chapter_id && that_present_chapter_id))
+          return false;
+        if (!this.chapter_id.equals(that.chapter_id))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_chapter_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_chapter_args typedOther = (record_contest_judge_rating_on_chapter_args)other;
+
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetChapter_id()).compareTo(typedOther.isSetChapter_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetChapter_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.chapter_id, typedOther.chapter_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_chapter_args(");
+      boolean first = true;
+
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("chapter_id:");
+      if (this.chapter_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.chapter_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_argsStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_chapter_argsStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_chapter_argsStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_argsStandardScheme extends StandardScheme<record_contest_judge_rating_on_chapter_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_chapter_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // CHAPTER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.chapter_id = iprot.readString();
+                struct.setChapter_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_chapter_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.chapter_id != null) {
+          oprot.writeFieldBegin(CHAPTER_ID_FIELD_DESC);
+          oprot.writeString(struct.chapter_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_chapter_argsTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_chapter_argsTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_chapter_argsTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_argsTupleScheme extends TupleScheme<record_contest_judge_rating_on_chapter_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_chapter_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetContest_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetChapter_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
+        if (struct.isSetChapter_id()) {
+          oprot.writeString(struct.chapter_id);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_chapter_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.chapter_id = iprot.readString();
+          struct.setChapter_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class record_contest_judge_rating_on_chapter_result implements org.apache.thrift.TBase<record_contest_judge_rating_on_chapter_result, record_contest_judge_rating_on_chapter_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_chapter_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_chapter_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_chapter_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_chapter_result.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_chapter_result() {
+    }
+
+    public record_contest_judge_rating_on_chapter_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_chapter_result(record_contest_judge_rating_on_chapter_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public record_contest_judge_rating_on_chapter_result deepCopy() {
+      return new record_contest_judge_rating_on_chapter_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public record_contest_judge_rating_on_chapter_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_chapter_result)
+        return this.equals((record_contest_judge_rating_on_chapter_result)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_chapter_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_chapter_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_chapter_result typedOther = (record_contest_judge_rating_on_chapter_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_chapter_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_resultStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_chapter_resultStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_chapter_resultStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_resultStandardScheme extends StandardScheme<record_contest_judge_rating_on_chapter_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_chapter_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_chapter_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_chapter_resultTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_chapter_resultTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_chapter_resultTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_chapter_resultTupleScheme extends TupleScheme<record_contest_judge_rating_on_chapter_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_chapter_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_chapter_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
   public static class create_or_edit_contest_args implements org.apache.thrift.TBase<create_or_edit_contest_args, create_or_edit_contest_args._Fields>, java.io.Serializable, Cloneable   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_contest_args");
 
@@ -35804,7 +36790,6 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField LANG_FIELD_DESC = new org.apache.thrift.protocol.TField("lang", org.apache.thrift.protocol.TType.STRING, (short)8);
     private static final org.apache.thrift.protocol.TField S_USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("s_user_id", org.apache.thrift.protocol.TType.STRING, (short)9);
     private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)10);
-    private static final org.apache.thrift.protocol.TField STATUS_FIELD_DESC = new org.apache.thrift.protocol.TField("status", org.apache.thrift.protocol.TType.I32, (short)11);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -35822,7 +36807,6 @@ public class KahaniyaService {
     public String lang; // required
     public String s_user_id; // required
     public String contestId; // required
-    public int status; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -35835,8 +36819,7 @@ public class KahaniyaService {
       GENRE((short)7, "genre"),
       LANG((short)8, "lang"),
       S_USER_ID((short)9, "s_user_id"),
-      CONTEST_ID((short)10, "contestId"),
-      STATUS((short)11, "status");
+      CONTEST_ID((short)10, "contestId");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -35871,8 +36854,6 @@ public class KahaniyaService {
             return S_USER_ID;
           case 10: // CONTEST_ID
             return CONTEST_ID;
-          case 11: // STATUS
-            return STATUS;
           default:
             return null;
         }
@@ -35915,8 +36896,7 @@ public class KahaniyaService {
     // isset id assignments
     private static final int __PREV_CNT_ISSET_ID = 0;
     private static final int __COUNT_ISSET_ID = 1;
-    private static final int __STATUS_ISSET_ID = 2;
-    private BitSet __isset_bit_vector = new BitSet(3);
+    private BitSet __isset_bit_vector = new BitSet(2);
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -35940,8 +36920,6 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contestId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-      tmpMap.put(_Fields.STATUS, new org.apache.thrift.meta_data.FieldMetaData("status", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(get_feed_args.class, metaDataMap);
     }
@@ -35959,8 +36937,7 @@ public class KahaniyaService {
       String genre,
       String lang,
       String s_user_id,
-      String contestId,
-      int status)
+      String contestId)
     {
       this();
       this.titleType = titleType;
@@ -35975,8 +36952,6 @@ public class KahaniyaService {
       this.lang = lang;
       this.s_user_id = s_user_id;
       this.contestId = contestId;
-      this.status = status;
-      setStatusIsSet(true);
     }
 
     /**
@@ -36011,7 +36986,6 @@ public class KahaniyaService {
       if (other.isSetContestId()) {
         this.contestId = other.contestId;
       }
-      this.status = other.status;
     }
 
     public get_feed_args deepCopy() {
@@ -36032,8 +37006,6 @@ public class KahaniyaService {
       this.lang = null;
       this.s_user_id = null;
       this.contestId = null;
-      setStatusIsSet(false);
-      this.status = 0;
     }
 
     public String getTitleType() {
@@ -36274,29 +37246,6 @@ public class KahaniyaService {
       }
     }
 
-    public int getStatus() {
-      return this.status;
-    }
-
-    public get_feed_args setStatus(int status) {
-      this.status = status;
-      setStatusIsSet(true);
-      return this;
-    }
-
-    public void unsetStatus() {
-      __isset_bit_vector.clear(__STATUS_ISSET_ID);
-    }
-
-    /** Returns true if field status is set (has been assigned a value) and false otherwise */
-    public boolean isSetStatus() {
-      return __isset_bit_vector.get(__STATUS_ISSET_ID);
-    }
-
-    public void setStatusIsSet(boolean value) {
-      __isset_bit_vector.set(__STATUS_ISSET_ID, value);
-    }
-
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case TITLE_TYPE:
@@ -36379,14 +37328,6 @@ public class KahaniyaService {
         }
         break;
 
-      case STATUS:
-        if (value == null) {
-          unsetStatus();
-        } else {
-          setStatus((Integer)value);
-        }
-        break;
-
       }
     }
 
@@ -36422,9 +37363,6 @@ public class KahaniyaService {
       case CONTEST_ID:
         return getContestId();
 
-      case STATUS:
-        return Integer.valueOf(getStatus());
-
       }
       throw new IllegalStateException();
     }
@@ -36456,8 +37394,6 @@ public class KahaniyaService {
         return isSetS_user_id();
       case CONTEST_ID:
         return isSetContestId();
-      case STATUS:
-        return isSetStatus();
       }
       throw new IllegalStateException();
     }
@@ -36562,15 +37498,6 @@ public class KahaniyaService {
         if (!(this_present_contestId && that_present_contestId))
           return false;
         if (!this.contestId.equals(that.contestId))
-          return false;
-      }
-
-      boolean this_present_status = true;
-      boolean that_present_status = true;
-      if (this_present_status || that_present_status) {
-        if (!(this_present_status && that_present_status))
-          return false;
-        if (this.status != that.status)
           return false;
       }
 
@@ -36690,16 +37617,6 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetStatus()).compareTo(typedOther.isSetStatus());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetStatus()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.status, typedOther.status);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
       return 0;
     }
 
@@ -36790,10 +37707,6 @@ public class KahaniyaService {
       } else {
         sb.append(this.contestId);
       }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("status:");
-      sb.append(this.status);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -36919,14 +37832,6 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 11: // STATUS
-              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-                struct.status = iprot.readI32();
-                struct.setStatusIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -36988,9 +37893,6 @@ public class KahaniyaService {
           oprot.writeString(struct.contestId);
           oprot.writeFieldEnd();
         }
-        oprot.writeFieldBegin(STATUS_FIELD_DESC);
-        oprot.writeI32(struct.status);
-        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -37039,10 +37941,7 @@ public class KahaniyaService {
         if (struct.isSetContestId()) {
           optionals.set(9);
         }
-        if (struct.isSetStatus()) {
-          optionals.set(10);
-        }
-        oprot.writeBitSet(optionals, 11);
+        oprot.writeBitSet(optionals, 10);
         if (struct.isSetTitleType()) {
           oprot.writeString(struct.titleType);
         }
@@ -37073,15 +37972,12 @@ public class KahaniyaService {
         if (struct.isSetContestId()) {
           oprot.writeString(struct.contestId);
         }
-        if (struct.isSetStatus()) {
-          oprot.writeI32(struct.status);
-        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, get_feed_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(11);
+        BitSet incoming = iprot.readBitSet(10);
         if (incoming.get(0)) {
           struct.titleType = iprot.readString();
           struct.setTitleTypeIsSet(true);
@@ -37121,10 +38017,6 @@ public class KahaniyaService {
         if (incoming.get(9)) {
           struct.contestId = iprot.readString();
           struct.setContestIdIsSet(true);
-        }
-        if (incoming.get(10)) {
-          struct.status = iprot.readI32();
-          struct.setStatusIsSet(true);
         }
       }
     }
