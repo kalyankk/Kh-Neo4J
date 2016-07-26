@@ -3221,163 +3221,176 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
-			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
-			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
-			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
 			
 			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
 			
-			int c = 0;
-			LinkedList<Node> outputSeriesNode = new LinkedList<Node>();
-			
 			if(user_node == null)
-				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+				throw new KahaniyaCustomException("No user exists with given id : "+user_id);
 
-			ResourceIterator<Node> seriesNodesItr = seriesId_index.query(SERIES_ID, "*").iterator();
+			Iterator<Relationship> genres_itr = user_node.getRelationships(USER_INTERESTED_GENRE).iterator();					
+			Iterator<Relationship> lang_itr = user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();					
 			
-			LinkedList<Node> seriesList = new LinkedList<Node>();
-			while(seriesNodesItr.hasNext())
-				seriesList.addLast(seriesNodesItr.next());
-			Collections.sort(seriesList, TrendingComparatorForSeriesNodes);				
-			for(Node series : seriesList)
-			{			
-				if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
-				{
-					break;
-				}
-				
-				Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
-				Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
-				if(filter != null && !filter.equals(""))
-				{
-					JSONObject filterJSON = new JSONObject(filter);
-					if(filterJSON.has("genre") && filterJSON.has("language"))
-					{
-						for(String genre: filterJSON.getString("genre").split(","))
-						{
-							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
-							if(genreNode != null && seriesGenreNode.equals(genreNode))
-							{
-								for(String lang: filterJSON.getString("language").split(","))
-								{
-									Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
-									if(langNode != null && seriesLangNode.equals(langNode))
-									{
-										if(c < prev_cnt)
-										{
-											c++;
-											continue;
-										}
-										c++;
-										outputSeriesNode.addLast(series);			
-										
-									}
-								}
-							}
-						}
-					}
-					else if(filterJSON.has("genre"))
-					{
-						for(String genre: filterJSON.getString("genre").split(","))
-						{
-							Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
-							if(genreNode != null && seriesGenreNode.equals(genreNode))
-							{
-								if(c < prev_cnt)
-								{
-									c++;
-									continue;
-								}
-								c++;
-								outputSeriesNode.addLast(series);			
-							}
-						}
-					}
-					else if(filterJSON.has("language"))
-					{
-						for(String lang: filterJSON.getString("language").split(","))
-						{
-							Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
-							if(langNode != null && seriesLangNode.equals(langNode))
-							{
-								if(c < prev_cnt)
-								{
-									c++;
-									continue;
-								}
-								c++;
-								outputSeriesNode.addLast(series);			
-								
-							}
-						}
-					}
-					else // i.e., no need to apply filter
-					{
-						if(c < prev_cnt)
-						{
-							c++;
-							continue;
-						}
-						c++;
-						outputSeriesNode.addLast(series);			
-						
-					}
-				}
-				else // i.e., no need to apply filter
-				{
-					if(c < prev_cnt)
-					{
-						c++;
-						continue;
-					}
-					c++;
-					outputSeriesNode.addLast(series);			
-					
-				}
-				
-			}
+			LinkedList<Node> genres = new LinkedList<Node>();
+			LinkedList<Node> langs = new LinkedList<Node>();
 			
-			for(Node series : outputSeriesNode)
+			LinkedList<Node> lang_genres = new LinkedList<Node>();
+
+			while(genres_itr.hasNext())
 			{
-				JSONObject jobj = new JSONObject();
-				JSONArray jarray = new JSONArray();
-				
-				Iterator<Relationship> chaptersRelItr = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
-				LinkedList<Node> chapterList = new LinkedList<Node>();
-				while(chaptersRelItr.hasNext())
-					chapterList.addLast(chaptersRelItr.next().getStartNode());
-				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
-				for(int i=0; i< 3; i++)
+				genres.addLast(genres_itr.next().getEndNode());
+			}
+			while(lang_itr.hasNext())
+			{
+				langs.addLast(lang_itr.next().getEndNode());
+			}
+						
+			for(Node gen : genres)
+			{
+				for(Node lang : langs)
 				{
-					if(chapterList.size() > i)
-						jarray.put(getJSONForChapter(chapterList.get(i), user_node));
+					Node n = genre_lang_index.get(GENRE_LANG_NAME, gen.getProperty(GENRE_NAME).toString() + " " + lang.getProperty(LANG_NAME).toString()).getSingle();
+					if(n != null)
+					{
+						lang_genres.addLast(n);
+					}
 				}
-				if(jarray.length() > 0)
+			}
+			
+			LinkedList<Node> allChapterList = new LinkedList<Node>();
+			LinkedList<Node> skipChapterList = new LinkedList<Node>();
+			
+			for(Node n : lang_genres)
+			{
+				Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
+				while(seriesRelItr.hasNext())
 				{
-					jobj.put("ttl", series.getProperty(SERIES_TITLE));
-					jobj.put("data", jarray);
-
-					jsonArray.put(jobj);
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+						allChapterList.addLast(chapterRelItr.next().getStartNode());
 				}
 				
 			}
+			
+			Collections.sort(allChapterList, TrendingComparatorForChapterNodes);
+
+			LinkedList<Node> authors = new LinkedList<Node>();
+			
+/*			for(int i=0; i< 3; i++)
+			{
+				if(allChapterList.size() > i)
+					jRecArray.put(getJSONForChapter(allChapterList.get(i), user_node));
+			}
+*/			
+			for(Node chapterNode : allChapterList)
+			{
+				Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+				if( auth.equals(user_node) || !"2".equalsIgnoreCase(auth.getProperty(STATUS).toString()) || authors.contains(auth) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user_node, chapterNode))
+					continue;
+				
+				authors.addLast(auth);
+				skipChapterList.addLast(chapterNode);
+
+				if(authors.size() == 3)
+					break;
+			}
+				
+			// removed lang based recommended listing
+/*			authors.clear();
+
+			for(Node n : langs)
+			{
+				
+				Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_LANGUAGE).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(seriesRelItr.hasNext())
+				{
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+					{
+						chapterList.addLast(chapterRelItr.next().getStartNode());
+					}
+				}
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				authors.clear();
+				for(Node chapterNode : chapterList)
+				{
+					Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+					if( auth.equals(user_node) || authors.contains(auth))
+						continue;
+					
+					authors.addLast(auth);
+					skipChapterList.addLast(chapterNode);
+
+					if(authors.size() == 3)
+						break;
+				}
+				
+			} */
+
+			//TODO sort the lang_genres node list, so that if a story is added to genere now, it should be on top (remove the genre if the latest chapter is read)
+			for(Node g : lang_genres)
+			{
+				
+				Iterator<Relationship> seriesRelItr = g.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
+				LinkedList<Node> chapterList = new LinkedList<Node>();
+				while(seriesRelItr.hasNext())
+				{
+					Iterator<Relationship> chapterRelItr = seriesRelItr.next().getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chapterRelItr.hasNext())
+					{
+						chapterList.addLast(chapterRelItr.next().getStartNode());
+					}
+				}
+				Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+				authors.clear();
+				for(Node chapterNode : chapterList)
+				{
+					Node auth = chapterNode.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+					if( auth.equals(user_node) || !"2".equalsIgnoreCase(auth.getProperty(STATUS).toString()) || authors.contains(auth) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user_node, chapterNode))
+						continue;
+					authors.addLast(auth);
+
+					skipChapterList.addLast(chapterNode);
+					if(authors.size() == 3)
+						 break;
+				}
+				
+			}
+			
+			int c = 0;
+			for(Node chapter: allChapterList)
+			{
+				if(c >= prev_cnt + count)
+					break;
+				if(skipChapterList.contains(chapter))
+					break;
+				else if(c < prev_cnt)
+				{
+					c++;
+					continue;
+				}
+				c++;
+				jsonArray.put(getJSONForChapter(chapter, user_node));
+			}
+			
 			tx.success();
 
 		}
 		catch(KahaniyaCustomException ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ get_series()");
-			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			System.out.println("Exception @ get_recomended_by_series()");
+			System.out.println("Something went wrong, while returning recommended chapters from get_recomended_by_series  :"+ex.getMessage());
 //				ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
 		catch(Exception ex)
 		{
 			System.out.println(new Date().toString());
-			System.out.println("Exception @ get_series()");
-			System.out.println("Something went wrong, while returning series from get_series  :"+ex.getMessage());
+			System.out.println("Exception @ get_recomended_by_series()");
+			System.out.println("Something went wrong, while returning recommended chapters from get_recomended_by_series  :"+ex.getMessage());
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
@@ -4068,23 +4081,45 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 				int presentTime = (int)(System.currentTimeMillis()/1000);
 				int listType = 1;
-				if(filter != null && !filter.equals("")){
-					JSONObject filterJSON = new JSONObject(filter);
-					if(filterJSON.has("actv") && "0".equalsIgnoreCase(filterJSON.getString("actv")))
-						listType = 0;
-				}
+				
+				JSONObject filterJSON;
+				if(filter != null && !filter.equals(""))
+					filterJSON = new JSONObject(filter);	
+				else filterJSON = new JSONObject();
+				
+				if(filterJSON.has("actv") && "0".equalsIgnoreCase(filterJSON.getString("actv")))
+					listType = 0;
 				
 				for(Node contest : contestsList)
 				{			
+					if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(contest.getProperty(CONTEST_PRICE).toString()))
+						continue;
+					if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(contest.getProperty(CONTEST_PRICE).toString()))
+						continue;
 					Node auth = contest.getSingleRelationship(USER_STARTED_CONTEST, Direction.INCOMING).getStartNode();
-//					if(auth.equals(user_node))
-	//					continue;
+
 					if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
 						continue;
-					if(listType == 1 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) > presentTime)
-						outputList.addLast(contest);
-					else if(listType == 0 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) <= presentTime)
-						outputList.addLast(contest);
+
+					if(filterJSON.has("language"))
+					{
+						for(String lang: filterJSON.getString("language").split(","))
+						{
+							if(lang.equalsIgnoreCase(contest.getProperty(CONTEST_LANGUAGE).toString()))
+							{
+								if(listType == 1 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) > presentTime)
+									outputList.addLast(contest);
+								else if(listType == 0 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) <= presentTime)
+									outputList.addLast(contest);
+							}
+						}
+					}
+					else{
+						if(listType == 1 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) > presentTime)
+							outputList.addLast(contest);
+						else if(listType == 0 && Integer.parseInt(contest.getProperty(CONTEST_END_DATE).toString()) <= presentTime)
+							outputList.addLast(contest);
+					}
 				}
 				if(listType == 1)
 					Collections.sort(outputList, TimeCreatedComparatorForNodes);
