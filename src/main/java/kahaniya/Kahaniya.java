@@ -3365,7 +3365,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				if(c >= prev_cnt + count)
 					break;
 				if(skipChapterList.contains(chapter))
-					break;
+					continue;
 				else if(c < prev_cnt)
 				{
 					c++;
@@ -6741,8 +6741,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 				c = 0;
 				while(seriesItr.hasNext() && c < count)
 				{
+					Node series = seriesItr.next();
+					// no short stories
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
 					c++;
-					jsonArray.put(getJSONForSeries(seriesItr.next(),s_user)); 
+					jsonArray.put(getJSONForSeries(series,s_user)); 
 				}
 			}
 			else if(tp == 3) // chapters
