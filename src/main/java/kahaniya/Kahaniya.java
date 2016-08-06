@@ -710,7 +710,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle();
 	}
 	
-	public void add_additional_properties() 
+/*	public void add_additional_properties() 
 	{
 		try (Transaction tx = graphDb.beginTx())
 		{
@@ -787,8 +787,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Failed to add additional properties : " + e.getMessage());}
 		finally{}
 	}
-	
-	public void add_chapter_contest_status_properties() 
+*/	
+/*	public void add_chapter_contest_status_properties() 
 	{
 		try (Transaction tx = graphDb.beginTx())
 		{
@@ -816,7 +816,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Failed to add chapter contest status properties : " + e.getMessage());}
 		finally{}
 	}
-	
+*/	
 	private Lock aquireWriteLock(Transaction tx) throws Exception {
 		Index<Node> lockNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
 		Node tobeLockedNode = lockNodeIndex.get( LockName, LockName ).getSingle();

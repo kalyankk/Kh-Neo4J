@@ -4,12 +4,12 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("06th August, 2016 - 01:15 P.M");
+		System.out.println("06th August, 2016 - 01:30 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
-		kahaniya.add_additional_properties();
-		kahaniya.add_chapter_contest_status_properties();
+//		kahaniya.add_additional_properties();
+//		kahaniya.add_chapter_contest_status_properties();
 //		test(kahaniya);
 		kahaniya.startThriftServer();
 
