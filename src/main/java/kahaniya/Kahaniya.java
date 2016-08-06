@@ -1,5 +1,7 @@
 package kahaniya;
 
+import java.io.File;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +21,7 @@ import org.apache.thrift.server.TThreadPoolServer.Args;
 import org.apache.thrift.transport.TServerSocket;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.neo4j.backup.OnlineBackup;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -550,6 +554,29 @@ public class Kahaniya implements KahaniyaService.Iface{
 		if(graphDb == null)
 			initGraphDb();
 	
+	}
+
+	@Override
+	public String db_backup()
+	{
+		String res;
+		try{
+			System.out.println("Got the request to backup db");
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+			String folderName = c.get(Calendar.YEAR)+"/"+c.get(Calendar.MONTH)+"/"+c.get(Calendar.DATE)+"/"+c.get(Calendar.HOUR_OF_DAY)+"/"+c.get(Calendar.MINUTE);
+			File f = new File("/var/kahaniyaN4j/data/backup/"+folderName+"/graphdb");
+			OnlineBackup backup = OnlineBackup.from( "127.0.0.1" );
+			backup.backup(f.getPath(), true);
+			res = "true";
+		}
+		catch(Exception ex){
+			System.out.println(new Date().toString());
+		      System.out.println("Something went wrong, while db_backup :"+ex.getMessage());
+		      ex.printStackTrace();
+		      res = "false";
+		   }
+		return res;
 	}
 	
 	private static void initGraphDb()
@@ -4383,6 +4410,60 @@ public class Kahaniya implements KahaniyaService.Iface{
 									
 				}
 			}
+			else if(feedType.equalsIgnoreCase("SRS"))
+			{
+				int c = 0;
+				if(contestId == null || contestId.length()==0)
+					throw new KahaniyaCustomException("Empty parameter receieved for contest/series id");
+				Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+				Node seriesNode = seriesId_index.get(SERIES_ID, contestId).getSingle();
+				if(seriesNode == null)
+					throw new KahaniyaCustomException("Series does not exists with given series id"+contestId);
+
+				LinkedList<Relationship> seriesChaptersRelsList = new LinkedList<Relationship>();
+				
+				if(filter != null && !filter.equals(""))
+				{
+					
+					JSONObject filterJSON = new JSONObject(filter);	
+
+					for(Relationship rel: seriesNode.getRelationships(CHAPTER_BELONGS_TO_SERIES))
+					{
+						Node chapter = rel.getEndNode();
+							
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("0") && !"0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						if(filterJSON.has("price") && filterJSON.getString("price").equals("1") && "0".equals(chapter.getProperty(CHAPTER_FREE_OR_PAID).toString()))
+							continue;
+						
+						seriesChaptersRelsList.addLast(rel);	
+					}
+				}
+				else
+				{
+					for(Relationship rel: seriesNode.getRelationships(CHAPTER_BELONGS_TO_SERIES))
+						seriesChaptersRelsList.addLast(rel);
+				}
+
+				Collections.sort(seriesChaptersRelsList, TimeCreatedComparatorForRelationships);
+				Collections.reverse(seriesChaptersRelsList);
+				for(Relationship rel : seriesChaptersRelsList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getStartNode();
+					
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					outputChaptersNode.addLast(chapter);
+									
+				}
+			}
 			else if(feedType.equalsIgnoreCase("B"))
 			{
 				int c = 0;
@@ -6783,6 +6864,138 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println(new Date().toString());
 			System.out.println("Exception @ search()");
 			System.out.println("Something went wrong, while returning search  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();	
+	}
+
+	@Override
+	public String get_chapter_view_suggestions(String chapter_id, String user_id, int count)
+			throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Empty value receieved for the parameter chapter_id");
+			if(user_id == null )
+				user_id = "";
+
+			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> chapter_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+
+			Node user = user_index.get(USER_ID, user_id).getSingle();
+			Node chapter = chapter_index.get(CHAPTER_ID, chapter_id).getSingle();
+			
+			Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
+			Node author = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.OUTGOING).getStartNode();
+			Node genre = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+			int i = 0;
+			
+			LinkedList<Node> suggested_chapters = new LinkedList<Node>();
+			
+			//get requested count of chapters from the same series
+			//skip the same chapter, user viewed chapter, user written chapter, author deleted chapter
+			for(Relationship rel : series.getRelationships(CHAPTER_BELONGS_TO_SERIES))
+			{
+				if(i==count)
+					break;
+				Node s_chapter = rel.getStartNode();
+				if(chapter.equals(s_chapter))
+					break;
+				Node auth = s_chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+				if(auth.equals(user) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, s_chapter))
+					continue;
+				if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+					continue;
+				
+				i++;
+				suggested_chapters.addLast(s_chapter);
+			}
+			//based on author, skip this if author and viewr is same (i.e., no need to send his own writings as suggestions)
+			//skip user viewed chapter
+			if(i<count && !author.equals(user) && author.hasProperty(IS_DELETED) && author.getProperty(IS_DELETED).toString().equals("1"))
+				for(Relationship rel: author.getRelationships(USER_WRITTEN_A_CHAPTER))
+				{
+					if(i==count)
+						break;
+					Node s_chapter = rel.getEndNode();
+					if(isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, s_chapter))
+						continue;
+					i++;
+					suggested_chapters.addLast(s_chapter);
+				}
+			
+			//get genre based series and find suggestions same as above
+			if(i<count)
+				for(Relationship rel: genre.getRelationships(SERIES_BELONGS_TO_GENRE))
+				{
+					if(i==count)
+						break;
+					for(Relationship rel2 : rel.getStartNode().getRelationships(CHAPTER_BELONGS_TO_SERIES))
+					{
+						if(i==count)
+							break;
+						Node s_chapter = rel2.getStartNode();
+						if(chapter.equals(s_chapter))
+							break;
+						Node auth = s_chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+						if(auth.equals(user) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, s_chapter))
+							continue;
+						if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+							continue;
+						
+						i++;
+						suggested_chapters.addLast(s_chapter);
+					}
+				}
+
+			//still unable to find, suggestions, simply list all the chapters which are not viewed
+			if(i<count)
+			{
+				ResourceIterator<Node> allChapters = chapter_index.query(CHAPTER_ID, "*").iterator();
+				while(allChapters.hasNext() && i < count)
+				{
+					Node s_chapter = allChapters.next();
+					if(chapter.equals(s_chapter))
+						break;
+					Node auth = s_chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+					if(auth.equals(user) || isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, s_chapter))
+						continue;
+					if(auth.hasProperty(IS_DELETED) && auth.getProperty(IS_DELETED).toString().equals("1"))
+						continue;
+					
+					i++;
+					suggested_chapters.addLast(s_chapter);
+				}
+			}
+			
+			for(Node s_chapter : suggested_chapters)
+			{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("P_Title_ID", s_chapter.getProperty(CHAPTER_TITLE_ID).toString());
+				jsonObject.put("P_Title", s_chapter.getProperty(CHAPTER_TITLE).toString());
+				jsonObject.put("Series_Tid", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID));
+				jsonArray.put(jsonObject);
+			}
+			
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_chapter_view_suggestions()");
+			System.out.println("Something went wrong, while returning chapter view suggestions  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_chapter_view_suggestions()");
+			System.out.println("Something went wrong, while returning chapter view suggestions  :"+ex.getMessage());
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
