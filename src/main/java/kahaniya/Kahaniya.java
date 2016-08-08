@@ -6890,7 +6890,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node chapter = chapter_index.get(CHAPTER_ID, chapter_id).getSingle();
 			
 			Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
-			Node author = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.OUTGOING).getStartNode();
+			Node author = chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 			Node genre = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
 			int i = 0;
 			
