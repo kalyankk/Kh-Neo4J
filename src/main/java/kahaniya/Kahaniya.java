@@ -1792,6 +1792,88 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return null;
 	}
 
+	private JSONObject getJSONForDiscoveryNotificationRel(Relationship rel)
+	{
+		Node actor = rel.getStartNode();
+		Node post = rel.getEndNode();
+		JSONObject postJSON = new JSONObject();
+		
+			JSONObject actorJSON = new JSONObject();
+			actorJSON.put("Actr_Id", actor.getProperty(USER_ID).toString());
+			actorJSON.put("Actr_Nme", actor.getProperty(FULL_NAME).toString());
+		postJSON.put("N_Actors",actorJSON);
+		postJSON.put("N_Tm",rel.getProperty(TIME_CREATED));
+		postJSON.put("Is_Neo4j",true);
+		
+		if(rel.isType(USER_WRITTEN_A_CHAPTER))
+		{
+			postJSON.put("N_Tp","C");
+			postJSON.put("N_Tg","W");
+			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(CHAPTER_TITLE_ID));
+		}
+		else if(rel.isType(USER_FAV_CHAPTER))
+		{
+			postJSON.put("N_Tp","C");
+			postJSON.put("N_Tg","FV");
+			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(CHAPTER_TITLE_ID));
+		}
+		else if(rel.isType(USER_RATED_A_CHAPTER))
+		{
+			postJSON.put("N_Tp","C");
+			postJSON.put("N_Tg","R");
+			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(CHAPTER_TITLE_ID));
+		}
+		else if(rel.isType(USER_WRITTEN_A_REVIEW))
+		{
+			postJSON.put("N_Tp","S");
+			postJSON.put("N_Tg","RV");
+			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+		}
+		else if(rel.isType(USER_SUBSCRIBED_TO_SERIES))
+		{
+			postJSON.put("N_Tp","S");
+			postJSON.put("N_Tg","SUB");
+			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+		}
+		else if(rel.isType(USER_STARTED_SERIES))
+		{
+			postJSON.put("N_Tp","S");
+			postJSON.put("N_Tg","W");
+			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+		}
+		else if(rel.isType(USER_WRITTEN_A_COMMENT))
+		{
+			Iterator<Relationship> cm_on_chapters = post.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
+			post = cm_on_chapters.next().getEndNode();
+			postJSON.put("N_Tp","C");
+			postJSON.put("N_Tg","CM");
+			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(CHAPTER_TITLE_ID));
+		}
+		else if(rel.isType(USER_PURCHASED_A_CHAPTER))
+		{
+			postJSON.put("N_Tp","C");
+			postJSON.put("N_Tg","PC");
+			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			postJSON.put("N_Pst_Link",post.getProperty(CHAPTER_TITLE_ID));
+		}
+		else if(rel.isType(USER_FOLLOW_USER))
+		{
+			postJSON.put("N_Tp","U");
+			postJSON.put("N_Tg","F");
+			postJSON.put("N_Pst_Ttl",post.getProperty(FULL_NAME));
+			postJSON.put("N_Pst_Link",post.getProperty(USER_NAME));
+		}
+		
+		return postJSON;
+	}
+	
 	private JSONObject getJSONForGenre(Node genre)
 	{
 		JSONObject ret = new JSONObject();
@@ -5430,6 +5512,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
+	
 	private JSONObject getJSONForChapter(Node chapter, Node req_user)
 	{
 		JSONObject obj = new JSONObject();
@@ -6974,10 +7057,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			for(Node s_chapter : suggested_chapters)
 			{
+				Node chapter_author = s_chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("P_Title_ID", s_chapter.getProperty(CHAPTER_TITLE_ID).toString());
 				jsonObject.put("P_Title", s_chapter.getProperty(CHAPTER_TITLE).toString());
 				jsonObject.put("Series_Tid", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID));
+				jsonObject.put("P_Author_FullName", chapter_author.getProperty(FULL_NAME));
+				jsonObject.put("P_Author", chapter_author.getProperty(USER_ID));
+				jsonObject.put("Series_Title", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE));
 				jsonArray.put(jsonObject);
 			}
 			
@@ -7242,6 +7329,186 @@ public class Kahaniya implements KahaniyaService.Iface{
 			res = "false";
 		}
 		return res;	
+	}
+
+	@Override
+	public String notifications_feed(String user_id, int prev_cnt, int count)
+			throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Empty value receieved for the parameter user_id");
+			
+			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Node user = user_index.get(USER_ID, user_id).getSingle();
+			if(user == null )
+				throw new KahaniyaCustomException("User doesnot exists with the given id");
+			
+			int i = 0;			
+			Iterator<Relationship> followingUsersRel = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+			
+			LinkedList<Relationship> discovery_rels = new LinkedList<Relationship>();
+			
+			
+			while(followingUsersRel.hasNext())				
+			{
+				Node following_user = followingUsersRel.next().getOtherNode(user);
+				Iterator<Relationship> followingUserDiscoveryRels = following_user.getRelationships(USER_WRITTEN_A_CHAPTER, USER_FAV_CHAPTER, USER_RATED_A_CHAPTER, USER_WRITTEN_A_REVIEW, USER_SUBSCRIBED_TO_SERIES, USER_PURCHASED_A_CHAPTER).iterator();
+				while(followingUserDiscoveryRels.hasNext())
+					discovery_rels.addLast(followingUserDiscoveryRels.next());
+				Iterator<Relationship> followers = following_user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+				while(followers.hasNext())
+				{
+					Relationship rel = followers.next();
+					if(!rel.getEndNode().equals(user))
+						discovery_rels.addLast(rel);
+				}
+				Iterator<Relationship> series = following_user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+				while(series.hasNext())
+				{
+					Relationship rel = followers.next();
+					if(!rel.getEndNode().getProperty(SERIES_TYPE).toString().equals("2"))
+						discovery_rels.addLast(rel);
+				}
+				Iterator<Relationship> comments = following_user.getRelationships(USER_WRITTEN_A_COMMENT, Direction.OUTGOING).iterator();
+				while(comments.hasNext())
+				{
+					Relationship rel = comments.next();
+					if(rel.getEndNode().hasRelationship(COMMENT_WRITTEN_ON_CHAPTER))
+						discovery_rels.addLast(rel);
+				}
+
+			}
+			
+			Collections.sort(discovery_rels, TimeCreatedComparatorForRelationships);
+			
+			int c = 0;
+			for(Relationship rel : discovery_rels)
+			{
+				
+				if(c < prev_cnt)
+				{
+					c ++;
+					continue;
+				}
+				if(c >= count + prev_cnt)
+					break;
+				jsonArray.put(getJSONForDiscoveryNotificationRel(rel));
+				c++;
+			}
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ notification_feed()");
+			System.out.println("Something went wrong, while returning notification feed   :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ notification_feed()");
+			System.out.println("Something went wrong, while returning notification feed   :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();	
+
+	}
+
+	@Override
+	public String discovery_feed(String user_id, int prev_cnt, int count)
+			throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Empty value receieved for the parameter user_id");
+			
+			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Node user = user_index.get(USER_ID, user_id).getSingle();
+			if(user == null )
+				throw new KahaniyaCustomException("User doesnot exists with the given id");
+			
+			int i = 0;			
+			Iterator<Relationship> followingUsersRel = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+			
+			LinkedList<Relationship> discovery_rels = new LinkedList<Relationship>();
+			
+			
+			while(followingUsersRel.hasNext())				
+			{
+				Node following_user = followingUsersRel.next().getOtherNode(user);
+				Iterator<Relationship> followingUserDiscoveryRels = following_user.getRelationships(USER_WRITTEN_A_CHAPTER, USER_FAV_CHAPTER, USER_RATED_A_CHAPTER, USER_WRITTEN_A_REVIEW, USER_SUBSCRIBED_TO_SERIES, USER_PURCHASED_A_CHAPTER).iterator();
+				while(followingUserDiscoveryRels.hasNext())
+					discovery_rels.addLast(followingUserDiscoveryRels.next());
+				Iterator<Relationship> followers = following_user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+				while(followers.hasNext())
+				{
+					Relationship rel = followers.next();
+					if(!rel.getEndNode().equals(user))
+						discovery_rels.addLast(rel);
+				}
+				Iterator<Relationship> series = following_user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+				while(series.hasNext())
+				{
+					Relationship rel = followers.next();
+					if(!rel.getEndNode().getProperty(SERIES_TYPE).toString().equals("2"))
+						discovery_rels.addLast(rel);
+				}
+				Iterator<Relationship> comments = following_user.getRelationships(USER_WRITTEN_A_COMMENT, Direction.OUTGOING).iterator();
+				while(comments.hasNext())
+				{
+					Relationship rel = comments.next();
+					if(rel.getEndNode().hasRelationship(COMMENT_WRITTEN_ON_CHAPTER))
+						discovery_rels.addLast(rel);
+				}
+
+			}
+			
+			Collections.sort(discovery_rels, TimeCreatedComparatorForRelationships);
+			
+			int c = 0;
+			for(Relationship rel : discovery_rels)
+			{
+				
+				if(c < prev_cnt)
+				{
+					c ++;
+					continue;
+				}
+				if(c >= count + prev_cnt)
+					break;
+				jsonArray.put(getJSONForDiscoveryNotificationRel(rel));
+				c++;
+			}
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ discovery_feed()");
+			System.out.println("Something went wrong, while returning discovery feed   :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ discovery_feed()");
+			System.out.println("Something went wrong, while returning discovery feed   :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();	
+
 	}
 
 }
