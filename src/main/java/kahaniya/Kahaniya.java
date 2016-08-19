@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -1792,7 +1793,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return null;
 	}
 
-	private JSONObject getJSONForDiscoveryNotificationRel(Relationship rel)
+	private JSONObject getJSONForDiscoveryNotificationRel(Relationship rel, Node req_user)
 	{
 		Node actor = rel.getStartNode();
 		Node post = rel.getEndNode();
@@ -1809,43 +1810,90 @@ public class Kahaniya implements KahaniyaService.Iface{
 		{
 			postJSON.put("N_Tp","C");
 			postJSON.put("N_Tg","W");
-			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
-			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
+			JSONObject obj = getJSONForChapter(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			
+//			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+//			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
 		else if(rel.isType(USER_FAV_CHAPTER))
 		{
 			postJSON.put("N_Tp","C");
 			postJSON.put("N_Tg","FV");
-			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
-			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
+			JSONObject obj = getJSONForChapter(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			//postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
 		else if(rel.isType(USER_RATED_A_CHAPTER))
 		{
 			postJSON.put("N_Tp","C");
 			postJSON.put("N_Tg","R");
-			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
-			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
+			JSONObject obj = getJSONForChapter(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			//postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
 		else if(rel.isType(USER_WRITTEN_A_REVIEW))
 		{
 			postJSON.put("N_Tp","S");
 			postJSON.put("N_Tg","RV");
-			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
-			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+
+			Iterator<Relationship> rev_on_series = post.getRelationships(REVIEW_BELONGS_TO_SERIES).iterator();
+			post = rev_on_series.next().getEndNode();
+
+			JSONObject obj = getJSONForSeries(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			//postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
 		}
 		else if(rel.isType(USER_SUBSCRIBED_TO_SERIES))
 		{
 			postJSON.put("N_Tp","S");
 			postJSON.put("N_Tg","SUB");
-			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
-			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+			JSONObject obj = getJSONForSeries(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			//postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
 		}
 		else if(rel.isType(USER_STARTED_SERIES))
 		{
 			postJSON.put("N_Tp","S");
 			postJSON.put("N_Tg","W");
-			postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
-			postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
+			JSONObject obj = getJSONForSeries(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
+			//postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
 		}
 		else if(rel.isType(USER_WRITTEN_A_COMMENT))
 		{
@@ -1853,22 +1901,43 @@ public class Kahaniya implements KahaniyaService.Iface{
 			post = cm_on_chapters.next().getEndNode();
 			postJSON.put("N_Tp","C");
 			postJSON.put("N_Tg","CM");
-			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
-			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
+			JSONObject obj = getJSONForChapter(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			//postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
 		else if(rel.isType(USER_PURCHASED_A_CHAPTER))
 		{
 			postJSON.put("N_Tp","C");
 			postJSON.put("N_Tg","PC");
-			postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
-			postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
+			JSONObject obj = getJSONForChapter(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
+			//postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
 		else if(rel.isType(USER_FOLLOW_USER))
 		{
 			postJSON.put("N_Tp","U");
 			postJSON.put("N_Tg","F");
-			postJSON.put("N_Pst_Ttl",post.getProperty(FULL_NAME));
-			postJSON.put("N_Pst_Link",post.getProperty(USER_NAME));
+			JSONObject obj = getJSONForUser(post, req_user);
+			Iterator<String> keys = obj.keys();
+			while(keys.hasNext())
+			{
+				String key = keys.next();
+				postJSON.put(key, obj.get(key));
+			}
+			//postJSON.put("N_Pst_Ttl",post.getProperty(FULL_NAME));
+			//postJSON.put("N_Pst_Link",post.getProperty(USER_NAME));
 		}
 		
 		return postJSON;
@@ -7396,7 +7465,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				if(c >= count + prev_cnt)
 					break;
-				jsonArray.put(getJSONForDiscoveryNotificationRel(rel));
+				jsonArray.put(getJSONForDiscoveryNotificationRel(rel, null));
 				c++;
 			}
 			tx.success();
@@ -7446,7 +7515,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			while(followingUsersRel.hasNext())				
 			{
 				Node following_user = followingUsersRel.next().getOtherNode(user);
-				Iterator<Relationship> followingUserDiscoveryRels = following_user.getRelationships(USER_WRITTEN_A_CHAPTER, USER_FAV_CHAPTER, USER_RATED_A_CHAPTER, USER_WRITTEN_A_REVIEW, USER_SUBSCRIBED_TO_SERIES, USER_PURCHASED_A_CHAPTER).iterator();
+				Iterator<Relationship> followingUserDiscoveryRels = following_user.getRelationships(USER_WRITTEN_A_CHAPTER, USER_FAV_CHAPTER, USER_RATED_A_CHAPTER, USER_SUBSCRIBED_TO_SERIES, USER_PURCHASED_A_CHAPTER).iterator();
 				while(followingUserDiscoveryRels.hasNext())
 					discovery_rels.addLast(followingUserDiscoveryRels.next());
 				Iterator<Relationship> followers = following_user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
@@ -7461,6 +7530,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 				{
 					Relationship rel = series.next();
 					if(rel.getEndNode().getProperty(SERIES_TYPE).toString().equals("2"))
+						discovery_rels.addLast(rel);
+				}
+				Iterator<Relationship> reviews = following_user.getRelationships(USER_WRITTEN_A_REVIEW, Direction.OUTGOING).iterator();
+				while(reviews.hasNext())
+				{
+					Relationship rel = reviews.next();
+					if(rel.getEndNode().hasRelationship(REVIEW_BELONGS_TO_SERIES))
 						discovery_rels.addLast(rel);
 				}
 				Iterator<Relationship> comments = following_user.getRelationships(USER_WRITTEN_A_COMMENT, Direction.OUTGOING).iterator();
@@ -7486,7 +7562,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 				if(c >= count + prev_cnt)
 					break;
-				jsonArray.put(getJSONForDiscoveryNotificationRel(rel));
+				jsonArray.put(getJSONForDiscoveryNotificationRel(rel, user));
 				c++;
 			}
 			tx.success();
