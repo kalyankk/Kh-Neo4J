@@ -6452,10 +6452,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Node user = userId_index.get(USER_ID, user_id).getSingle();
 
-			ResourceIterator<Node> allUsersItr = userId_index.get(USER_ID, "*").iterator();
-			
-			
-			
+			ResourceIterator<Node> allUsersItr = userId_index.query(USER_ID, "*").iterator();
+				
 			LinkedList<Node> authorsList = new LinkedList<Node>();
 			while(allUsersItr.hasNext())
 			{
