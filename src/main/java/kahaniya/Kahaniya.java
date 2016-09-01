@@ -1949,7 +1949,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		else if(rel.isType(USER_READ_A_CHAPTER))
 		{
 			postJSON.put("N_Tp","C");
-			postJSON.put("N_Tg","R");
+			postJSON.put("N_Tg","RD");
 			//postJSON.put("N_Actors",actorJSON);
 			
 			JSONObject obj = getJSONForChapter(post, req_user);
@@ -5754,6 +5754,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return obj;
 	}
 	
+	private JSONObject getShortJSONForUser(Node user, Node req_user)
+	{
+		JSONObject obj = new JSONObject();
+		obj.put("FullName",user.getProperty(FULL_NAME).toString());
+		obj.put("UserId",user.getProperty(USER_ID).toString());
+		obj.put("User_Status",user.getProperty(STATUS).toString());
+		obj.put("Is_Neo4j",true);
+		return obj;
+	}
+	
 	private JSONObject getJSONForComment(Node comment)
 	{
 		JSONObject obj = new JSONObject();
@@ -6458,7 +6468,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			while(allUsersItr.hasNext())
 			{
 				Node n = allUsersItr.next();
-				if(n.getDegree(USER_WRITTEN_A_CHAPTER) > 0 && !n.equals(user))
+				if(n.getDegree(USER_WRITTEN_A_CHAPTER) > 0 && !n.equals(user) && !isRelationExistsBetween(USER_FOLLOW_USER, user, n))
 					authorsList.addLast(n);
 			}
 			
@@ -6479,7 +6489,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 			
 			for(Node author: outputNodes)
-				jsonArray.put(getJSONForUser(author, user));
+				jsonArray.put(getShortJSONForUser(author, user));
 			
 			tx.success();
 
@@ -7616,13 +7626,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 					}
 				}
-				Iterator<Relationship> series = following_user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+/*				Iterator<Relationship> series = following_user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
 				while(series.hasNext())
 				{
 					Relationship rel = series.next();
 					if(rel.getEndNode().getProperty(SERIES_TYPE).toString().equals("2"))
 						discovery_rels.addLast(rel);
 				}
+*/
 				Iterator<Relationship> reviews = following_user.getRelationships(USER_WRITTEN_A_REVIEW, Direction.OUTGOING).iterator();
 				while(reviews.hasNext())
 				{
