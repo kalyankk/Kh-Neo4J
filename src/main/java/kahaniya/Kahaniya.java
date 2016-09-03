@@ -1872,7 +1872,15 @@ public class Kahaniya implements KahaniyaService.Iface{
 				String key = keys.next();
 				postJSON.put(key, obj.get(key));
 			}
-			postJSON.put("Num_Actors", post.getDegree(REVIEW_BELONGS_TO_SERIES));
+			Iterator<Relationship> num_actors = post.getRelationships(REVIEW_BELONGS_TO_SERIES).iterator();
+			LinkedList<Node> actorNodes = new LinkedList<Node>();
+			while(num_actors.hasNext())
+			{
+				Relationship t_rel = num_actors.next().getStartNode().getSingleRelationship(USER_WRITTEN_A_REVIEW, Direction.INCOMING);
+				if(!actorNodes.contains(t_rel.getStartNode()))
+					actorNodes.addLast(t_rel.getStartNode());
+			}
+			postJSON.put("Num_Actors", actorNodes.size());
 			//postJSON.put("N_Pst_Ttl",post.getProperty(SERIES_TITLE));
 			//postJSON.put("N_Pst_Link",post.getProperty(SERIES_TITLE_ID));
 		}
@@ -1925,7 +1933,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 				String key = keys.next();
 				postJSON.put(key, obj.get(key));
 			}
-			postJSON.put("Num_Actors", post.getDegree(COMMENT_WRITTEN_ON_CHAPTER));
+
+			Iterator<Relationship> num_actors = post.getRelationships(COMMENT_WRITTEN_ON_CHAPTER).iterator();
+			LinkedList<Node> actorNodes = new LinkedList<Node>();
+			while(num_actors.hasNext())
+			{
+				Relationship t_rel = num_actors.next().getStartNode().getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING);
+				if(!actorNodes.contains(t_rel.getStartNode()))
+					actorNodes.addLast(t_rel.getStartNode());
+			}
+			postJSON.put("Num_Actors", actorNodes.size());
+			
 			//postJSON.put("N_Pst_Ttl",post.getProperty(CHAPTER_TITLE));
 			//postJSON.put("N_Pst_Link",post.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID)+"/"+post.getProperty(CHAPTER_TITLE_ID));
 		}
@@ -7707,6 +7725,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 				while(pur_chapters.hasNext())
 				{
 					Relationship rel = pur_chapters.next();
+
+					//for every chapter view, there will a purchase with 0 or more coins, so skip 0 coins purchases
+					if(Integer.parseInt(rel.getProperty(CHAPTER_PURCHASED_PRICE).toString()) <= 0)
+						continue;
+						
 					Node pur_chapter = rel.getEndNode();
 					if(!purchasedChapters.contains(pur_chapter))
 					{
@@ -7835,4 +7858,47 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	}
 
+	@Override
+	public String get_genre_followers(String genre_name)
+			throws TException {
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+
+			if(genre_name == null || genre_name.length() == 0)
+				throw new KahaniyaCustomException("Empty value receieved for the parameter genre_name");
+						
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Node genre = genreName_index.get(GENRE_NAME, genre_name.toLowerCase()).getSingle();
+			if(genre == null )
+				throw new KahaniyaCustomException("Genre doesnot exists with the given genre name");
+					
+			Iterator<Relationship> followingUsersRel = genre.getRelationships(USER_INTERESTED_GENRE, Direction.INCOMING).iterator();
+			
+			while(followingUsersRel.hasNext())
+			{
+				jsonArray.put(new JSONObject().put("userId", followingUsersRel.next().getStartNode().getProperty(USER_ID)));
+			}	
+			tx.success();
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_genre_followers()");
+			System.out.println("Something went wrong, while returning genre followers   :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_genre_followers()");
+			System.out.println("Something went wrong, while returning genre followers   :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();	
+
+	}
 }
