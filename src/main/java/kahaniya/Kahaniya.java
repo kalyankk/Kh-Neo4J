@@ -2027,7 +2027,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 */
 			postJSON.put("N_Data", obj);
-			postJSON.put("N_Lnk", "/"+obj.getString("UserId"));
+			postJSON.put("N_Lnk", "/"+obj.getString("U_Id"));
 			postJSON.put("Num_Actors", post.getDegree(USER_FOLLOW_USER, Direction.INCOMING));
 			//postJSON.put("N_Pst_Ttl",post.getProperty(FULL_NAME));
 			//postJSON.put("N_Pst_Link",post.getProperty(USER_NAME));
@@ -7700,7 +7700,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node user = user_index.get(USER_ID, user_id).getSingle();
 			if(user == null )
 				throw new KahaniyaCustomException("User doesnot exists with the given id");
-
+			
+			int last_seen = (int)(System.currentTimeMillis()/1000);
+			user.setProperty(NTFS_LAST_SEEN, last_seen);
+			
 			LinkedList<Relationship> discovery_rels = new LinkedList<Relationship>();
 
 			if(user.hasRelationship(USER_FOLLOW_USER, Direction.INCOMING))
@@ -7747,7 +7750,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Relationship t_rel = itr.next();
 						if(!user.equals(t_rel.getStartNode().getSingleRelationship(USER_WRITTEN_A_REVIEW, Direction.INCOMING).getStartNode()))
-							list.addLast(t_rel);
+							list.addLast(t_rel.getStartNode().getSingleRelationship(USER_WRITTEN_A_REVIEW, Direction.INCOMING));
 					}
 					Collections.sort(list, TimeCreatedComparatorForRelationships);
 					if(list.size() > 0)
@@ -7768,7 +7771,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Relationship t_rel = itr.next();
 						if(!user.equals(t_rel.getStartNode().getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING).getStartNode()))
-							list.addLast(t_rel);
+							list.addLast(t_rel.getStartNode().getSingleRelationship(USER_WRITTEN_A_COMMENT, Direction.INCOMING));
 					}
 					Collections.sort(list, TimeCreatedComparatorForRelationships);
 					if(list.size() > 0)
