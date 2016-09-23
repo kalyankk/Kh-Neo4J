@@ -3269,9 +3269,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		
 		if(feedType.equalsIgnoreCase("R"))
 		{
-			if(prev_cnt == 0)
+			/*if(prev_cnt == 0)
 				return get_recommended(filter, prev_cnt, count, s_user_id);
 			else return get_recomended_by_series(filter, prev_cnt - 1, count, s_user_id);
+			*/
+			return get_for_you_feed(filter, prev_cnt, count, s_user_id);
 		}
 		else if(tileType.equalsIgnoreCase("A"))
 			return get_authors(feedType, filter, prev_cnt, count, s_user_id);
@@ -3284,6 +3286,175 @@ public class Kahaniya implements KahaniyaService.Iface{
 		else if(tileType.equalsIgnoreCase("All"))
 			return "[{\"chapters\":"+get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, "")+", \"series\":"+get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id)+", \"authors\":"+get_authors(feedType, filter, prev_cnt, count, s_user_id)+"}]";
 		else return "";
+	}
+
+	private String get_for_you_feed(String filter, int prev_cnt, int count, String user_id)
+	{
+		// no need to apply filter
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);			
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+
+			if(user_node == null)
+				throw new KahaniyaCustomException("No user exists with given id : "+user_id);
+
+			Iterator<Relationship> genres_itr = user_node.getRelationships(USER_INTERESTED_GENRE).iterator();					
+			Iterator<Relationship> lang_itr = user_node.getRelationships(USER_INTERESTED_LANGUAGE).iterator();					
+			
+			LinkedList<Node> genres = new LinkedList<Node>();
+			LinkedList<Node> langs = new LinkedList<Node>();
+			
+			LinkedList<Node> lang_genres = new LinkedList<Node>();
+
+			while(genres_itr.hasNext())
+			{
+				genres.addLast(genres_itr.next().getEndNode());
+			}
+			while(lang_itr.hasNext())
+			{
+				langs.addLast(lang_itr.next().getEndNode());
+			}
+						
+			for(Node gen : genres)
+			{
+				for(Node lang : langs)
+				{
+					Node n = genre_lang_index.get(GENRE_LANG_NAME, gen.getProperty(GENRE_NAME).toString() + " " + lang.getProperty(LANG_NAME).toString()).getSingle();
+					if(n != null)
+					{
+						lang_genres.addLast(n);
+					}
+				}
+			}
+
+			LinkedList<Node> chapterList = new LinkedList();
+			
+			// chapters written by following authors
+			Iterator<Relationship> authors = user_node.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+			while(authors.hasNext())
+			{
+				Node author = authors.next().getEndNode();
+				Iterator<Relationship> startedSeries = author.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+				while(startedSeries.hasNext())
+				{
+					Node series = startedSeries.next().getEndNode();
+					Iterator<Relationship> chaptersFromSeries = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+					while(chaptersFromSeries.hasNext())
+					{
+						//chapter should be from user interested lang
+						Node chapter = chaptersFromSeries.next().getStartNode();
+						if(langs.contains(chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode())
+								&& !isRelationExistsBetween(USER_READ_A_CHAPTER, user_node, chapter))
+							chapterList.addLast(chapter);
+					}
+				}
+			}
+			// chapters from subscribed series
+			Iterator<Relationship> subscribedSeries = user_node.getRelationships(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING).iterator();
+			while(subscribedSeries.hasNext())
+			{
+				Node series = subscribedSeries.next().getEndNode();
+				//no need to add chapters from series if user is already following the author, we added those chapters above
+				if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode()))
+					continue;
+				
+				Iterator<Relationship> chaptersFromSeries = series.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+				while(chaptersFromSeries.hasNext())
+				{
+					//chapter should be from user interested lang
+					Node chapter = chaptersFromSeries.next().getStartNode();
+					if(langs.contains(chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode())
+							&& !isRelationExistsBetween(USER_READ_A_CHAPTER, user_node, chapter))
+						chapterList.addLast(chapter);
+				}
+			}
+			
+			Collections.sort(chapterList, TimeCreatedComparatorForNodes);
+			
+			int c = 0;
+			
+			for(Node chapter : chapterList)
+			{
+				if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+					break;
+				
+				if(c < prev_cnt)
+				{
+					c++;
+					continue;
+				}
+				c++;
+				jsonArray.put(getJSONForChapter(chapter, user_node));				
+			}
+						
+			//if sufficient chapters not found, add chapters from following genres with filters
+			if(c < prev_cnt + count)
+			{
+				LinkedList<Node> allOtherChapterList = new LinkedList();
+				for(Node n : lang_genres)
+				{
+					Iterator<Relationship> seriesRelItr = n.getRelationships(SERIES_BELONGS_TO_GENRE_LANGUAGE).iterator();
+					while(seriesRelItr.hasNext())
+					{
+						Node seriesNode = seriesRelItr.next().getStartNode();
+						if(isRelationExistsBetween(USER_SUBSCRIBED_TO_SERIES, user_node, seriesNode))
+							break;
+						if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, seriesNode.getSingleRelationship(USER_STARTED_SERIES, Direction.OUTGOING).getStartNode()))
+							break;
+						Iterator<Relationship> chapterRelItr = seriesNode.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+						while(chapterRelItr.hasNext())
+						{
+							Node chapter = chapterRelItr.next().getStartNode();
+							if(!isRelationExistsBetween(USER_READ_A_CHAPTER, user_node, chapter))
+								allOtherChapterList.addLast(chapter);
+						}
+					}
+					
+				}
+				
+				Collections.sort(allOtherChapterList, TrendingComparatorForChapterNodes);
+				
+				for(Node chapter : allOtherChapterList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					jsonArray.put(getJSONForChapter(chapter, user_node));				
+				}
+
+			}
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_for_you_feed()");
+			System.out.println("Something went wrong, while returning for you chapters from get_for_you_feed  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_for_you_feed()");
+			System.out.println("Something went wrong, while returning for you chapters from get_for_you_feed  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();
 	}
 	
 	private String get_recommended(String filter, int prev_cnt, int count, String user_id)
