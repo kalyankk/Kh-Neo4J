@@ -7566,6 +7566,51 @@ public class Kahaniya implements KahaniyaService.Iface{
 					discovery_rels.addLast(list.getFirst());
 			}
 			
+			if(user.hasRelationship(USER_FOLLOW_USER, Direction.OUTGOING))
+			{
+				Iterator<Relationship> itr = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+				while(itr.hasNext())
+				{
+					Node user_following = itr.next().getEndNode();
+					Iterator<Relationship> startedSeries = user_following.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+					while(startedSeries.hasNext())
+					{
+						Relationship temp_rel = startedSeries.next();
+						Node series = temp_rel.getEndNode();
+						//prepare json only for web series
+						if(series.getProperty(SERIES_TYPE).toString().equals("2"))
+							discovery_rels.addLast(temp_rel);
+					}
+					
+					Iterator<Relationship> writtenChapters = user_following.getRelationships(USER_WRITTEN_A_CHAPTER, Direction.OUTGOING).iterator();
+					while(writtenChapters.hasNext())
+					{
+						discovery_rels.addLast(writtenChapters.next());
+					}
+					
+				}
+			}
+			
+			if(user.hasRelationship(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING))
+			{
+				Iterator<Relationship> itr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING).iterator();
+				while(itr.hasNext())
+				{
+					Node subscribedSeries = itr.next().getEndNode();
+					//It should be web series & should not follow the author
+					if(!isRelationExistsBetween(USER_FOLLOW_USER, user, subscribedSeries.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode()) 
+							&& subscribedSeries.getProperty(SERIES_TYPE).toString().equals("2"))
+					{
+						
+						Iterator<Relationship> chaptersFromSubSeries = subscribedSeries.getRelationships(CHAPTER_BELONGS_TO_SERIES, Direction.INCOMING).iterator();
+						while(chaptersFromSubSeries.hasNext())
+						{
+							discovery_rels.addLast(chaptersFromSubSeries.next());
+						}					
+					}
+				}
+			}
+
 			Iterator<Relationship> startedSeries = user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
 			while(startedSeries.hasNext())
 			{
@@ -7719,6 +7764,52 @@ public class Kahaniya implements KahaniyaService.Iface{
 				Collections.sort(list, TimeCreatedComparatorForRelationships);
 				if(list.size() > 0)
 					discovery_rels.addLast(list.getFirst());
+			}
+			
+			//Users you are following
+			if(user.hasRelationship(USER_FOLLOW_USER, Direction.OUTGOING))
+			{
+				Iterator<Relationship> itr = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+				while(itr.hasNext())
+				{
+					Node user_following = itr.next().getEndNode();
+					Iterator<Relationship> startedSeries = user_following.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
+					while(startedSeries.hasNext())
+					{
+						Relationship temp_rel = startedSeries.next();
+						Node series = temp_rel.getEndNode();
+						//prepare json only for web series
+						if(series.getProperty(SERIES_TYPE).toString().equals("2"))
+							discovery_rels.addLast(temp_rel);
+					}
+					
+					Iterator<Relationship> writtenChapters = user_following.getRelationships(USER_WRITTEN_A_CHAPTER, Direction.OUTGOING).iterator();
+					while(writtenChapters.hasNext())
+					{
+						discovery_rels.addLast(writtenChapters.next());
+					}
+					
+				}
+			}
+			
+			if(user.hasRelationship(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING))
+			{
+				Iterator<Relationship> itr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, Direction.OUTGOING).iterator();
+				while(itr.hasNext())
+				{
+					Node subscribedSeries = itr.next().getEndNode();
+					//It should be web series & should not follow the author
+					if(!isRelationExistsBetween(USER_FOLLOW_USER, user, subscribedSeries.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode()) 
+							&& subscribedSeries.getProperty(SERIES_TYPE).toString().equals("2"))
+					{
+						
+						Iterator<Relationship> chaptersFromSubSeries = subscribedSeries.getRelationships(CHAPTER_BELONGS_TO_SERIES, Direction.INCOMING).iterator();
+						while(chaptersFromSubSeries.hasNext())
+						{
+							discovery_rels.addLast(chaptersFromSubSeries.next());
+						}					
+					}
+				}
 			}
 			
 			Iterator<Relationship> startedSeries = user.getRelationships(USER_STARTED_SERIES, Direction.OUTGOING).iterator();
