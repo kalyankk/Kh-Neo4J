@@ -1813,7 +1813,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 		if(rel.isType(USER_WRITTEN_A_CHAPTER))
 		{ // this was removed from discovery
 			postJSON.put("N_Typ","C");
-			postJSON.put("N_Tag","W");
+			if(isRelationExistsBetween(USER_FOLLOW_USER, req_user, rel.getStartNode()))
+				postJSON.put("N_Tag","NCF");
+			else postJSON.put("N_Tag","NCS");
 			postJSON.put("N_Actors",actors);
 			JSONObject obj = getJSONForChapter(post, req_user);
 /*			Iterator<String> keys = obj.keys();
