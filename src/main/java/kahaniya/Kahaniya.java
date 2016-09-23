@@ -3406,6 +3406,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 							break;
 						if(isRelationExistsBetween(USER_FOLLOW_USER, user_node, seriesNode.getSingleRelationship(USER_STARTED_SERIES, Direction.OUTGOING).getStartNode()))
 							break;
+						if(user_node.equals(seriesNode.getSingleRelationship(USER_STARTED_SERIES, Direction.OUTGOING).getStartNode()))
+							break;
 						Iterator<Relationship> chapterRelItr = seriesNode.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
 						while(chapterRelItr.hasNext())
 						{
