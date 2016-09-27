@@ -8103,7 +8103,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 						Iterator<Relationship> chaptersFromSubSeries = subscribedSeries.getRelationships(CHAPTER_BELONGS_TO_SERIES, Direction.INCOMING).iterator();
 						while(chaptersFromSubSeries.hasNext())
 						{
-							discovery_rels.addLast(chaptersFromSubSeries.next());
+							discovery_rels.addLast(chaptersFromSubSeries.next().getStartNode().getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING));
 						}					
 					}
 				}
