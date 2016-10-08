@@ -6856,7 +6856,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			LinkedList<Node> followingSeriesList = new LinkedList<Node>();
 			if(user != null)
 			{
-				Iterator<Relationship> followingSeriesItr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, USER_STARTED_SERIES).iterator();
+				Iterator<Relationship> followingSeriesItr = user.getRelationships(USER_SUBSCRIBED_TO_SERIES, USER_STARTED_SERIES, USER_SKIP_SUBSCRIBED_TO_SERIES).iterator();
 				while(followingSeriesItr.hasNext())
 					followingSeriesList.addLast(followingSeriesItr.next().getEndNode());
 				
@@ -6927,7 +6927,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			while(allUsersItr.hasNext())
 			{
 				Node n = allUsersItr.next();
-				if(n.getDegree(USER_WRITTEN_A_CHAPTER) > 0 && !n.equals(user) && !isRelationExistsBetween(USER_FOLLOW_USER, user, n))
+				if(n.getDegree(USER_WRITTEN_A_CHAPTER) > 0 && !n.equals(user) && !isRelationExistsBetween(USER_FOLLOW_USER, user, n) && !isRelationExistsBetween(USER_SKIP_FOLLOW_USER, user, n))
 					authorsList.addLast(n);
 			}
 			
