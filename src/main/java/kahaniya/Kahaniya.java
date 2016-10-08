@@ -192,6 +192,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
 	public static final RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
 	public static final RelationshipType USER_STARTED_SERIES = DynamicRelationshipType.withName("USER_STARTED_SERIES");
+	
+	public static final RelationshipType USER_SKIP_FOLLOW_USER = DynamicRelationshipType.withName("USER_SKIP_FOLLOW_USER");
 
 	public static final RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
 	public static final RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
@@ -216,6 +218,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType SERIES_BELONGS_TO_CONTEST = DynamicRelationshipType.withName("SERIES_BELONGS_TO_CONTEST");	
 	public static final RelationshipType USER_STARTED_CONTEST = DynamicRelationshipType.withName("USER_STARTED_CONTEST");	
 	public static final RelationshipType USER_SUBSCRIBED_TO_CONTEST = DynamicRelationshipType.withName("USER_SUBSCRIBED_TO_CONTEST");
+	
+	public static final RelationshipType USER_SKIP_SUBSCRIBED_TO_SERIES = DynamicRelationshipType.withName("USER_SKIP_SUBSCRIBED_TO_SERIES");
 	
 	public static final RelationshipType USER_WRITTEN_A_COMMENT = DynamicRelationshipType.withName("USER_WRITTEN_A_COMMENT");
 	public static final RelationshipType COMMENT_WRITTEN_ON_CHAPTER = DynamicRelationshipType.withName("COMMENT_WRITTEN_ON_CHAPTER");
@@ -1787,7 +1791,61 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;
 	}
+	
+	@Override
+	public String skip_follow_user(String user_id_1, String user_id_2, int time)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id_1 == null || user_id_1.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id_1");
+			if(user_id_2 == null || user_id_2.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id_2");
+			
+			aquireWriteLock(tx);
+			
+			Index<Node> userIdIndex = graphDb.index().forNodes(USER_ID_INDEX);
+			Node userOne = userIdIndex.get(USER_ID, user_id_1).getSingle();
+			Node userTwo = userIdIndex.get(USER_ID, user_id_2).getSingle();
 
+			if(userOne == null)
+				throw new KahaniyaCustomException("User does not exists with given id : " + user_id_1);
+			if(userTwo == null)
+				throw new KahaniyaCustomException("User does not exists with given id : " + user_id_2);
+			
+			if(isRelationExistsBetween(USER_SKIP_FOLLOW_USER, userOne, userTwo))
+			{
+				deleteRelation(USER_SKIP_FOLLOW_USER, userOne, userTwo);
+			}			
+			else
+			{
+				createRelation(USER_SKIP_FOLLOW_USER, userOne, userTwo, time);
+			}
+
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ follow_user()");
+			System.out.println("Something went wrong, while skip a user from follow suggestion  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ follow_user()");
+			System.out.println("Something went wrong, while skip a user from follow suggesion  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+	
 	@Override
 	public String deactivate_user(String user_id) throws TException {
 		// TODO Auto-generated method stub
@@ -2851,6 +2909,58 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;
 	}
+	
+	@Override
+	public String skip_subscribe_series(String series_id, String user_id, int time)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
+			if(series_node == null)
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(isRelationExistsBetween(USER_SKIP_SUBSCRIBED_TO_SERIES, user_node, series_node))
+				deleteRelation(USER_SKIP_SUBSCRIBED_TO_SERIES, user_node, series_node);
+			else
+				createRelation(USER_SKIP_SUBSCRIBED_TO_SERIES, user_node, series_node, time);
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ subscribe_series()");
+			System.out.println("Something went wrong, while skip subscribing series from series subscribe suggestions :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ subscribe_series()");
+			System.out.println("Something went wrong, while skip subscribing series from series subscribe suggestions  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
 	
 	@Override
 	public String subscribe_contest(String contest_id, String user_id, int time) 
