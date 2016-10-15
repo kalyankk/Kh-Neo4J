@@ -76,6 +76,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 	//lock related keys
 	public static final String LockName = "lock_node";
+	
+	//series status index related keys
+	public static final String SERIES_STATUS = "series_status";
+	
 	//writing style node related keys
 	public static final String WRITING_STYLE_NAME = "writing_style_name";
 
@@ -173,6 +177,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 	
 	public static final String NODE_TYPE = "node_type";
 	public static final String LOCK_NODE = "lock_node";
+	public static final String SERIES_STATUS_BASE_NODE = "series_status_base_node"; //search on key
+	public static final String SERIES_STARTED_BASE_NODE = "series_started_base_node"; // search value to get started node
+	public static final String SERIES_ONGOING_BASE_NODE = "series_ongoing_base_node"; // search value to get completed node
+	public static final String SERIES_COMPLETED_BASE_NODE = "series_completed_base_node"; // search value to get completed node
 	public static final String USER_NODE = "user_node";
 	public static final String GENRE_NODE = "genre_node";
 	public static final String LANG_NODE = "language_node";
@@ -198,6 +206,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType SERIES_BELONGS_TO_GENRE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE");
 	public static final RelationshipType SERIES_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_LANGUAGE");
 	public static final RelationshipType SERIES_BELONGS_TO_GENRE_LANGUAGE = DynamicRelationshipType.withName("SERIES_BELONGS_TO_GENRE_LANGUAGE");
+	public static final RelationshipType SERIES_STARTED_REL_TO_BASE_NODE = DynamicRelationshipType.withName("SERIES_STARTED_REL_TO_BASE_NODE");
+	public static final RelationshipType SERIES_ONGOING_REL_TO_BASE_NODE = DynamicRelationshipType.withName("SERIES_ONGOING_REL_TO_BASE_NODE");
+	public static final RelationshipType SERIES_COMPLETED_REL_TO_BASE_NODE = DynamicRelationshipType.withName("SERIES_COMPLETED_REL_TO_BASE_NODE");
 	public static final RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
 	
 	public static final RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
@@ -682,18 +693,39 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> lockNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
 				
 			//create lock node
-				if(lockNodeIndex.get(LockName, LockName).getSingle() == null){ //create node if and only if there no locknode with given name
-					Node lockNode = graphDb.createNode();  //creating a node
-					lockNode.setProperty( LockName, LockName ); //attach name to lock node
-					lockNode.setProperty( NODE_TYPE, LOCK_NODE ); //attach nod type to lock node
-					lockNodeIndex.add( lockNode, LockName, LockName ); //attach node to lock node index to retrieve later
-				}
-				else{
-					Node lockNode = lockNodeIndex.get(LockName, LockName).getSingle();
-					if(!lockNode.hasProperty(NODE_TYPE))
-						lockNode.setProperty(NODE_TYPE, LOCK_NODE);
-				}
-			
+			if(lockNodeIndex.get(LockName, LockName).getSingle() == null){ //create node if and only if there no locknode with given name
+				Node lockNode = graphDb.createNode();  //creating a node
+				lockNode.setProperty( LockName, LockName ); //attach name to lock node
+				lockNode.setProperty( NODE_TYPE, LOCK_NODE ); //attach nod type to lock node
+				lockNodeIndex.add( lockNode, LockName, LockName ); //attach node to lock node index to retrieve later
+			}
+			else{
+				Node lockNode = lockNodeIndex.get(LockName, LockName).getSingle();
+				if(!lockNode.hasProperty(NODE_TYPE))
+					lockNode.setProperty(NODE_TYPE, LOCK_NODE);
+			}
+
+			//create series started node
+			if(lockNodeIndex.get(SERIES_STATUS, SERIES_STARTED_BASE_NODE).getSingle() == null){ //create node if and only if there no locknode with given name
+				Node series_started_node = graphDb.createNode();  //creating a node
+				series_started_node.setProperty( SERIES_STATUS, SERIES_STARTED_BASE_NODE ); //attach name to lock node
+				series_started_node.setProperty( NODE_TYPE, SERIES_STATUS_BASE_NODE ); //attach nod type to lock node
+				lockNodeIndex.add( series_started_node, SERIES_STATUS,  SERIES_STARTED_BASE_NODE ); //attach node to lock node index to retrieve later
+			}
+			//create series started node
+			if(lockNodeIndex.get(SERIES_STATUS, SERIES_ONGOING_BASE_NODE).getSingle() == null){ //create node if and only if there no locknode with given name
+				Node series_ongoing_node = graphDb.createNode();  //creating a node
+				series_ongoing_node.setProperty( SERIES_STATUS, SERIES_ONGOING_BASE_NODE ); //attach name to lock node
+				series_ongoing_node.setProperty( NODE_TYPE, SERIES_STATUS_BASE_NODE ); //attach nod type to lock node
+				lockNodeIndex.add( series_ongoing_node, SERIES_STATUS,  SERIES_ONGOING_BASE_NODE ); //attach node to lock node index to retrieve later
+			}
+			//create series started node
+			if(lockNodeIndex.get(SERIES_STATUS, SERIES_COMPLETED_BASE_NODE).getSingle() == null){ //create node if and only if there no locknode with given name
+				Node series_completed_node = graphDb.createNode();  //creating a node
+				series_completed_node.setProperty( SERIES_STATUS, SERIES_COMPLETED_BASE_NODE ); //attach name to lock node
+				series_completed_node.setProperty( NODE_TYPE, SERIES_STATUS_BASE_NODE ); //attach nod type to lock node
+				lockNodeIndex.add( series_completed_node, SERIES_STATUS,  SERIES_COMPLETED_BASE_NODE ); //attach node to lock node index to retrieve later
+			}
 			tx.success();
 		}
 		catch(Exception e){
@@ -716,6 +748,41 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle();
 	}
 	
+	public void add_default_status_to_series() 
+	{
+		try (Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> seriesNodeIndex = graphDb.index().forNodes( SERIES_ID_INDEX );
+			Index<Node> seriesStatusBaseNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
+
+			Node seriesOngoingNode = seriesStatusBaseNodeIndex.get(SERIES_STATUS, SERIES_ONGOING_BASE_NODE).getSingle();
+			Node seriesCompletedNode = seriesStatusBaseNodeIndex.get(SERIES_STATUS, SERIES_COMPLETED_BASE_NODE).getSingle();
+			
+			ResourceIterator<Node> seriesItr = seriesNodeIndex.query(SERIES_ID, "*").iterator();
+			
+			while(seriesItr.hasNext())
+			{
+				Node series = seriesItr.next();
+
+				if(!series.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE) && !series.hasRelationship(SERIES_ONGOING_REL_TO_BASE_NODE) && !series.hasRelationship(SERIES_COMPLETED_REL_TO_BASE_NODE))
+				{
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						createRelation(SERIES_ONGOING_REL_TO_BASE_NODE, series, seriesOngoingNode);
+					else 
+						createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series, seriesCompletedNode);
+				}
+
+			}
+			
+			tx.success();
+		}
+		catch(Exception e){
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ add_default_status_to_series()");
+			System.out.println("Failed to add default status to stories : " + e.getMessage());}
+		finally{}
+	}
+
 /*	public void add_additional_properties() 
 	{
 		try (Transaction tx = graphDb.beginTx())
@@ -2192,6 +2259,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
+			Index<Node> series_status_base_node_index = graphDb.index().forNodes(LOCK_INDEX);
+			Node seriesStartedBaseNode = series_status_base_node_index.get(SERIES_STATUS, SERIES_STARTED_BASE_NODE).getSingle();
+			Node seriesCompletedBaseNode = series_status_base_node_index.get(SERIES_STATUS, SERIES_COMPLETED_BASE_NODE).getSingle();
+			if(seriesStartedBaseNode == null)
+				throw new KahaniyaCustomException("Unable to find SERIES_STARTED_BASE_NODE");
+			if(seriesCompletedBaseNode == null)
+				throw new KahaniyaCustomException("Unable to find SERIES_COMPLETED_BASE_NODE");
+			
 			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
 			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
 			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
@@ -2253,6 +2328,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			createRelation(SERIES_BELONGS_TO_GENRE, series_node, genreNode);
 			createRelation(SERIES_BELONGS_TO_LANGUAGE, series_node, langNode);
 			createRelation(SERIES_BELONGS_TO_GENRE_LANGUAGE, series_node, genre_lang_node);
+			
+			//create relationship with series_started_base_node
+			if(series_type == 2) // for short story, it should be completed
+				createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series_node, seriesCompletedBaseNode);
+			else
+				createRelation(SERIES_STARTED_REL_TO_BASE_NODE, series_node, seriesStartedBaseNode);
 			
 			//Indexing newly created series node
 			seriesId_index.add(series_node, SERIES_ID, series_id);
@@ -2674,6 +2755,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Index<Node> chapterTitleId_index = graphDb.index().forNodes(CHAPTER_TITLE_ID_INDEX);
 			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
 			
+			Index<Node> series_status_base_node_index = graphDb.index().forNodes(LOCK_INDEX);
+			Node seriesOngoingBaseNode = series_status_base_node_index.get(SERIES_STATUS, SERIES_ONGOING_BASE_NODE).getSingle();
+			if(seriesOngoingBaseNode == null)
+				throw new KahaniyaCustomException("Unable to find SERIES_ONGOING_BASE_NODE");
+			
+
+			
 			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
 			if(userNode == null)
 				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
@@ -2710,6 +2798,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 					throw new KahaniyaCustomException("Contest not found for the given contest id:"+contestId);
 				chapter_node.getSingleRelationship(CHAPTER_BELONGS_TO_CONTEST, Direction.OUTGOING).setProperty(CHAPTER_CONTEST_STATUS, 0);
 
+			}
+			
+			//update relation with base series if series is in started status
+			//no need to update if series is ongoing / completed
+			if(seriesNode.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE))
+			{
+				seriesNode.getSingleRelationship(SERIES_STARTED_REL_TO_BASE_NODE, Direction.OUTGOING).delete();
+				createRelation(SERIES_ONGOING_REL_TO_BASE_NODE, seriesNode, seriesOngoingBaseNode);
 			}
 			
 			//Indexing newly created series node
@@ -6262,6 +6358,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Type", series.getProperty(SERIES_TYPE).toString());
 		obj.put("P_Num_Chapters", series.getDegree(CHAPTER_BELONGS_TO_SERIES));
 		obj.put("P_Num_Subscribers", series.getDegree(USER_SUBSCRIBED_TO_SERIES));
+		
+		if(series.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE))
+			obj.put("P_Going_Sts", 0);
+		else if(series.hasRelationship(SERIES_ONGOING_REL_TO_BASE_NODE))
+			obj.put("P_Going_Sts", 1);
+		else if(series.hasRelationship(SERIES_COMPLETED_REL_TO_BASE_NODE))
+			obj.put("P_Going_Sts", 2);
+		
 		if(user == null)
 			obj.put("Is_Subscribe",0);
 		else
@@ -8663,4 +8767,58 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();	
 
 	}
+	
+	@Override
+	public String update_series_going_status(String series_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(series_id == null || series_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param series_id");
+			
+			aquireWriteLock(tx);
+			Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+			Index<Node> seriesStatusBaseIndex = graphDb.index().forNodes(LOCK_INDEX);
+			
+			Node seriesCompletedBaseNode = seriesStatusBaseIndex.get(SERIES_STATUS, SERIES_COMPLETED_BASE_NODE).getSingle();
+			if(seriesCompletedBaseNode == null)
+				throw new KahaniyaCustomException("Unable to find SERIES_COMPLETED_BASE_NODE");
+			Node series_node = seriesId_index.get(SERIES_ID, series_id).getSingle();
+			if(series_node == null)
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+series_id);
+			
+			if(series_node.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE))
+			{
+				series_node.getSingleRelationship(SERIES_STARTED_REL_TO_BASE_NODE, Direction.OUTGOING).delete();
+				createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series_node, seriesCompletedBaseNode);
+			}
+			else if(series_node.hasRelationship(SERIES_ONGOING_REL_TO_BASE_NODE))
+			{
+				series_node.getSingleRelationship(SERIES_ONGOING_REL_TO_BASE_NODE, Direction.OUTGOING).delete();
+				createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series_node, seriesCompletedBaseNode);
+			}
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_series_going_status()");
+			System.out.println("Something went wrong, while changing series status to series_completed update_series_going_status  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_series_going_status()");
+			System.out.println("Something went wrong, while changing series status to series_completed update_series_going_status  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
 }
