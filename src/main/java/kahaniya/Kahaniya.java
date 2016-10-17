@@ -766,9 +766,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 				if(!series.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE) && !series.hasRelationship(SERIES_ONGOING_REL_TO_BASE_NODE) && !series.hasRelationship(SERIES_COMPLETED_REL_TO_BASE_NODE))
 				{
-					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+					if(series.getProperty(SERIES_TYPE).toString().equals("2")) // for web series
 						createRelation(SERIES_ONGOING_REL_TO_BASE_NODE, series, seriesOngoingNode);
-					else 
+					else //for short series
 						createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series, seriesCompletedNode);
 				}
 
