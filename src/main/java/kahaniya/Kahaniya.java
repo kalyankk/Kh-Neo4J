@@ -2330,10 +2330,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 			createRelation(SERIES_BELONGS_TO_GENRE_LANGUAGE, series_node, genre_lang_node);
 			
 			//create relationship with series_started_base_node
-			if(series_type == 2) // for short story, it should be completed
-				createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series_node, seriesCompletedBaseNode);
-			else
+			if(series_type == 2) // for web series, it should be in started status, otherwise completed
 				createRelation(SERIES_STARTED_REL_TO_BASE_NODE, series_node, seriesStartedBaseNode);
+			else
+				createRelation(SERIES_COMPLETED_REL_TO_BASE_NODE, series_node, seriesCompletedBaseNode);
 			
 			//Indexing newly created series node
 			seriesId_index.add(series_node, SERIES_ID, series_id);
