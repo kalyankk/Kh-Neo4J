@@ -6360,11 +6360,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Num_Subscribers", series.getDegree(USER_SUBSCRIBED_TO_SERIES));
 		
 		if(series.hasRelationship(SERIES_STARTED_REL_TO_BASE_NODE))
-			obj.put("P_Going_Sts", 0);
+			obj.put("P_Og_Sts", 0);
 		else if(series.hasRelationship(SERIES_ONGOING_REL_TO_BASE_NODE))
-			obj.put("P_Going_Sts", 1);
+			obj.put("P_Og_Sts", 1);
 		else if(series.hasRelationship(SERIES_COMPLETED_REL_TO_BASE_NODE))
-			obj.put("P_Going_Sts", 2);
+			obj.put("P_Og_Sts", 2);
 		
 		if(user == null)
 			obj.put("Is_Subscribe",0);
