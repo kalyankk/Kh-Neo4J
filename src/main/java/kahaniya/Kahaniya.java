@@ -7769,9 +7769,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				Node chapter_author = s_chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
 				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("P_ID", s_chapter.getProperty(CHAPTER_ID).toString());
 				jsonObject.put("P_Title_ID", s_chapter.getProperty(CHAPTER_TITLE_ID).toString());
 				jsonObject.put("P_Title", s_chapter.getProperty(CHAPTER_TITLE).toString());
+				jsonObject.put("Series_id", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_ID));
 				jsonObject.put("Series_Tid", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID));
+				jsonObject.put("Series_type", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TYPE));
 				jsonObject.put("P_Author_FullName", chapter_author.getProperty(FULL_NAME));
 				jsonObject.put("P_Author", chapter_author.getProperty(USER_ID));
 				jsonObject.put("Series_Title", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE));
