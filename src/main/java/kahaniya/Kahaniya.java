@@ -367,6 +367,30 @@ public class Kahaniya implements KahaniyaService.Iface{
 		    }
 		}; 
 
+	private static Comparator<Node> LastChapterAddedTimeComparatorForSeries = new Comparator<Node>() {
+		public int compare(Node n1, Node n2) {
+		   int v1 = 0;
+		   int v2 = 0;
+		   Iterator<Relationship> seriesChaptersRel1 = n1.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		   while(seriesChaptersRel1.hasNext())
+		   {
+			   Relationship rel = seriesChaptersRel1.next();
+			   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) > v1)
+						   v1 = Integer.parseInt(rel.getProperty(TIME_CREATED).toString());
+		   }
+		   Iterator<Relationship> seriesChaptersRel2 = n2.getRelationships(CHAPTER_BELONGS_TO_SERIES).iterator();
+		   while(seriesChaptersRel2.hasNext())
+		   {
+			   Relationship rel = seriesChaptersRel2.next();
+			   if(Integer.parseInt(rel.getProperty(TIME_CREATED).toString()) > v2)
+						   v2 = Integer.parseInt(rel.getProperty(TIME_CREATED).toString());
+		   }
+		   //ascending order
+		   //return v1-v2;
+		   //descending order
+		   return v2-v1;
+	    }};
+
 	private static Comparator<Node> TrendingComparatorForAuthorNodes = new Comparator<Node>() {
 		public int compare(Node n1, Node n2) {
 		   int v1 = 0;
@@ -4287,6 +4311,230 @@ public class Kahaniya implements KahaniyaService.Iface{
 				}
 			}
 			
+
+			else if(feedType.equalsIgnoreCase("OG")) // for ONGOING series
+			{
+				
+				Index<Node> seriesStatusBaseNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
+				Node seriesOngoingNode = seriesStatusBaseNodeIndex.get(SERIES_STATUS, SERIES_ONGOING_BASE_NODE).getSingle();
+				
+				Iterator<Relationship> ongoignSeriesRelsItr = seriesOngoingNode.getRelationships(SERIES_ONGOING_REL_TO_BASE_NODE).iterator();
+				LinkedList<Node> ongoignSeriesList = new LinkedList<Node>();
+				while(ongoignSeriesRelsItr.hasNext())
+					ongoignSeriesList.addLast(ongoignSeriesRelsItr.next().getStartNode());
+				Collections.sort(ongoignSeriesList, LastChapterAddedTimeComparatorForSeries);				
+				for(Node series : ongoignSeriesList)
+				{				
+					
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
+					
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						if(filterJSON.has("genre") && filterJSON.has("language"))
+						{
+							for(String genre: filterJSON.getString("genre").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("language").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
+											c++;
+											outputSeriesNode.addLast(series);			
+											
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genre"))
+						{
+							for(String genre: filterJSON.getString("genre").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+								}
+							}
+						}
+						else if(filterJSON.has("language"))
+						{
+							for(String lang: filterJSON.getString("language").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+									
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputSeriesNode.addLast(series);			
+							
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);			
+						
+					}
+					
+				}
+			}
+			else if(feedType.equalsIgnoreCase("CM")) // for COMPLETED series
+			{
+				
+				Index<Node> seriesStatusBaseNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
+				Node seriesCompletedNode = seriesStatusBaseNodeIndex.get(SERIES_STATUS, SERIES_COMPLETED_BASE_NODE).getSingle();
+				
+				Iterator<Relationship> completedSeriesRelsItr = seriesCompletedNode.getRelationships(SERIES_COMPLETED_REL_TO_BASE_NODE).iterator();
+				LinkedList<Relationship> completedSeriesRelList = new LinkedList<Relationship>();
+				while(completedSeriesRelsItr.hasNext())
+					completedSeriesRelList.addLast(completedSeriesRelsItr.next());
+				Collections.sort(completedSeriesRelList, TimeCreatedComparatorForRelationships);				
+				for(Relationship rel : completedSeriesRelList)
+				{				
+					
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					Node series = rel.getStartNode();
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
+					
+					Node seriesGenreNode = series.getSingleRelationship(SERIES_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					Node seriesLangNode = series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{
+						JSONObject filterJSON = new JSONObject(filter);
+						if(filterJSON.has("genre") && filterJSON.has("language"))
+						{
+							for(String genre: filterJSON.getString("genre").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									for(String lang: filterJSON.getString("language").split(","))
+									{
+										Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+										if(langNode != null && seriesLangNode.equals(langNode))
+										{
+											if(c < prev_cnt)
+											{
+												c++;
+												continue;
+											}
+											c++;
+											outputSeriesNode.addLast(series);			
+											
+										}
+									}
+								}
+							}
+						}
+						else if(filterJSON.has("genre"))
+						{
+							for(String genre: filterJSON.getString("genre").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+								if(genreNode != null && seriesGenreNode.equals(genreNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+								}
+							}
+						}
+						else if(filterJSON.has("language"))
+						{
+							for(String lang: filterJSON.getString("language").split(","))
+							{
+								Node langNode = lang_index.get(LANG_NAME, lang.toLowerCase()).getSingle();
+								if(langNode != null && seriesLangNode.equals(langNode))
+								{
+									if(c < prev_cnt)
+									{
+										c++;
+										continue;
+									}
+									c++;
+									outputSeriesNode.addLast(series);			
+									
+								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputSeriesNode.addLast(series);			
+							
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputSeriesNode.addLast(series);			
+						
+					}
+					
+				}
+			}
+
 			else if(feedType.equalsIgnoreCase("G"))
 			{
 				Node genreNode = genre_index.get(GENRE_NAME, genre_name.toLowerCase()).getSingle();
