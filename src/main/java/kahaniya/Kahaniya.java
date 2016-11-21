@@ -93,6 +93,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_TITLE_ID = "chapter_title_id";
 	public static final String CHAPTER_FEAT_IMAGE = "chapter_feat_image";
 	public static final String CHAPTER_FREE_OR_PAID = "chapter_free_or_paid";
+	public static final String CHAPTER_WORDS_COUNT = "chapter_words_count";
 	public static final String TOTAL_CHAPTER_VIEWS = "chapter_total_view_count";
 	public static final String TOTAL_CHAPTER_READS = "chapter_total_read_count";
 	public static final String CHAPTER_LAST_VIEWED_TIME = "chapter_last_viewed_time";
@@ -506,14 +507,14 @@ public class Kahaniya implements KahaniyaService.Iface{
 	}
 
 	private Node Chapter(String chapter_id, String title_id, String title,
-			String feat_image, int free_or_paid, int time_created) {
+			String feat_image, int free_or_paid, int time_created, int w_count) {
 		Node node = graphDb.createNode();
 		node.setProperty(CHAPTER_ID, chapter_id);
 		node.setProperty(CHAPTER_TITLE_ID, title_id);
 		node.setProperty(CHAPTER_TITLE, title);
 		node.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
 		node.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
-		node.setProperty(TIME_CREATED, time_created);
+		node.setProperty(CHAPTER_WORDS_COUNT, w_count);
 		node.setProperty(NODE_TYPE, CHAPTER_NODE);
 		node.setProperty(TOTAL_CHAPTER_VIEWS, 0);
 		node.setProperty(TOTAL_CHAPTER_READS, 0);
@@ -772,7 +773,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle();
 	}
 	
-	public void add_default_status_to_series() 
+/*	public void add_default_status_to_series() 
 	{
 		try (Transaction tx = graphDb.beginTx())
 		{
@@ -806,7 +807,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			System.out.println("Failed to add default status to stories : " + e.getMessage());}
 		finally{}
 	}
-
+*/
 /*	public void add_additional_properties() 
 	{
 		try (Transaction tx = graphDb.beginTx())
@@ -914,6 +915,34 @@ public class Kahaniya implements KahaniyaService.Iface{
 		finally{}
 	}
 */	
+	// Set default value to chapter_words_count property on chapters 
+	public void add_chapter_words_count_property() 
+	{
+		try (Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> chapterNodeIndex = graphDb.index().forNodes( CHAPTER_ID_INDEX );
+			
+			ResourceIterator<Node> chapterItr = chapterNodeIndex.query(CHAPTER_ID, "*").iterator();
+			
+			while(chapterItr.hasNext())
+			{
+				Node chapter = chapterItr.next();
+
+				if(!chapter.hasProperty(CHAPTER_WORDS_COUNT))
+				{
+					chapter.setProperty(CHAPTER_WORDS_COUNT, 0);
+				}
+				
+			}
+			tx.success();
+		}
+		catch(Exception e){
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ add_chapter_words_count_property()");
+			System.out.println("Failed to add chapter words count property : " + e.getMessage());}
+		finally{}
+	}
+	
 	private Lock aquireWriteLock(Transaction tx) throws Exception {
 		Index<Node> lockNodeIndex = graphDb.index().forNodes( LOCK_INDEX );
 		Node tobeLockedNode = lockNodeIndex.get( LockName, LockName ).getSingle();
@@ -2655,19 +2684,19 @@ public class Kahaniya implements KahaniyaService.Iface{
 	@Override
 	public String create_or_edit_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id, String title,
-			String feat_image, int time_created, int free_or_paid, int is_edit, String contestId)
+			String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count)
 			throws TException {
 		if(is_edit == 0)
-			return create_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, contestId);
+			return create_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, contestId, w_count);
 		else if(is_edit == 1)
-			return edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, contestId);
+			return edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, free_or_paid, time_created, contestId, w_count);
 		else return "false";		
 	}
 	
 	private String edit_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id,
 			String title, String feat_image, int free_or_paid,
-			int time_created, String contestId) {
+			int time_created, String contestId, int w_count) {
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -2726,6 +2755,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			chapterNode.setProperty(CHAPTER_TITLE, title);
 			chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
 			chapterNode.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
+			chapterNode.setProperty(CHAPTER_WORDS_COUNT, w_count);
 			
 			res = "true";
 			tx.success();
@@ -2753,7 +2783,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	private String create_chapter(String chapter_id, String series_id,
 			String series_type, String user_id, String title_id,
 			String title, String feat_image, int free_or_paid, 
-			int time_created, String contestId) {
+			int time_created, String contestId, int w_count) {
 		
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -2799,7 +2829,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
 				throw new KahaniyaCustomException("Chapter already exists with given title id : "+title_id);
 			
-			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created);  // Creating a new chapter node
+			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created, w_count);  // Creating a new chapter node
 			if(chapter_node == null)
 				throw new KahaniyaCustomException("Something went wrong, while creating chapter ");
 
@@ -2859,6 +2889,49 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;
 	}
+	// Update chapter Words count value
+	@Override
+	public String update_chapter_words_count(String chapter_id, int w_count) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(chapter_id == null || chapter_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param chapter_id");
+			if(w_count <= 0)
+				throw new KahaniyaCustomException("Valid words count is greater than 0, receieved "+w_count+" for the param status ");
+
+			aquireWriteLock(tx);
+			Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+						
+			Node chapter_node = chapterId_index.get(CHAPTER_ID, chapter_id).getSingle();
+			if(chapter_node == null)
+				throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+chapter_id);
+			
+			chapter_node.setProperty(CHAPTER_WORDS_COUNT, w_count);
+								
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_chapter_contest_status()");
+			System.out.println("Something went wrong, while updating chapter_words_count  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ update_chapter_contest_status()");
+			System.out.println("Something went wrong, while updating chapter_words_count  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
 
 	@Override
 	public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws TException {
@@ -6434,6 +6507,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		obj.put("P_Author_Status",chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
 		obj.put("P_Title_ID",chapter.getProperty(CHAPTER_TITLE_ID).toString());
 		obj.put("P_Id",chapter.getProperty(CHAPTER_ID).toString());
+		obj.put("P_Wc",chapter.getProperty(CHAPTER_WORDS_COUNT).toString());
 		
 		Node series = chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
 		
@@ -8020,12 +8094,17 @@ public class Kahaniya implements KahaniyaService.Iface{
 				jsonObject.put("P_ID", s_chapter.getProperty(CHAPTER_ID).toString());
 				jsonObject.put("P_Title_ID", s_chapter.getProperty(CHAPTER_TITLE_ID).toString());
 				jsonObject.put("P_Title", s_chapter.getProperty(CHAPTER_TITLE).toString());
-				jsonObject.put("Series_id", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_ID));
-				jsonObject.put("Series_Tid", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID));
-				jsonObject.put("Series_type", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TYPE));
 				jsonObject.put("P_Author_FullName", chapter_author.getProperty(FULL_NAME));
 				jsonObject.put("P_Author", chapter_author.getProperty(USER_ID));
-				jsonObject.put("Series_Title", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE));
+				
+				
+				JSONObject seriesJSON = new JSONObject();
+				seriesJSON.put("Series_Id", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_ID));
+				seriesJSON.put("Series_Tid", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID));
+				seriesJSON.put("Series_Typ", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TYPE));
+				seriesJSON.put("Series_Ttl", s_chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE));
+				
+				jsonObject.put("Series_Info", seriesJSON);
 				jsonArray.put(jsonObject);
 			}
 			

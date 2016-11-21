@@ -75,7 +75,7 @@ public class KahaniyaService {
 
     public String create_or_edit_review(String series_id, String review_id, String data, String user_id, int time_created, int is_edit) throws org.apache.thrift.TException;
 
-    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException;
+    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count) throws org.apache.thrift.TException;
 
     public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws org.apache.thrift.TException;
 
@@ -141,6 +141,8 @@ public class KahaniyaService {
 
     public String update_series_going_status(String series_id) throws org.apache.thrift.TException;
 
+    public String update_chapter_words_count(String chapter_id, int w_count) throws org.apache.thrift.TException;
+
   }
 
   public interface AsyncIface {
@@ -189,7 +191,7 @@ public class KahaniyaService {
 
     public void create_or_edit_review(String series_id, String review_id, String data, String user_id, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_review_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException;
+    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException;
 
     public void update_chapter_contest_status(String chapter_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_contest_status_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -254,6 +256,8 @@ public class KahaniyaService {
     public void get_genre_followers(String genre_name, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_genre_followers_call> resultHandler) throws org.apache.thrift.TException;
 
     public void update_series_going_status(String series_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_series_going_status_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void update_chapter_words_count(String chapter_id, int w_count, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_words_count_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -829,13 +833,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "create_or_edit_review failed: unknown result");
     }
 
-    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException
+    public String create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count) throws org.apache.thrift.TException
     {
-      send_create_or_edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId);
+      send_create_or_edit_chapter(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId, w_count);
       return recv_create_or_edit_chapter();
     }
 
-    public void send_create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId) throws org.apache.thrift.TException
+    public void send_create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count) throws org.apache.thrift.TException
     {
       create_or_edit_chapter_args args = new create_or_edit_chapter_args();
       args.setChapter_id(chapter_id);
@@ -849,6 +853,7 @@ public class KahaniyaService {
       args.setFree_or_paid(free_or_paid);
       args.setIs_edit(is_edit);
       args.setContestId(contestId);
+      args.setW_count(w_count);
       sendBase("create_or_edit_chapter", args);
     }
 
@@ -1682,6 +1687,30 @@ public class KahaniyaService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_series_going_status failed: unknown result");
+    }
+
+    public String update_chapter_words_count(String chapter_id, int w_count) throws org.apache.thrift.TException
+    {
+      send_update_chapter_words_count(chapter_id, w_count);
+      return recv_update_chapter_words_count();
+    }
+
+    public void send_update_chapter_words_count(String chapter_id, int w_count) throws org.apache.thrift.TException
+    {
+      update_chapter_words_count_args args = new update_chapter_words_count_args();
+      args.setChapter_id(chapter_id);
+      args.setW_count(w_count);
+      sendBase("update_chapter_words_count", args);
+    }
+
+    public String recv_update_chapter_words_count() throws org.apache.thrift.TException
+    {
+      update_chapter_words_count_result result = new update_chapter_words_count_result();
+      receiveBase(result, "update_chapter_words_count");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_chapter_words_count failed: unknown result");
     }
 
   }
@@ -2544,9 +2573,9 @@ public class KahaniyaService {
       }
     }
 
-    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException {
+    public void create_or_edit_chapter(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      create_or_edit_chapter_call method_call = new create_or_edit_chapter_call(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId, resultHandler, this, ___protocolFactory, ___transport);
+      create_or_edit_chapter_call method_call = new create_or_edit_chapter_call(chapter_id, series_id, series_type, user_id, title_id, title, feat_image, time_created, free_or_paid, is_edit, contestId, w_count, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -2563,7 +2592,8 @@ public class KahaniyaService {
       private int free_or_paid;
       private int is_edit;
       private String contestId;
-      public create_or_edit_chapter_call(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private int w_count;
+      public create_or_edit_chapter_call(String chapter_id, String series_id, String series_type, String user_id, String title_id, String title, String feat_image, int time_created, int free_or_paid, int is_edit, String contestId, int w_count, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_chapter_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.chapter_id = chapter_id;
         this.series_id = series_id;
@@ -2576,6 +2606,7 @@ public class KahaniyaService {
         this.free_or_paid = free_or_paid;
         this.is_edit = is_edit;
         this.contestId = contestId;
+        this.w_count = w_count;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -2592,6 +2623,7 @@ public class KahaniyaService {
         args.setFree_or_paid(free_or_paid);
         args.setIs_edit(is_edit);
         args.setContestId(contestId);
+        args.setW_count(w_count);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -3888,6 +3920,41 @@ public class KahaniyaService {
       }
     }
 
+    public void update_chapter_words_count(String chapter_id, int w_count, org.apache.thrift.async.AsyncMethodCallback<update_chapter_words_count_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      update_chapter_words_count_call method_call = new update_chapter_words_count_call(chapter_id, w_count, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class update_chapter_words_count_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String chapter_id;
+      private int w_count;
+      public update_chapter_words_count_call(String chapter_id, int w_count, org.apache.thrift.async.AsyncMethodCallback<update_chapter_words_count_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.chapter_id = chapter_id;
+        this.w_count = w_count;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("update_chapter_words_count", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        update_chapter_words_count_args args = new update_chapter_words_count_args();
+        args.setChapter_id(chapter_id);
+        args.setW_count(w_count);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_update_chapter_words_count();
+      }
+    }
+
   }
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
@@ -3956,6 +4023,7 @@ public class KahaniyaService {
       processMap.put("discovery_feed", new discovery_feed());
       processMap.put("get_genre_followers", new get_genre_followers());
       processMap.put("update_series_going_status", new update_series_going_status());
+      processMap.put("update_chapter_words_count", new update_chapter_words_count());
       return processMap;
     }
 
@@ -4322,7 +4390,7 @@ public class KahaniyaService {
 
       protected create_or_edit_chapter_result getResult(I iface, create_or_edit_chapter_args args) throws org.apache.thrift.TException {
         create_or_edit_chapter_result result = new create_or_edit_chapter_result();
-        result.success = iface.create_or_edit_chapter(args.chapter_id, args.series_id, args.series_type, args.user_id, args.title_id, args.title, args.feat_image, args.time_created, args.free_or_paid, args.is_edit, args.contestId);
+        result.success = iface.create_or_edit_chapter(args.chapter_id, args.series_id, args.series_type, args.user_id, args.title_id, args.title, args.feat_image, args.time_created, args.free_or_paid, args.is_edit, args.contestId, args.w_count);
         return result;
       }
     }
@@ -4835,6 +4903,22 @@ public class KahaniyaService {
       protected update_series_going_status_result getResult(I iface, update_series_going_status_args args) throws org.apache.thrift.TException {
         update_series_going_status_result result = new update_series_going_status_result();
         result.success = iface.update_series_going_status(args.series_id);
+        return result;
+      }
+    }
+
+    private static class update_chapter_words_count<I extends Iface> extends org.apache.thrift.ProcessFunction<I, update_chapter_words_count_args> {
+      public update_chapter_words_count() {
+        super("update_chapter_words_count");
+      }
+
+      protected update_chapter_words_count_args getEmptyArgsInstance() {
+        return new update_chapter_words_count_args();
+      }
+
+      protected update_chapter_words_count_result getResult(I iface, update_chapter_words_count_args args) throws org.apache.thrift.TException {
+        update_chapter_words_count_result result = new update_chapter_words_count_result();
+        result.success = iface.update_chapter_words_count(args.chapter_id, args.w_count);
         return result;
       }
     }
@@ -24919,6 +25003,7 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField FREE_OR_PAID_FIELD_DESC = new org.apache.thrift.protocol.TField("free_or_paid", org.apache.thrift.protocol.TType.I32, (short)9);
     private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)10);
     private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contestId", org.apache.thrift.protocol.TType.STRING, (short)11);
+    private static final org.apache.thrift.protocol.TField W_COUNT_FIELD_DESC = new org.apache.thrift.protocol.TField("w_count", org.apache.thrift.protocol.TType.I32, (short)12);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -24937,6 +25022,7 @@ public class KahaniyaService {
     public int free_or_paid; // required
     public int is_edit; // required
     public String contestId; // required
+    public int w_count; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -24950,7 +25036,8 @@ public class KahaniyaService {
       TIME_CREATED((short)8, "time_created"),
       FREE_OR_PAID((short)9, "free_or_paid"),
       IS_EDIT((short)10, "is_edit"),
-      CONTEST_ID((short)11, "contestId");
+      CONTEST_ID((short)11, "contestId"),
+      W_COUNT((short)12, "w_count");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -24987,6 +25074,8 @@ public class KahaniyaService {
             return IS_EDIT;
           case 11: // CONTEST_ID
             return CONTEST_ID;
+          case 12: // W_COUNT
+            return W_COUNT;
           default:
             return null;
         }
@@ -25030,7 +25119,8 @@ public class KahaniyaService {
     private static final int __TIME_CREATED_ISSET_ID = 0;
     private static final int __FREE_OR_PAID_ISSET_ID = 1;
     private static final int __IS_EDIT_ISSET_ID = 2;
-    private BitSet __isset_bit_vector = new BitSet(3);
+    private static final int __W_COUNT_ISSET_ID = 3;
+    private BitSet __isset_bit_vector = new BitSet(4);
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -25056,6 +25146,8 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contestId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.W_COUNT, new org.apache.thrift.meta_data.FieldMetaData("w_count", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_chapter_args.class, metaDataMap);
     }
@@ -25074,7 +25166,8 @@ public class KahaniyaService {
       int time_created,
       int free_or_paid,
       int is_edit,
-      String contestId)
+      String contestId,
+      int w_count)
     {
       this();
       this.chapter_id = chapter_id;
@@ -25091,6 +25184,8 @@ public class KahaniyaService {
       this.is_edit = is_edit;
       setIs_editIsSet(true);
       this.contestId = contestId;
+      this.w_count = w_count;
+      setW_countIsSet(true);
     }
 
     /**
@@ -25126,6 +25221,7 @@ public class KahaniyaService {
       if (other.isSetContestId()) {
         this.contestId = other.contestId;
       }
+      this.w_count = other.w_count;
     }
 
     public create_or_edit_chapter_args deepCopy() {
@@ -25148,6 +25244,8 @@ public class KahaniyaService {
       setIs_editIsSet(false);
       this.is_edit = 0;
       this.contestId = null;
+      setW_countIsSet(false);
+      this.w_count = 0;
     }
 
     public String getChapter_id() {
@@ -25411,6 +25509,29 @@ public class KahaniyaService {
       }
     }
 
+    public int getW_count() {
+      return this.w_count;
+    }
+
+    public create_or_edit_chapter_args setW_count(int w_count) {
+      this.w_count = w_count;
+      setW_countIsSet(true);
+      return this;
+    }
+
+    public void unsetW_count() {
+      __isset_bit_vector.clear(__W_COUNT_ISSET_ID);
+    }
+
+    /** Returns true if field w_count is set (has been assigned a value) and false otherwise */
+    public boolean isSetW_count() {
+      return __isset_bit_vector.get(__W_COUNT_ISSET_ID);
+    }
+
+    public void setW_countIsSet(boolean value) {
+      __isset_bit_vector.set(__W_COUNT_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case CHAPTER_ID:
@@ -25501,6 +25622,14 @@ public class KahaniyaService {
         }
         break;
 
+      case W_COUNT:
+        if (value == null) {
+          unsetW_count();
+        } else {
+          setW_count((Integer)value);
+        }
+        break;
+
       }
     }
 
@@ -25539,6 +25668,9 @@ public class KahaniyaService {
       case CONTEST_ID:
         return getContestId();
 
+      case W_COUNT:
+        return Integer.valueOf(getW_count());
+
       }
       throw new IllegalStateException();
     }
@@ -25572,6 +25704,8 @@ public class KahaniyaService {
         return isSetIs_edit();
       case CONTEST_ID:
         return isSetContestId();
+      case W_COUNT:
+        return isSetW_count();
       }
       throw new IllegalStateException();
     }
@@ -25685,6 +25819,15 @@ public class KahaniyaService {
         if (!(this_present_contestId && that_present_contestId))
           return false;
         if (!this.contestId.equals(that.contestId))
+          return false;
+      }
+
+      boolean this_present_w_count = true;
+      boolean that_present_w_count = true;
+      if (this_present_w_count || that_present_w_count) {
+        if (!(this_present_w_count && that_present_w_count))
+          return false;
+        if (this.w_count != that.w_count)
           return false;
       }
 
@@ -25814,6 +25957,16 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetW_count()).compareTo(typedOther.isSetW_count());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetW_count()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.w_count, typedOther.w_count);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -25908,6 +26061,10 @@ public class KahaniyaService {
       } else {
         sb.append(this.contestId);
       }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("w_count:");
+      sb.append(this.w_count);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -26041,6 +26198,14 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 12: // W_COUNT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.w_count = iprot.readI32();
+                struct.setW_countIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -26105,6 +26270,9 @@ public class KahaniyaService {
           oprot.writeString(struct.contestId);
           oprot.writeFieldEnd();
         }
+        oprot.writeFieldBegin(W_COUNT_FIELD_DESC);
+        oprot.writeI32(struct.w_count);
+        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -26156,7 +26324,10 @@ public class KahaniyaService {
         if (struct.isSetContestId()) {
           optionals.set(10);
         }
-        oprot.writeBitSet(optionals, 11);
+        if (struct.isSetW_count()) {
+          optionals.set(11);
+        }
+        oprot.writeBitSet(optionals, 12);
         if (struct.isSetChapter_id()) {
           oprot.writeString(struct.chapter_id);
         }
@@ -26190,12 +26361,15 @@ public class KahaniyaService {
         if (struct.isSetContestId()) {
           oprot.writeString(struct.contestId);
         }
+        if (struct.isSetW_count()) {
+          oprot.writeI32(struct.w_count);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_chapter_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(11);
+        BitSet incoming = iprot.readBitSet(12);
         if (incoming.get(0)) {
           struct.chapter_id = iprot.readString();
           struct.setChapter_idIsSet(true);
@@ -26239,6 +26413,10 @@ public class KahaniyaService {
         if (incoming.get(10)) {
           struct.contestId = iprot.readString();
           struct.setContestIdIsSet(true);
+        }
+        if (incoming.get(11)) {
+          struct.w_count = iprot.readI32();
+          struct.setW_countIsSet(true);
         }
       }
     }
@@ -57644,6 +57822,811 @@ public class KahaniyaService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, update_series_going_status_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class update_chapter_words_count_args implements org.apache.thrift.TBase<update_chapter_words_count_args, update_chapter_words_count_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_chapter_words_count_args");
+
+    private static final org.apache.thrift.protocol.TField CHAPTER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("chapter_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField W_COUNT_FIELD_DESC = new org.apache.thrift.protocol.TField("w_count", org.apache.thrift.protocol.TType.I32, (short)2);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_chapter_words_count_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_chapter_words_count_argsTupleSchemeFactory());
+    }
+
+    public String chapter_id; // required
+    public int w_count; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      CHAPTER_ID((short)1, "chapter_id"),
+      W_COUNT((short)2, "w_count");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // CHAPTER_ID
+            return CHAPTER_ID;
+          case 2: // W_COUNT
+            return W_COUNT;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __W_COUNT_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CHAPTER_ID, new org.apache.thrift.meta_data.FieldMetaData("chapter_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.W_COUNT, new org.apache.thrift.meta_data.FieldMetaData("w_count", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_chapter_words_count_args.class, metaDataMap);
+    }
+
+    public update_chapter_words_count_args() {
+    }
+
+    public update_chapter_words_count_args(
+      String chapter_id,
+      int w_count)
+    {
+      this();
+      this.chapter_id = chapter_id;
+      this.w_count = w_count;
+      setW_countIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_chapter_words_count_args(update_chapter_words_count_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetChapter_id()) {
+        this.chapter_id = other.chapter_id;
+      }
+      this.w_count = other.w_count;
+    }
+
+    public update_chapter_words_count_args deepCopy() {
+      return new update_chapter_words_count_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.chapter_id = null;
+      setW_countIsSet(false);
+      this.w_count = 0;
+    }
+
+    public String getChapter_id() {
+      return this.chapter_id;
+    }
+
+    public update_chapter_words_count_args setChapter_id(String chapter_id) {
+      this.chapter_id = chapter_id;
+      return this;
+    }
+
+    public void unsetChapter_id() {
+      this.chapter_id = null;
+    }
+
+    /** Returns true if field chapter_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetChapter_id() {
+      return this.chapter_id != null;
+    }
+
+    public void setChapter_idIsSet(boolean value) {
+      if (!value) {
+        this.chapter_id = null;
+      }
+    }
+
+    public int getW_count() {
+      return this.w_count;
+    }
+
+    public update_chapter_words_count_args setW_count(int w_count) {
+      this.w_count = w_count;
+      setW_countIsSet(true);
+      return this;
+    }
+
+    public void unsetW_count() {
+      __isset_bit_vector.clear(__W_COUNT_ISSET_ID);
+    }
+
+    /** Returns true if field w_count is set (has been assigned a value) and false otherwise */
+    public boolean isSetW_count() {
+      return __isset_bit_vector.get(__W_COUNT_ISSET_ID);
+    }
+
+    public void setW_countIsSet(boolean value) {
+      __isset_bit_vector.set(__W_COUNT_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CHAPTER_ID:
+        if (value == null) {
+          unsetChapter_id();
+        } else {
+          setChapter_id((String)value);
+        }
+        break;
+
+      case W_COUNT:
+        if (value == null) {
+          unsetW_count();
+        } else {
+          setW_count((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CHAPTER_ID:
+        return getChapter_id();
+
+      case W_COUNT:
+        return Integer.valueOf(getW_count());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case CHAPTER_ID:
+        return isSetChapter_id();
+      case W_COUNT:
+        return isSetW_count();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_chapter_words_count_args)
+        return this.equals((update_chapter_words_count_args)that);
+      return false;
+    }
+
+    public boolean equals(update_chapter_words_count_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_chapter_id = true && this.isSetChapter_id();
+      boolean that_present_chapter_id = true && that.isSetChapter_id();
+      if (this_present_chapter_id || that_present_chapter_id) {
+        if (!(this_present_chapter_id && that_present_chapter_id))
+          return false;
+        if (!this.chapter_id.equals(that.chapter_id))
+          return false;
+      }
+
+      boolean this_present_w_count = true;
+      boolean that_present_w_count = true;
+      if (this_present_w_count || that_present_w_count) {
+        if (!(this_present_w_count && that_present_w_count))
+          return false;
+        if (this.w_count != that.w_count)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_chapter_words_count_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_chapter_words_count_args typedOther = (update_chapter_words_count_args)other;
+
+      lastComparison = Boolean.valueOf(isSetChapter_id()).compareTo(typedOther.isSetChapter_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetChapter_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.chapter_id, typedOther.chapter_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetW_count()).compareTo(typedOther.isSetW_count());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetW_count()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.w_count, typedOther.w_count);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_chapter_words_count_args(");
+      boolean first = true;
+
+      sb.append("chapter_id:");
+      if (this.chapter_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.chapter_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("w_count:");
+      sb.append(this.w_count);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_chapter_words_count_argsStandardSchemeFactory implements SchemeFactory {
+      public update_chapter_words_count_argsStandardScheme getScheme() {
+        return new update_chapter_words_count_argsStandardScheme();
+      }
+    }
+
+    private static class update_chapter_words_count_argsStandardScheme extends StandardScheme<update_chapter_words_count_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_chapter_words_count_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // CHAPTER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.chapter_id = iprot.readString();
+                struct.setChapter_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // W_COUNT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.w_count = iprot.readI32();
+                struct.setW_countIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_chapter_words_count_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.chapter_id != null) {
+          oprot.writeFieldBegin(CHAPTER_ID_FIELD_DESC);
+          oprot.writeString(struct.chapter_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(W_COUNT_FIELD_DESC);
+        oprot.writeI32(struct.w_count);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_chapter_words_count_argsTupleSchemeFactory implements SchemeFactory {
+      public update_chapter_words_count_argsTupleScheme getScheme() {
+        return new update_chapter_words_count_argsTupleScheme();
+      }
+    }
+
+    private static class update_chapter_words_count_argsTupleScheme extends TupleScheme<update_chapter_words_count_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_chapter_words_count_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetChapter_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetW_count()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetChapter_id()) {
+          oprot.writeString(struct.chapter_id);
+        }
+        if (struct.isSetW_count()) {
+          oprot.writeI32(struct.w_count);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_chapter_words_count_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.chapter_id = iprot.readString();
+          struct.setChapter_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.w_count = iprot.readI32();
+          struct.setW_countIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class update_chapter_words_count_result implements org.apache.thrift.TBase<update_chapter_words_count_result, update_chapter_words_count_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_chapter_words_count_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_chapter_words_count_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_chapter_words_count_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_chapter_words_count_result.class, metaDataMap);
+    }
+
+    public update_chapter_words_count_result() {
+    }
+
+    public update_chapter_words_count_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_chapter_words_count_result(update_chapter_words_count_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public update_chapter_words_count_result deepCopy() {
+      return new update_chapter_words_count_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public update_chapter_words_count_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_chapter_words_count_result)
+        return this.equals((update_chapter_words_count_result)that);
+      return false;
+    }
+
+    public boolean equals(update_chapter_words_count_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_chapter_words_count_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_chapter_words_count_result typedOther = (update_chapter_words_count_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_chapter_words_count_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_chapter_words_count_resultStandardSchemeFactory implements SchemeFactory {
+      public update_chapter_words_count_resultStandardScheme getScheme() {
+        return new update_chapter_words_count_resultStandardScheme();
+      }
+    }
+
+    private static class update_chapter_words_count_resultStandardScheme extends StandardScheme<update_chapter_words_count_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_chapter_words_count_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_chapter_words_count_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_chapter_words_count_resultTupleSchemeFactory implements SchemeFactory {
+      public update_chapter_words_count_resultTupleScheme getScheme() {
+        return new update_chapter_words_count_resultTupleScheme();
+      }
+    }
+
+    private static class update_chapter_words_count_resultTupleScheme extends TupleScheme<update_chapter_words_count_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_chapter_words_count_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_chapter_words_count_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
