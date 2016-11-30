@@ -4,12 +4,12 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("18th Nov, 2016 - 04:40 P.M");
+		System.out.println("30th Nov, 2016 - 04:30 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
 //		kahaniya.add_default_status_to_series();
-		kahaniya.add_chapter_words_count_property();
+//		kahaniya.add_chapter_words_count_property();
 //		kahaniya.add_additional_properties();
 //		kahaniya.add_chapter_contest_status_properties();
 //		test(kahaniya);
@@ -20,7 +20,36 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
- /*   		System.out.println(k.create_or_edit_contest("contest10", "one", "contest title 10", "contest-title-id-10", "contest-summary", "", "feat_image", "prose", "", "", "", 100, 1000, "LANG3", 0, 1, 900, 0));
+//    		System.out.println(k.create_language("LANG19"));
+//    		System.out.println(k.create_or_edit_anthology("anth38", "my antho38", "my-antho38", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
+//    		System.out.println(k.create_or_edit_anthology("anth39", "my antho39", "my-antho39", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
+//    		System.out.println(k.create_or_edit_anthology("anth37", "my antho37", "my-antho37", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
+//    		System.out.println(k.create_or_edit_anthology("anth36", "my antho36", "my-antho36", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
+//    		System.out.println(k.create_or_edit_anthology("anth35", "my antho35", "my-antho35", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
+    		
+//    		System.out.println(k.create_or_edit_chapter("chap12", "mys1", "1", "n-one", "title_id", "title", "feat_image", 123123, 0, 0, "", 100));
+//    		System.out.println(k.tag_a_post("anth38", "chap12", "C", "n-one", 123123, 1));
+//    		System.out.println(k.get_feed("C", "AN", "LANG19", 0, 10, "n-one", "GEN3", "", "", "anth38"));
+    
+    		/*
+    		k.create_user("n-one", "n-one", "n-one", "n-one", "n-one", "n-one","dob","gender","address","bio", "GEN2,GEN3", "LANG3,LANG4", 2, 2, 100);
+    		k.create_user("n-two", "n-two", "n-two", "n-two", "n-two", "n-two","dob","gender","address","bio", "GEN1,GEN3", "LANG2,LANG3", 2, 2, 100);
+    		k.create_genre("poetry");
+    		k.create_genre("GEN3");
+    		k.create_genre("GEN4");
+    		k.create_language("LANG3");
+    		k.create_language("LANG4");
+    		k.create_or_edit_series("mys1", "n-one", "my s1", "my-s1", "sdfsd sdf", "fet_image","GEN3","LANG3" , "qweqweqwe", "copyrights", "dd_img", "dd_summary", 1, 12903781, 0, "1","");
+    		k.create_or_edit_series("ss1", "n-one", "ss1", "ss1", "ss1", "feature_image", "GEN4", "LANG4", "keywords", "copyrights", "dd_img", "dd_summary", 1, 101, 0, "1","");
+    		k.create_or_edit_series("ss2", "n-one", "ss2", "ss2", "ss2", "feature_image", "GEN3", "LANG1", "keywords", "copyrights", "dd_img", "dd_summary", 1, 102, 0,"1","");
+    		k.create_or_edit_chapter("chap1", "mys1", "1", "n-one", "title_id", "title", "feat_image", 123123, 0, 0, "", 100);
+    		k.create_or_edit_chapter("cc1", "ss2", "1", "n-one", "cc1", "cc1", "feat_image", 102, 0, 0,"",200);
+    		    		
+    		System.out.println("stats");
+    		System.out.println(k.get_stats("U"));
+    		System.out.println(k.get_stats("S"));
+    		System.out.println(k.get_stats("CH"));
+    		System.out.println(k.create_or_edit_contest("contest10", "one", "contest title 10", "contest-title-id-10", "contest-summary", "", "feat_image", "prose", "", "", "", 100, 1000, "LANG3", 0, 1, 900, 0));
     		System.out.println(k.create_or_edit_contest("contest11", "one", "contest title 11", "contest-title-id-11", "contest-summary", "", "feat_image", "prose", "", "", "", 200, 1100, "LANG3", 0, 1, 900, 0));
     		System.out.println(k.create_or_edit_contest("contest12", "one", "contest title 12", "contest-title-id-12", "contest-summary", "", "feat_image", "prose", "", "", "", 300, 1200, "LANG3", 0, 1, 900, 0));
     		System.out.println(k.create_or_edit_contest("contest13", "one", "contest title 13", "contest-title-id-13", "contest-summary", "", "feat_image", "prose", "", "", "", 400, 1300, "LANG3", 0, 1, 900, 0));

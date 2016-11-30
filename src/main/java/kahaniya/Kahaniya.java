@@ -59,6 +59,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String CHAPTER_TITLE_ID_INDEX = "chapter_index_by_title_id";
 	public static final String SERIES_TITLE_ID_INDEX = "series_index_by_title_id";
 	public static final String SERIES_TYPE_INDEX = "series_index_by_type";
+	public static final String ANTHOLOGY_ID_INDEX = "anthology_index_by_id";
+	public static final String ANTHOLOGY_TITLE_ID_INDEX = "anthology_index_by_title_id";
+	
 
 	public static final String USER_VIEWED_CHAPTER_REL_INDEX = "user_viewed_chapter_relation_index";
 	public static final String USER_READ_CHAPTER_REL_INDEX = "user_read_chapter_relation_index";
@@ -73,6 +76,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SEARCH_USER = "search_user";
 	public static final String SEARCH_CHAPTER = "search_chapter";
 	public static final String SEARCH_SERIES = "search_series";
+	public static final String SEARCH_ANTHOLOGY = "search_anthology";
 
 	//lock related keys
 	public static final String LockName = "lock_node";
@@ -142,7 +146,13 @@ public class Kahaniya implements KahaniyaService.Iface{
 	//keyword node related keys
 	public static final String KEYWORD_NAME = "keyword_name";
 	
-	
+	//Anthology related keys
+	public static final String ANTHOLOGY_ID = "anthology_id";
+	public static final String ANTHOLOGY_TITLE = "anthology_title";
+	public static final String ANTHOLOGY_TITLE_ID = "anthology_title_id";
+	public static final String ANTHOLOGY_SUMMARY = "anthology_summary";
+	public static final String ANTHOLOGY_FEAT_IMG = "anthology_feat_img";
+		
 	//series node related keys
 	public static final String SERIES_ID = "series_id";
 	public static final String SERIES_TITLE = "series_title";
@@ -190,6 +200,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String KEYWORD_NODE = "keyword_node";
 	public static final String REVIEW_NODE = "review_node";
 	public static final String CHAPTER_NODE = "chapter_node";
+	public static final String ANTHOLOGY_NODE = "anthology_node";
 	public static final String COMMENT_NODE = "comment_node";
 	public static final String CONTEST_NODE = "contest_node";
 	public static final String WRITING_STYLE_NODE = "writing_style_node";
@@ -201,6 +212,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType USER_INTERESTED_LANGUAGE = DynamicRelationshipType.withName("USER_INTERESTED_LANGUAGE");
 	public static final RelationshipType USER_FOLLOW_USER = DynamicRelationshipType.withName("USER_FOLLOW_USER");
 	public static final RelationshipType USER_STARTED_SERIES = DynamicRelationshipType.withName("USER_STARTED_SERIES");
+	public static final RelationshipType USER_STARTED_ANTHOLOGY = DynamicRelationshipType.withName("USER_STARTED_ANTHOLOGY");
 	
 	public static final RelationshipType USER_SKIP_FOLLOW_USER = DynamicRelationshipType.withName("USER_SKIP_FOLLOW_USER");
 
@@ -211,6 +223,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final RelationshipType SERIES_ONGOING_REL_TO_BASE_NODE = DynamicRelationshipType.withName("SERIES_ONGOING_REL_TO_BASE_NODE");
 	public static final RelationshipType SERIES_COMPLETED_REL_TO_BASE_NODE = DynamicRelationshipType.withName("SERIES_COMPLETED_REL_TO_BASE_NODE");
 	public static final RelationshipType SERIES_KEYWORD = DynamicRelationshipType.withName("SERIES_KEYWORD");
+	
+	public static final RelationshipType ANTHOLOGY_BELONGS_TO_GENRE = DynamicRelationshipType.withName("ANTHOLOGY_BELONGS_TO_GENRE");
+	public static final RelationshipType ANTHOLOGY_BELONGS_TO_LANGUAGE = DynamicRelationshipType.withName("ANTHOLOGY_BELONGS_TO_LANGUAGE");
+	public static final RelationshipType ANTHOLOGY_BELONGS_TO_GENRE_LANGUAGE = DynamicRelationshipType.withName("ANTHOLOGY_BELONGS_TO_GENRE_LANGUAGE");
+	
+	public static final RelationshipType ANTHOLOGY_TAGGED_A_POST = DynamicRelationshipType.withName("ANTHOLOGY_TAGGED_A_POST");
 	
 	public static final RelationshipType USER_WRITTEN_A_REVIEW = DynamicRelationshipType.withName("USER_WRITTEN_A_REVIEW");
 	public static final RelationshipType REVIEW_BELONGS_TO_SERIES = DynamicRelationshipType.withName("REVIEW_BELONGS_TO_SERIES");
@@ -497,6 +515,20 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return node;
 	}
 	
+	private Node Anthology(String anthology_id, String title, String title_id,
+			String summary, String feature_image, int time_created) {
+		Node node = graphDb.createNode();
+		node.setProperty(ANTHOLOGY_ID, anthology_id);
+		node.setProperty(ANTHOLOGY_TITLE, title);
+		node.setProperty(ANTHOLOGY_TITLE_ID, title_id);
+		node.setProperty(ANTHOLOGY_SUMMARY, summary);
+		node.setProperty(ANTHOLOGY_FEAT_IMG, feature_image);
+		node.setProperty(NODE_TYPE, ANTHOLOGY_NODE);
+		node.setProperty(TIME_CREATED, time_created);
+		
+		return node;
+	}
+	
 	private Node Review(String review_id, String data, int time_created)
 	{
 		Node node = graphDb.createNode();
@@ -514,6 +546,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(CHAPTER_TITLE, title);
 		node.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
 		node.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
+		node.setProperty(TIME_CREATED, time_created);
 		node.setProperty(CHAPTER_WORDS_COUNT, w_count);
 		node.setProperty(NODE_TYPE, CHAPTER_NODE);
 		node.setProperty(TOTAL_CHAPTER_VIEWS, 0);
@@ -2248,6 +2281,312 @@ public class Kahaniya implements KahaniyaService.Iface{
 		ret.put("Is_Neo4j",true);
 		return ret;
 	}
+	
+	@Override
+	public String create_or_edit_anthology(String anthology_id, String title, String title_id, 
+			String summary, String feature_image, String user_id, String genres, String language,
+			int time_created, int is_edit)
+			throws TException {
+		if(is_edit == 0)
+			return create_anthology(anthology_id, title, title_id, summary, feature_image, user_id, genres, language, time_created);
+		else if(is_edit == 1)
+			return edit_anthology(anthology_id, title, title_id, summary, feature_image, user_id, genres, language, time_created);
+		else return "false";
+	}
+	
+	private String create_anthology(String anthology_id, 
+			String title, String title_id, String summary,
+			String feature_image, String user_id, String genres, String language,
+			int time_created){
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(anthology_id == null || anthology_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param anthology_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(genres == null || genres.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param genre");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(summary == null)
+				summary = "";
+			if(feature_image == null)
+				feature_image = "";
+					
+			
+			aquireWriteLock(tx);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+			Index<Node> anthologyTitleId_index = graphDb.index().forNodes(ANTHOLOGY_TITLE_ID_INDEX);
+			
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
+								
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
+							
+			Node userNode = userId_index.get(USER_ID,user_id).getSingle();
+			if(userNode == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			if(anthologyId_index.get(ANTHOLOGY_ID,anthology_id).getSingle()!=null)
+				throw new KahaniyaCustomException("Anthology already exists with given id : "+anthology_id);
+			if(anthologyTitleId_index.get(ANTHOLOGY_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
+				throw new KahaniyaCustomException("Anthology already exists with given title id : "+title_id);
+				
+			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
+			if(langNode == null)
+				throw new KahaniyaCustomException("Language doesnot exists for the name : " + language);
+					
+			Node anthology_node = Anthology(anthology_id, title, title_id, summary, feature_image, time_created);  // Creating a new anthology node
+			if(anthology_node == null)
+				throw new KahaniyaCustomException("Something went wrong, while creating anthology ");
+
+			//create relationship with user
+			createRelation(USER_STARTED_ANTHOLOGY, userNode, anthology_node);
+			
+			//create relationship with Genres
+			genres = genres.toLowerCase();
+			for(String genre : genres.split(","))
+			{
+				Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+				if(genreNode == null)
+					throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
+				
+				createRelation(ANTHOLOGY_BELONGS_TO_GENRE, anthology_node, genreNode);
+				
+				//Genre + Language Relation
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase() + " " +language.toLowerCase()).getSingle();
+				if(genre_lang_node == null)
+					throw new KahaniyaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
+				
+				createRelation(ANTHOLOGY_BELONGS_TO_GENRE_LANGUAGE, anthology_node, genre_lang_node);
+				
+			}
+			
+						
+			//create relationships with Genres and Languages
+			createRelation(ANTHOLOGY_BELONGS_TO_LANGUAGE, anthology_node, langNode);
+			
+				
+			//Indexing newly created anthology node
+			anthologyId_index.add(anthology_node, ANTHOLOGY_ID, anthology_id);
+			anthologyTitleId_index.add(anthology_node, ANTHOLOGY_TITLE_ID, title_id.toLowerCase());
+			
+			search_index.add(anthology_node, SEARCH_ANTHOLOGY, title_id.toLowerCase());
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ create_anthology()");
+			System.out.println("Something went wrong, while creating anthology from create_anthology  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ create_anthology()");
+			System.out.println("Something went wrong, while creating anthology from create_anthology  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+
+	private String edit_anthology(String anthology_id, 
+			String title, String title_id, String summary,
+			String feature_image, String user_id, String genres, String language,
+			int time_created){
+
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(anthology_id == null || anthology_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param anthology_id");
+			if(title == null || title.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title");
+			if(title_id == null || title_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param title_id");
+			if(genres == null || genres.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param genre");
+			if(language == null || language.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param language");
+			if(summary == null)
+				summary = "";
+			if(feature_image == null)
+				feature_image = "";
+						
+			aquireWriteLock(tx);
+			Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+						
+			Index<Node> genreName_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> langName_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			Index<Node> genre_lang_index = graphDb.index().forNodes(GENRE_LANG_INDEX);
+					
+			Node anthology_node = anthologyId_index.get(ANTHOLOGY_ID, anthology_id).getSingle();
+			if(anthology_node == null)
+				throw new KahaniyaCustomException("Anthology doesnot exists with given id : "+anthology_id);
+			
+//			Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+//			if(genreNode == null)
+//				throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
+			
+			Node langNode = langName_index.get(LANG_NAME, language.toLowerCase()).getSingle();
+			if(langNode == null)
+				throw new KahaniyaCustomException("Language doesnot exists for the name : " + language);
+			
+//			Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase()+" "+language.toLowerCase()).getSingle();
+//			if(genre_lang_node == null)
+//				throw new KahaniyaCustomException("Genre Language doesnot exists for the name : " + genre+" "+language);
+			
+			//remove existing relationships with Genres, Languages and keywords
+			for(Relationship rel : anthology_node.getRelationships(ANTHOLOGY_BELONGS_TO_GENRE))
+				rel.delete();
+			for(Relationship rel : anthology_node.getRelationships(ANTHOLOGY_BELONGS_TO_LANGUAGE))
+				rel.delete();
+			for(Relationship rel : anthology_node.getRelationships(ANTHOLOGY_BELONGS_TO_GENRE_LANGUAGE))
+				rel.delete();
+			
+			//create relationship with Genres
+			genres = genres.toLowerCase();
+			for(String genre : genres.split(","))
+			{
+				Node genreNode = genreName_index.get(GENRE_NAME, genre.toLowerCase()).getSingle();
+				if(genreNode == null)
+					throw new KahaniyaCustomException("Genre doesnot exists for the name : " + genre);
+				
+				createRelation(ANTHOLOGY_BELONGS_TO_GENRE, anthology_node, genreNode);
+				
+				//Genre + Language Relation
+				Node genre_lang_node = genre_lang_index.get(GENRE_LANG_NAME, genre.toLowerCase() + " " +language.toLowerCase()).getSingle();
+				if(genre_lang_node == null)
+					throw new KahaniyaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
+				
+				createRelation(ANTHOLOGY_BELONGS_TO_GENRE_LANGUAGE, anthology_node, genre_lang_node);
+				
+			}
+			
+						
+			//create relationships with Genres and Languages
+			createRelation(ANTHOLOGY_BELONGS_TO_LANGUAGE, anthology_node, langNode);
+			
+			anthology_node.setProperty(ANTHOLOGY_TITLE, title);
+			anthology_node.setProperty(ANTHOLOGY_SUMMARY, summary);
+			anthology_node.setProperty(ANTHOLOGY_FEAT_IMG, feature_image);
+						
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_anthology()");
+			System.out.println("Something went wrong, while editing anthology from edit_anthology  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ edit_anthology()");
+			System.out.println("Something went wrong, while editing anthology from edit_anthology  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+
+	}
+	
+	@Override
+	public String tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag)
+			throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			if(user_id == null || user_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param user_id");
+			if(anthology_id == null || anthology_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the param anthology_id");
+
+			aquireWriteLock(tx);
+			Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			
+			Node anthology_node = anthologyId_index.get(ANTHOLOGY_ID, anthology_id).getSingle();
+			if(anthology_node == null)
+				throw new KahaniyaCustomException("Anthology doesnot exists with given id : "+anthology_id);
+			
+			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			if(user_node == null)
+				throw new KahaniyaCustomException("User doesnot exists with given id : "+user_id);
+			
+			if(type.equalsIgnoreCase("C")){
+				Index<Node> chapterId_index = graphDb.index().forNodes(CHAPTER_ID_INDEX);
+				Node chapter_node = chapterId_index.get(CHAPTER_ID, type_id).getSingle();
+				if(chapter_node == null)
+					throw new KahaniyaCustomException("Chapter doesnot exists with given id : "+type_id);
+				
+				if(is_tag == 1){
+					if(!isRelationExistsBetween(ANTHOLOGY_TAGGED_A_POST, anthology_node, chapter_node))
+						createRelation(ANTHOLOGY_TAGGED_A_POST, anthology_node, chapter_node, time);
+					else
+						throw new KahaniyaCustomException("Already the given chapter tagged to anthology : "+type_id);
+				}
+				else if(is_tag == 0){					
+					deleteRelation(ANTHOLOGY_TAGGED_A_POST, anthology_node, chapter_node);
+				}
+				else return "false";
+				
+			}else if(type.equalsIgnoreCase("S")){
+				Index<Node> seriesId_index = graphDb.index().forNodes(SERIES_ID_INDEX);
+				Node series_node = seriesId_index.get(SERIES_ID, type_id).getSingle();
+				if(series_node == null)
+					throw new KahaniyaCustomException("Series doesnot exists with given id : "+type_id);
+				
+				if(!isRelationExistsBetween(ANTHOLOGY_TAGGED_A_POST, anthology_node, series_node))
+					createRelation(ANTHOLOGY_TAGGED_A_POST, anthology_node, series_node, time );
+				else
+					throw new KahaniyaCustomException("Already the given series tagged to anthology : "+type_id);
+			}
+									
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ tag_a_post()");
+			System.out.println("Something went wrong, while anthology tagging a post  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ tag_a_post()");
+			System.out.println("Something went wrong, while anthology tagging a post  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;
+	}
+
+
 
 	@Override
 	public String create_or_edit_series(String series_id, String user_id,
@@ -2522,6 +2861,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 			
 			series_node.setProperty(SERIES_TITLE, title);
+			series_node.setProperty(SERIES_TITLE_ID, title_id);
 			series_node.setProperty(SERIES_TAG_LINE, tag_line);
 			series_node.setProperty(SERIES_FEAT_IMG, feature_image);
 			series_node.setProperty(SERIES_KEYWORDS, keywords);
@@ -2753,6 +3093,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			}
 
 			chapterNode.setProperty(CHAPTER_TITLE, title);
+			chapterNode.setProperty(CHAPTER_TITLE_ID, title_id);
 			chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
 			chapterNode.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
 			chapterNode.setProperty(CHAPTER_WORDS_COUNT, w_count);
@@ -2826,8 +3167,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(chapterId_index.get(CHAPTER_ID,chapter_id).getSingle()!=null)
 				throw new KahaniyaCustomException("Chapter already exists with given id : "+chapter_id);
 			
-			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
-				throw new KahaniyaCustomException("Chapter already exists with given title id : "+title_id);
+//			if(chapterTitleId_index.get(CHAPTER_TITLE_ID,title_id.toLowerCase()).getSingle()!=null)
+//				throw new KahaniyaCustomException("Chapter already exists with given title id : "+title_id);
 			
 			Node chapter_node = Chapter(chapter_id, title_id, title, feat_image, free_or_paid, time_created, w_count);  // Creating a new chapter node
 			if(chapter_node == null)
@@ -3586,6 +3927,8 @@ public class Kahaniya implements KahaniyaService.Iface{
 			return get_contests(feedType, filter, prev_cnt, count, s_user_id);
 		else if(tileType.equalsIgnoreCase("S"))
 			return get_series(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
+		else if(tileType.equalsIgnoreCase("AN"))
+			return get_anthologies(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id);
 		else if(tileType.equalsIgnoreCase("C"))
 			return get_chapters(feedType, filter, prev_cnt, count, s_user_id, genre, lang, user_id, contestId);
 		else if(tileType.equalsIgnoreCase("All"))
@@ -4876,6 +5219,117 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
+	private String get_anthologies(String feedType, String filter, int prev_cnt, int count, String s_user_id, String genre_name, String lang_name, String user_id)
+	{
+
+		JSONArray jsonArray = new JSONArray();		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			aquireWriteLock(tx);
+//			Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+			Index<Node> userId_index = graphDb.index().forNodes(USER_ID_INDEX);
+			Index<Node> genre_index = graphDb.index().forNodes(GENRE_NAME_INDEX);
+			Index<Node> lang_index = graphDb.index().forNodes(LANG_NAME_INDEX);
+			
+//			Node user_node = userId_index.get(USER_ID, user_id).getSingle();
+			Node s_user_node = userId_index.get(USER_ID, s_user_id).getSingle();
+			
+			int c = 0;
+			LinkedList<Node> outputAnthologyNode = new LinkedList<Node>();
+			
+			if(feedType.equalsIgnoreCase("L"))
+			{
+				
+				JSONObject filterJSON = new JSONObject(filter);
+				Node langNode = lang_index.get(LANG_NAME, filterJSON.getString("language").toLowerCase()).getSingle();
+				if(langNode == null)
+					throw new KahaniyaCustomException("Invalid Language Name");
+				Iterator<Relationship> anthologyRelItr = langNode.getRelationships(ANTHOLOGY_BELONGS_TO_LANGUAGE).iterator();
+				LinkedList<Relationship> anthologyRelList = new LinkedList<Relationship>();
+				while(anthologyRelItr.hasNext())
+					anthologyRelList.addLast(anthologyRelItr.next());
+				Collections.sort(anthologyRelList, TimeCreatedComparatorForRelationships);				
+				for(Relationship rel : anthologyRelList)
+				{				
+					
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node anthology = rel.getStartNode();
+//					Node anthologyGenreNode = anthology.getSingleRelationship(ANTHOLOGY_BELONGS_TO_GENRE, Direction.OUTGOING).getEndNode();
+					if(filter != null && !filter.equals(""))
+					{									
+						if(filterJSON.has("genre"))
+						{
+							for(String genr: filterJSON.getString("genre").split(","))
+							{
+								Node genreNode = genre_index.get(GENRE_NAME, genr.toLowerCase()).getSingle();
+//								if(genreNode != null && anthologyGenreNode.equals(genreNode))
+//								{
+//									if(c < prev_cnt)
+//									{
+//										c++;
+//										continue;
+//									}
+//									c++;
+//									outputAnthologyNode.addLast(anthology);			
+//									
+//								}
+							}
+						}
+						else // i.e., no need to apply filter
+						{
+							if(c < prev_cnt)
+							{
+								c++;
+								continue;
+							}
+							c++;
+							outputAnthologyNode.addLast(anthology);			
+							
+						}
+					}
+					else // i.e., no need to apply filter
+					{
+						if(c < prev_cnt)
+						{
+							c++;
+							continue;
+						}
+						c++;
+						outputAnthologyNode.addLast(anthology);			
+						
+					}
+					
+				}
+			}
+			
+			for(Node anthology : outputAnthologyNode)
+				jsonArray.put(getJSONForAnthologies(anthology, s_user_node));
+			
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_anthologies()");
+			System.out.println("Something went wrong, while returning anthologies from get_anthologies  :"+ex.getMessage());
+//				ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ get_anthologies()");
+			System.out.println("Something went wrong, while returning anthologies from get_anthologies  :"+ex.getMessage());
+			ex.printStackTrace();
+			jsonArray = new JSONArray();
+		}
+		return jsonArray.toString();
+	}
+
+	
 	private String get_authors(String feedType, String filter, int prev_cnt, int count, String user_id)
 	{
 		JSONArray jsonArray = new JSONArray();		
@@ -5356,6 +5810,42 @@ public class Kahaniya implements KahaniyaService.Iface{
 									
 				}
 			}
+			else if(feedType.equalsIgnoreCase("AN"))
+			{
+				int c = 0;
+				if(contestId == null || contestId.length()==0)
+					throw new KahaniyaCustomException("Empty parameter receieved for anthology id");
+				Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+				Node anthologyNode = anthologyId_index.get(ANTHOLOGY_ID, contestId).getSingle();
+				if(anthologyNode == null)
+					throw new KahaniyaCustomException("Anthology does not exists with given anthology id"+contestId);
+
+				LinkedList<Relationship> anthologyChaptersRelsList = new LinkedList<Relationship>();
+				
+				for(Relationship rel: anthologyNode.getRelationships(ANTHOLOGY_TAGGED_A_POST))
+					anthologyChaptersRelsList.addLast(rel);
+				
+
+				Collections.sort(anthologyChaptersRelsList, TimeCreatedComparatorForRelationships);
+								
+				for(Relationship rel : anthologyChaptersRelsList)
+				{
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					Node chapter = rel.getEndNode();
+					
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					outputChaptersNode.addLast(chapter);
+									
+				}
+			}
+
 			else if(feedType.equalsIgnoreCase("SRS"))
 			{
 				int c = 0;
@@ -6708,6 +7198,51 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return obj;
 	}
 	
+	private JSONObject getJSONForAnthologies(Node anthology, Node user)
+	{
+		JSONObject obj = new JSONObject();		
+		obj.put("P_Author_FullName",anthology.getSingleRelationship(USER_STARTED_ANTHOLOGY, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
+		obj.put("P_Author",anthology.getSingleRelationship(USER_STARTED_ANTHOLOGY, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
+		obj.put("P_Author_Status",anthology.getSingleRelationship(USER_STARTED_ANTHOLOGY, Direction.INCOMING).getStartNode().getProperty(STATUS).toString());
+		obj.put("P_Title_ID",anthology.getProperty(ANTHOLOGY_TITLE_ID).toString());
+		obj.put("P_Title",anthology.getProperty(ANTHOLOGY_TITLE).toString());
+		obj.put("P_Feature_Image",anthology.getProperty(ANTHOLOGY_FEAT_IMG).toString());
+		obj.put("P_Id",anthology.getProperty(ANTHOLOGY_ID).toString());
+		
+		
+		JSONArray list = new JSONArray();
+		Iterator<Relationship> belongstoRels = anthology.getRelationships(ANTHOLOGY_BELONGS_TO_GENRE, Direction.OUTGOING).iterator();
+		while(belongstoRels.hasNext())
+		{
+			list.put(belongstoRels.next().getEndNode().getProperty(GENRE_NAME.toString()));	
+		}
+		obj.put("P_Genre",list);
+		obj.put("P_Lang",anthology.getSingleRelationship(ANTHOLOGY_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
+		obj.put("P_TimeCreated",anthology.getProperty(TIME_CREATED).toString());
+		obj.put("P_Num_Chapters", anthology.getDegree(ANTHOLOGY_TAGGED_A_POST));
+//		obj.put("P_Num_Subscribers", anthology.getDegree(USER_SUBSCRIBED_TO_ANTHOLOGY));
+		
+//		if(user == null)
+//			obj.put("Is_Subscribe",0);
+//		else
+//		{
+//			obj.put("Is_Subscribe",0);			
+//			Iterator<Relationship> followingRels = user.getRelationships(USER_SUBSCRIBED_TO_ANTHOLOGY, Direction.OUTGOING).iterator();
+//			while(followingRels.hasNext())
+//			{
+//				if(followingRels.next().getEndNode().equals(anthology))
+//				{
+//					obj.put("Is_Subscribe",1);
+//					break;
+//				}
+//			}
+//		}
+
+		obj.put("Is_Neo4j",true);
+		return obj;
+	}
+
+	
 	private JSONObject getJSONForContest(Node contest, Node user)
 	{
 		JSONObject obj = new JSONObject();		
@@ -7808,6 +8343,58 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return res;	
 	}
+	
+	@Override
+	public String delete_anthology(String anthology_id) throws TException {
+		String res;		
+		try(Transaction tx = graphDb.beginTx())
+		{
+			
+			if(anthology_id == null || anthology_id.length() == 0)
+				throw new KahaniyaCustomException("Null or empty string receieved for the parameter anthology_id");
+
+			Index<Node> anthologyId_index = graphDb.index().forNodes(ANTHOLOGY_ID_INDEX);
+			Index<Node> anthologyTitleId_index = graphDb.index().forNodes(ANTHOLOGY_TITLE_ID_INDEX);
+			Index<Node> search_index = graphDb.index().forNodes(SEARCH_INDEX);
+			
+			Node anthology = anthologyId_index.get(ANTHOLOGY_ID,anthology_id).getSingle();
+			
+			if(anthology == null)
+				throw new KahaniyaCustomException("Series doesnot exists with given id : "+anthology_id);
+			
+			// Delete Relationships of Anthology
+			Iterator<Relationship> relsItr = anthology.getRelationships().iterator();
+			while(relsItr.hasNext())
+				relsItr.next().delete();
+			
+			anthologyId_index.remove(anthology);
+			anthologyTitleId_index.remove(anthology);
+			search_index.remove(anthology);
+			anthology.delete();
+			
+			res = "true";
+			tx.success();
+
+		}
+		catch(KahaniyaCustomException ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting anthology from delete_anthology  :"+ex.getMessage());
+//				ex.printStackTrace();
+			res = "false";
+		}
+		catch(Exception ex)
+		{
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ delete_series()");
+			System.out.println("Something went wrong, while deleting anthology from delete_anthology  :"+ex.getMessage());
+			ex.printStackTrace();
+			res = "false";
+		}
+		return res;	
+	}
+
 	
 	@Override
 	public String search(String query, int tp, String user_id, int prev_cnt, int count)

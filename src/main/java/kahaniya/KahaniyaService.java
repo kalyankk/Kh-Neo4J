@@ -143,6 +143,12 @@ public class KahaniyaService {
 
     public String update_chapter_words_count(String chapter_id, int w_count) throws org.apache.thrift.TException;
 
+    public String create_or_edit_anthology(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit) throws org.apache.thrift.TException;
+
+    public String tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag) throws org.apache.thrift.TException;
+
+    public String delete_anthology(String anthology_id) throws org.apache.thrift.TException;
+
   }
 
   public interface AsyncIface {
@@ -258,6 +264,12 @@ public class KahaniyaService {
     public void update_series_going_status(String series_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_series_going_status_call> resultHandler) throws org.apache.thrift.TException;
 
     public void update_chapter_words_count(String chapter_id, int w_count, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_words_count_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void create_or_edit_anthology(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_anthology_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.tag_a_post_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void delete_anthology(String anthology_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.delete_anthology_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -1711,6 +1723,89 @@ public class KahaniyaService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_chapter_words_count failed: unknown result");
+    }
+
+    public String create_or_edit_anthology(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit) throws org.apache.thrift.TException
+    {
+      send_create_or_edit_anthology(anthology_id, title, title_id, summary, feature_image, user_id, genres, language, time_created, is_edit);
+      return recv_create_or_edit_anthology();
+    }
+
+    public void send_create_or_edit_anthology(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit) throws org.apache.thrift.TException
+    {
+      create_or_edit_anthology_args args = new create_or_edit_anthology_args();
+      args.setAnthology_id(anthology_id);
+      args.setTitle(title);
+      args.setTitle_id(title_id);
+      args.setSummary(summary);
+      args.setFeature_image(feature_image);
+      args.setUser_id(user_id);
+      args.setGenres(genres);
+      args.setLanguage(language);
+      args.setTime_created(time_created);
+      args.setIs_edit(is_edit);
+      sendBase("create_or_edit_anthology", args);
+    }
+
+    public String recv_create_or_edit_anthology() throws org.apache.thrift.TException
+    {
+      create_or_edit_anthology_result result = new create_or_edit_anthology_result();
+      receiveBase(result, "create_or_edit_anthology");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "create_or_edit_anthology failed: unknown result");
+    }
+
+    public String tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag) throws org.apache.thrift.TException
+    {
+      send_tag_a_post(anthology_id, type_id, type, user_id, time, is_tag);
+      return recv_tag_a_post();
+    }
+
+    public void send_tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag) throws org.apache.thrift.TException
+    {
+      tag_a_post_args args = new tag_a_post_args();
+      args.setAnthology_id(anthology_id);
+      args.setType_id(type_id);
+      args.setType(type);
+      args.setUser_id(user_id);
+      args.setTime(time);
+      args.setIs_tag(is_tag);
+      sendBase("tag_a_post", args);
+    }
+
+    public String recv_tag_a_post() throws org.apache.thrift.TException
+    {
+      tag_a_post_result result = new tag_a_post_result();
+      receiveBase(result, "tag_a_post");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "tag_a_post failed: unknown result");
+    }
+
+    public String delete_anthology(String anthology_id) throws org.apache.thrift.TException
+    {
+      send_delete_anthology(anthology_id);
+      return recv_delete_anthology();
+    }
+
+    public void send_delete_anthology(String anthology_id) throws org.apache.thrift.TException
+    {
+      delete_anthology_args args = new delete_anthology_args();
+      args.setAnthology_id(anthology_id);
+      sendBase("delete_anthology", args);
+    }
+
+    public String recv_delete_anthology() throws org.apache.thrift.TException
+    {
+      delete_anthology_result result = new delete_anthology_result();
+      receiveBase(result, "delete_anthology");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "delete_anthology failed: unknown result");
     }
 
   }
@@ -3955,6 +4050,144 @@ public class KahaniyaService {
       }
     }
 
+    public void create_or_edit_anthology(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_anthology_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      create_or_edit_anthology_call method_call = new create_or_edit_anthology_call(anthology_id, title, title_id, summary, feature_image, user_id, genres, language, time_created, is_edit, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class create_or_edit_anthology_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String anthology_id;
+      private String title;
+      private String title_id;
+      private String summary;
+      private String feature_image;
+      private String user_id;
+      private String genres;
+      private String language;
+      private int time_created;
+      private int is_edit;
+      public create_or_edit_anthology_call(String anthology_id, String title, String title_id, String summary, String feature_image, String user_id, String genres, String language, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_anthology_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.anthology_id = anthology_id;
+        this.title = title;
+        this.title_id = title_id;
+        this.summary = summary;
+        this.feature_image = feature_image;
+        this.user_id = user_id;
+        this.genres = genres;
+        this.language = language;
+        this.time_created = time_created;
+        this.is_edit = is_edit;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("create_or_edit_anthology", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        create_or_edit_anthology_args args = new create_or_edit_anthology_args();
+        args.setAnthology_id(anthology_id);
+        args.setTitle(title);
+        args.setTitle_id(title_id);
+        args.setSummary(summary);
+        args.setFeature_image(feature_image);
+        args.setUser_id(user_id);
+        args.setGenres(genres);
+        args.setLanguage(language);
+        args.setTime_created(time_created);
+        args.setIs_edit(is_edit);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_create_or_edit_anthology();
+      }
+    }
+
+    public void tag_a_post(String anthology_id, String type_id, String type, String user_id, int time, int is_tag, org.apache.thrift.async.AsyncMethodCallback<tag_a_post_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      tag_a_post_call method_call = new tag_a_post_call(anthology_id, type_id, type, user_id, time, is_tag, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class tag_a_post_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String anthology_id;
+      private String type_id;
+      private String type;
+      private String user_id;
+      private int time;
+      private int is_tag;
+      public tag_a_post_call(String anthology_id, String type_id, String type, String user_id, int time, int is_tag, org.apache.thrift.async.AsyncMethodCallback<tag_a_post_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.anthology_id = anthology_id;
+        this.type_id = type_id;
+        this.type = type;
+        this.user_id = user_id;
+        this.time = time;
+        this.is_tag = is_tag;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("tag_a_post", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        tag_a_post_args args = new tag_a_post_args();
+        args.setAnthology_id(anthology_id);
+        args.setType_id(type_id);
+        args.setType(type);
+        args.setUser_id(user_id);
+        args.setTime(time);
+        args.setIs_tag(is_tag);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_tag_a_post();
+      }
+    }
+
+    public void delete_anthology(String anthology_id, org.apache.thrift.async.AsyncMethodCallback<delete_anthology_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      delete_anthology_call method_call = new delete_anthology_call(anthology_id, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class delete_anthology_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String anthology_id;
+      public delete_anthology_call(String anthology_id, org.apache.thrift.async.AsyncMethodCallback<delete_anthology_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.anthology_id = anthology_id;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("delete_anthology", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        delete_anthology_args args = new delete_anthology_args();
+        args.setAnthology_id(anthology_id);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_delete_anthology();
+      }
+    }
+
   }
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
@@ -4024,6 +4257,9 @@ public class KahaniyaService {
       processMap.put("get_genre_followers", new get_genre_followers());
       processMap.put("update_series_going_status", new update_series_going_status());
       processMap.put("update_chapter_words_count", new update_chapter_words_count());
+      processMap.put("create_or_edit_anthology", new create_or_edit_anthology());
+      processMap.put("tag_a_post", new tag_a_post());
+      processMap.put("delete_anthology", new delete_anthology());
       return processMap;
     }
 
@@ -4919,6 +5155,54 @@ public class KahaniyaService {
       protected update_chapter_words_count_result getResult(I iface, update_chapter_words_count_args args) throws org.apache.thrift.TException {
         update_chapter_words_count_result result = new update_chapter_words_count_result();
         result.success = iface.update_chapter_words_count(args.chapter_id, args.w_count);
+        return result;
+      }
+    }
+
+    private static class create_or_edit_anthology<I extends Iface> extends org.apache.thrift.ProcessFunction<I, create_or_edit_anthology_args> {
+      public create_or_edit_anthology() {
+        super("create_or_edit_anthology");
+      }
+
+      protected create_or_edit_anthology_args getEmptyArgsInstance() {
+        return new create_or_edit_anthology_args();
+      }
+
+      protected create_or_edit_anthology_result getResult(I iface, create_or_edit_anthology_args args) throws org.apache.thrift.TException {
+        create_or_edit_anthology_result result = new create_or_edit_anthology_result();
+        result.success = iface.create_or_edit_anthology(args.anthology_id, args.title, args.title_id, args.summary, args.feature_image, args.user_id, args.genres, args.language, args.time_created, args.is_edit);
+        return result;
+      }
+    }
+
+    private static class tag_a_post<I extends Iface> extends org.apache.thrift.ProcessFunction<I, tag_a_post_args> {
+      public tag_a_post() {
+        super("tag_a_post");
+      }
+
+      protected tag_a_post_args getEmptyArgsInstance() {
+        return new tag_a_post_args();
+      }
+
+      protected tag_a_post_result getResult(I iface, tag_a_post_args args) throws org.apache.thrift.TException {
+        tag_a_post_result result = new tag_a_post_result();
+        result.success = iface.tag_a_post(args.anthology_id, args.type_id, args.type, args.user_id, args.time, args.is_tag);
+        return result;
+      }
+    }
+
+    private static class delete_anthology<I extends Iface> extends org.apache.thrift.ProcessFunction<I, delete_anthology_args> {
+      public delete_anthology() {
+        super("delete_anthology");
+      }
+
+      protected delete_anthology_args getEmptyArgsInstance() {
+        return new delete_anthology_args();
+      }
+
+      protected delete_anthology_result getResult(I iface, delete_anthology_args args) throws org.apache.thrift.TException {
+        delete_anthology_result result = new delete_anthology_result();
+        result.success = iface.delete_anthology(args.anthology_id);
         return result;
       }
     }
@@ -32281,8 +32565,6 @@ public class KahaniyaService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
-        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
-        __isset_bit_vector = new BitSet(1);
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
@@ -58627,6 +58909,3510 @@ public class KahaniyaService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, update_chapter_words_count_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class create_or_edit_anthology_args implements org.apache.thrift.TBase<create_or_edit_anthology_args, create_or_edit_anthology_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_anthology_args");
+
+    private static final org.apache.thrift.protocol.TField ANTHOLOGY_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("anthology_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField TITLE_FIELD_DESC = new org.apache.thrift.protocol.TField("title", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField TITLE_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("title_id", org.apache.thrift.protocol.TType.STRING, (short)3);
+    private static final org.apache.thrift.protocol.TField SUMMARY_FIELD_DESC = new org.apache.thrift.protocol.TField("summary", org.apache.thrift.protocol.TType.STRING, (short)4);
+    private static final org.apache.thrift.protocol.TField FEATURE_IMAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("feature_image", org.apache.thrift.protocol.TType.STRING, (short)5);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)6);
+    private static final org.apache.thrift.protocol.TField GENRES_FIELD_DESC = new org.apache.thrift.protocol.TField("genres", org.apache.thrift.protocol.TType.STRING, (short)7);
+    private static final org.apache.thrift.protocol.TField LANGUAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("language", org.apache.thrift.protocol.TType.STRING, (short)8);
+    private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)9);
+    private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)10);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new create_or_edit_anthology_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new create_or_edit_anthology_argsTupleSchemeFactory());
+    }
+
+    public String anthology_id; // required
+    public String title; // required
+    public String title_id; // required
+    public String summary; // required
+    public String feature_image; // required
+    public String user_id; // required
+    public String genres; // required
+    public String language; // required
+    public int time_created; // required
+    public int is_edit; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      ANTHOLOGY_ID((short)1, "anthology_id"),
+      TITLE((short)2, "title"),
+      TITLE_ID((short)3, "title_id"),
+      SUMMARY((short)4, "summary"),
+      FEATURE_IMAGE((short)5, "feature_image"),
+      USER_ID((short)6, "user_id"),
+      GENRES((short)7, "genres"),
+      LANGUAGE((short)8, "language"),
+      TIME_CREATED((short)9, "time_created"),
+      IS_EDIT((short)10, "is_edit");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // ANTHOLOGY_ID
+            return ANTHOLOGY_ID;
+          case 2: // TITLE
+            return TITLE;
+          case 3: // TITLE_ID
+            return TITLE_ID;
+          case 4: // SUMMARY
+            return SUMMARY;
+          case 5: // FEATURE_IMAGE
+            return FEATURE_IMAGE;
+          case 6: // USER_ID
+            return USER_ID;
+          case 7: // GENRES
+            return GENRES;
+          case 8: // LANGUAGE
+            return LANGUAGE;
+          case 9: // TIME_CREATED
+            return TIME_CREATED;
+          case 10: // IS_EDIT
+            return IS_EDIT;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __TIME_CREATED_ISSET_ID = 0;
+    private static final int __IS_EDIT_ISSET_ID = 1;
+    private BitSet __isset_bit_vector = new BitSet(2);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ANTHOLOGY_ID, new org.apache.thrift.meta_data.FieldMetaData("anthology_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TITLE, new org.apache.thrift.meta_data.FieldMetaData("title", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TITLE_ID, new org.apache.thrift.meta_data.FieldMetaData("title_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.SUMMARY, new org.apache.thrift.meta_data.FieldMetaData("summary", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.FEATURE_IMAGE, new org.apache.thrift.meta_data.FieldMetaData("feature_image", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.GENRES, new org.apache.thrift.meta_data.FieldMetaData("genres", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.LANGUAGE, new org.apache.thrift.meta_data.FieldMetaData("language", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TIME_CREATED, new org.apache.thrift.meta_data.FieldMetaData("time_created", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_anthology_args.class, metaDataMap);
+    }
+
+    public create_or_edit_anthology_args() {
+    }
+
+    public create_or_edit_anthology_args(
+      String anthology_id,
+      String title,
+      String title_id,
+      String summary,
+      String feature_image,
+      String user_id,
+      String genres,
+      String language,
+      int time_created,
+      int is_edit)
+    {
+      this();
+      this.anthology_id = anthology_id;
+      this.title = title;
+      this.title_id = title_id;
+      this.summary = summary;
+      this.feature_image = feature_image;
+      this.user_id = user_id;
+      this.genres = genres;
+      this.language = language;
+      this.time_created = time_created;
+      setTime_createdIsSet(true);
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public create_or_edit_anthology_args(create_or_edit_anthology_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetAnthology_id()) {
+        this.anthology_id = other.anthology_id;
+      }
+      if (other.isSetTitle()) {
+        this.title = other.title;
+      }
+      if (other.isSetTitle_id()) {
+        this.title_id = other.title_id;
+      }
+      if (other.isSetSummary()) {
+        this.summary = other.summary;
+      }
+      if (other.isSetFeature_image()) {
+        this.feature_image = other.feature_image;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+      if (other.isSetGenres()) {
+        this.genres = other.genres;
+      }
+      if (other.isSetLanguage()) {
+        this.language = other.language;
+      }
+      this.time_created = other.time_created;
+      this.is_edit = other.is_edit;
+    }
+
+    public create_or_edit_anthology_args deepCopy() {
+      return new create_or_edit_anthology_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.anthology_id = null;
+      this.title = null;
+      this.title_id = null;
+      this.summary = null;
+      this.feature_image = null;
+      this.user_id = null;
+      this.genres = null;
+      this.language = null;
+      setTime_createdIsSet(false);
+      this.time_created = 0;
+      setIs_editIsSet(false);
+      this.is_edit = 0;
+    }
+
+    public String getAnthology_id() {
+      return this.anthology_id;
+    }
+
+    public create_or_edit_anthology_args setAnthology_id(String anthology_id) {
+      this.anthology_id = anthology_id;
+      return this;
+    }
+
+    public void unsetAnthology_id() {
+      this.anthology_id = null;
+    }
+
+    /** Returns true if field anthology_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetAnthology_id() {
+      return this.anthology_id != null;
+    }
+
+    public void setAnthology_idIsSet(boolean value) {
+      if (!value) {
+        this.anthology_id = null;
+      }
+    }
+
+    public String getTitle() {
+      return this.title;
+    }
+
+    public create_or_edit_anthology_args setTitle(String title) {
+      this.title = title;
+      return this;
+    }
+
+    public void unsetTitle() {
+      this.title = null;
+    }
+
+    /** Returns true if field title is set (has been assigned a value) and false otherwise */
+    public boolean isSetTitle() {
+      return this.title != null;
+    }
+
+    public void setTitleIsSet(boolean value) {
+      if (!value) {
+        this.title = null;
+      }
+    }
+
+    public String getTitle_id() {
+      return this.title_id;
+    }
+
+    public create_or_edit_anthology_args setTitle_id(String title_id) {
+      this.title_id = title_id;
+      return this;
+    }
+
+    public void unsetTitle_id() {
+      this.title_id = null;
+    }
+
+    /** Returns true if field title_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetTitle_id() {
+      return this.title_id != null;
+    }
+
+    public void setTitle_idIsSet(boolean value) {
+      if (!value) {
+        this.title_id = null;
+      }
+    }
+
+    public String getSummary() {
+      return this.summary;
+    }
+
+    public create_or_edit_anthology_args setSummary(String summary) {
+      this.summary = summary;
+      return this;
+    }
+
+    public void unsetSummary() {
+      this.summary = null;
+    }
+
+    /** Returns true if field summary is set (has been assigned a value) and false otherwise */
+    public boolean isSetSummary() {
+      return this.summary != null;
+    }
+
+    public void setSummaryIsSet(boolean value) {
+      if (!value) {
+        this.summary = null;
+      }
+    }
+
+    public String getFeature_image() {
+      return this.feature_image;
+    }
+
+    public create_or_edit_anthology_args setFeature_image(String feature_image) {
+      this.feature_image = feature_image;
+      return this;
+    }
+
+    public void unsetFeature_image() {
+      this.feature_image = null;
+    }
+
+    /** Returns true if field feature_image is set (has been assigned a value) and false otherwise */
+    public boolean isSetFeature_image() {
+      return this.feature_image != null;
+    }
+
+    public void setFeature_imageIsSet(boolean value) {
+      if (!value) {
+        this.feature_image = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public create_or_edit_anthology_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public String getGenres() {
+      return this.genres;
+    }
+
+    public create_or_edit_anthology_args setGenres(String genres) {
+      this.genres = genres;
+      return this;
+    }
+
+    public void unsetGenres() {
+      this.genres = null;
+    }
+
+    /** Returns true if field genres is set (has been assigned a value) and false otherwise */
+    public boolean isSetGenres() {
+      return this.genres != null;
+    }
+
+    public void setGenresIsSet(boolean value) {
+      if (!value) {
+        this.genres = null;
+      }
+    }
+
+    public String getLanguage() {
+      return this.language;
+    }
+
+    public create_or_edit_anthology_args setLanguage(String language) {
+      this.language = language;
+      return this;
+    }
+
+    public void unsetLanguage() {
+      this.language = null;
+    }
+
+    /** Returns true if field language is set (has been assigned a value) and false otherwise */
+    public boolean isSetLanguage() {
+      return this.language != null;
+    }
+
+    public void setLanguageIsSet(boolean value) {
+      if (!value) {
+        this.language = null;
+      }
+    }
+
+    public int getTime_created() {
+      return this.time_created;
+    }
+
+    public create_or_edit_anthology_args setTime_created(int time_created) {
+      this.time_created = time_created;
+      setTime_createdIsSet(true);
+      return this;
+    }
+
+    public void unsetTime_created() {
+      __isset_bit_vector.clear(__TIME_CREATED_ISSET_ID);
+    }
+
+    /** Returns true if field time_created is set (has been assigned a value) and false otherwise */
+    public boolean isSetTime_created() {
+      return __isset_bit_vector.get(__TIME_CREATED_ISSET_ID);
+    }
+
+    public void setTime_createdIsSet(boolean value) {
+      __isset_bit_vector.set(__TIME_CREATED_ISSET_ID, value);
+    }
+
+    public int getIs_edit() {
+      return this.is_edit;
+    }
+
+    public create_or_edit_anthology_args setIs_edit(int is_edit) {
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
+      return this;
+    }
+
+    public void unsetIs_edit() {
+      __isset_bit_vector.clear(__IS_EDIT_ISSET_ID);
+    }
+
+    /** Returns true if field is_edit is set (has been assigned a value) and false otherwise */
+    public boolean isSetIs_edit() {
+      return __isset_bit_vector.get(__IS_EDIT_ISSET_ID);
+    }
+
+    public void setIs_editIsSet(boolean value) {
+      __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        if (value == null) {
+          unsetAnthology_id();
+        } else {
+          setAnthology_id((String)value);
+        }
+        break;
+
+      case TITLE:
+        if (value == null) {
+          unsetTitle();
+        } else {
+          setTitle((String)value);
+        }
+        break;
+
+      case TITLE_ID:
+        if (value == null) {
+          unsetTitle_id();
+        } else {
+          setTitle_id((String)value);
+        }
+        break;
+
+      case SUMMARY:
+        if (value == null) {
+          unsetSummary();
+        } else {
+          setSummary((String)value);
+        }
+        break;
+
+      case FEATURE_IMAGE:
+        if (value == null) {
+          unsetFeature_image();
+        } else {
+          setFeature_image((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      case GENRES:
+        if (value == null) {
+          unsetGenres();
+        } else {
+          setGenres((String)value);
+        }
+        break;
+
+      case LANGUAGE:
+        if (value == null) {
+          unsetLanguage();
+        } else {
+          setLanguage((String)value);
+        }
+        break;
+
+      case TIME_CREATED:
+        if (value == null) {
+          unsetTime_created();
+        } else {
+          setTime_created((Integer)value);
+        }
+        break;
+
+      case IS_EDIT:
+        if (value == null) {
+          unsetIs_edit();
+        } else {
+          setIs_edit((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return getAnthology_id();
+
+      case TITLE:
+        return getTitle();
+
+      case TITLE_ID:
+        return getTitle_id();
+
+      case SUMMARY:
+        return getSummary();
+
+      case FEATURE_IMAGE:
+        return getFeature_image();
+
+      case USER_ID:
+        return getUser_id();
+
+      case GENRES:
+        return getGenres();
+
+      case LANGUAGE:
+        return getLanguage();
+
+      case TIME_CREATED:
+        return Integer.valueOf(getTime_created());
+
+      case IS_EDIT:
+        return Integer.valueOf(getIs_edit());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return isSetAnthology_id();
+      case TITLE:
+        return isSetTitle();
+      case TITLE_ID:
+        return isSetTitle_id();
+      case SUMMARY:
+        return isSetSummary();
+      case FEATURE_IMAGE:
+        return isSetFeature_image();
+      case USER_ID:
+        return isSetUser_id();
+      case GENRES:
+        return isSetGenres();
+      case LANGUAGE:
+        return isSetLanguage();
+      case TIME_CREATED:
+        return isSetTime_created();
+      case IS_EDIT:
+        return isSetIs_edit();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof create_or_edit_anthology_args)
+        return this.equals((create_or_edit_anthology_args)that);
+      return false;
+    }
+
+    public boolean equals(create_or_edit_anthology_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_anthology_id = true && this.isSetAnthology_id();
+      boolean that_present_anthology_id = true && that.isSetAnthology_id();
+      if (this_present_anthology_id || that_present_anthology_id) {
+        if (!(this_present_anthology_id && that_present_anthology_id))
+          return false;
+        if (!this.anthology_id.equals(that.anthology_id))
+          return false;
+      }
+
+      boolean this_present_title = true && this.isSetTitle();
+      boolean that_present_title = true && that.isSetTitle();
+      if (this_present_title || that_present_title) {
+        if (!(this_present_title && that_present_title))
+          return false;
+        if (!this.title.equals(that.title))
+          return false;
+      }
+
+      boolean this_present_title_id = true && this.isSetTitle_id();
+      boolean that_present_title_id = true && that.isSetTitle_id();
+      if (this_present_title_id || that_present_title_id) {
+        if (!(this_present_title_id && that_present_title_id))
+          return false;
+        if (!this.title_id.equals(that.title_id))
+          return false;
+      }
+
+      boolean this_present_summary = true && this.isSetSummary();
+      boolean that_present_summary = true && that.isSetSummary();
+      if (this_present_summary || that_present_summary) {
+        if (!(this_present_summary && that_present_summary))
+          return false;
+        if (!this.summary.equals(that.summary))
+          return false;
+      }
+
+      boolean this_present_feature_image = true && this.isSetFeature_image();
+      boolean that_present_feature_image = true && that.isSetFeature_image();
+      if (this_present_feature_image || that_present_feature_image) {
+        if (!(this_present_feature_image && that_present_feature_image))
+          return false;
+        if (!this.feature_image.equals(that.feature_image))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      boolean this_present_genres = true && this.isSetGenres();
+      boolean that_present_genres = true && that.isSetGenres();
+      if (this_present_genres || that_present_genres) {
+        if (!(this_present_genres && that_present_genres))
+          return false;
+        if (!this.genres.equals(that.genres))
+          return false;
+      }
+
+      boolean this_present_language = true && this.isSetLanguage();
+      boolean that_present_language = true && that.isSetLanguage();
+      if (this_present_language || that_present_language) {
+        if (!(this_present_language && that_present_language))
+          return false;
+        if (!this.language.equals(that.language))
+          return false;
+      }
+
+      boolean this_present_time_created = true;
+      boolean that_present_time_created = true;
+      if (this_present_time_created || that_present_time_created) {
+        if (!(this_present_time_created && that_present_time_created))
+          return false;
+        if (this.time_created != that.time_created)
+          return false;
+      }
+
+      boolean this_present_is_edit = true;
+      boolean that_present_is_edit = true;
+      if (this_present_is_edit || that_present_is_edit) {
+        if (!(this_present_is_edit && that_present_is_edit))
+          return false;
+        if (this.is_edit != that.is_edit)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(create_or_edit_anthology_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      create_or_edit_anthology_args typedOther = (create_or_edit_anthology_args)other;
+
+      lastComparison = Boolean.valueOf(isSetAnthology_id()).compareTo(typedOther.isSetAnthology_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAnthology_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.anthology_id, typedOther.anthology_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTitle()).compareTo(typedOther.isSetTitle());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTitle()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.title, typedOther.title);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTitle_id()).compareTo(typedOther.isSetTitle_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTitle_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.title_id, typedOther.title_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetSummary()).compareTo(typedOther.isSetSummary());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSummary()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.summary, typedOther.summary);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetFeature_image()).compareTo(typedOther.isSetFeature_image());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetFeature_image()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.feature_image, typedOther.feature_image);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetGenres()).compareTo(typedOther.isSetGenres());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetGenres()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.genres, typedOther.genres);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLanguage()).compareTo(typedOther.isSetLanguage());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLanguage()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.language, typedOther.language);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTime_created()).compareTo(typedOther.isSetTime_created());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTime_created()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.time_created, typedOther.time_created);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIs_edit()).compareTo(typedOther.isSetIs_edit());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIs_edit()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.is_edit, typedOther.is_edit);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("create_or_edit_anthology_args(");
+      boolean first = true;
+
+      sb.append("anthology_id:");
+      if (this.anthology_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.anthology_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("title:");
+      if (this.title == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.title);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("title_id:");
+      if (this.title_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.title_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("summary:");
+      if (this.summary == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.summary);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("feature_image:");
+      if (this.feature_image == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.feature_image);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("genres:");
+      if (this.genres == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.genres);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("language:");
+      if (this.language == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.language);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("time_created:");
+      sb.append(this.time_created);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("is_edit:");
+      sb.append(this.is_edit);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class create_or_edit_anthology_argsStandardSchemeFactory implements SchemeFactory {
+      public create_or_edit_anthology_argsStandardScheme getScheme() {
+        return new create_or_edit_anthology_argsStandardScheme();
+      }
+    }
+
+    private static class create_or_edit_anthology_argsStandardScheme extends StandardScheme<create_or_edit_anthology_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, create_or_edit_anthology_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // ANTHOLOGY_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.anthology_id = iprot.readString();
+                struct.setAnthology_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // TITLE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.title = iprot.readString();
+                struct.setTitleIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // TITLE_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.title_id = iprot.readString();
+                struct.setTitle_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // SUMMARY
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.summary = iprot.readString();
+                struct.setSummaryIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 5: // FEATURE_IMAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.feature_image = iprot.readString();
+                struct.setFeature_imageIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 6: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 7: // GENRES
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.genres = iprot.readString();
+                struct.setGenresIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 8: // LANGUAGE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.language = iprot.readString();
+                struct.setLanguageIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 9: // TIME_CREATED
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.time_created = iprot.readI32();
+                struct.setTime_createdIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 10: // IS_EDIT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.is_edit = iprot.readI32();
+                struct.setIs_editIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, create_or_edit_anthology_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.anthology_id != null) {
+          oprot.writeFieldBegin(ANTHOLOGY_ID_FIELD_DESC);
+          oprot.writeString(struct.anthology_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.title != null) {
+          oprot.writeFieldBegin(TITLE_FIELD_DESC);
+          oprot.writeString(struct.title);
+          oprot.writeFieldEnd();
+        }
+        if (struct.title_id != null) {
+          oprot.writeFieldBegin(TITLE_ID_FIELD_DESC);
+          oprot.writeString(struct.title_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.summary != null) {
+          oprot.writeFieldBegin(SUMMARY_FIELD_DESC);
+          oprot.writeString(struct.summary);
+          oprot.writeFieldEnd();
+        }
+        if (struct.feature_image != null) {
+          oprot.writeFieldBegin(FEATURE_IMAGE_FIELD_DESC);
+          oprot.writeString(struct.feature_image);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.genres != null) {
+          oprot.writeFieldBegin(GENRES_FIELD_DESC);
+          oprot.writeString(struct.genres);
+          oprot.writeFieldEnd();
+        }
+        if (struct.language != null) {
+          oprot.writeFieldBegin(LANGUAGE_FIELD_DESC);
+          oprot.writeString(struct.language);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(TIME_CREATED_FIELD_DESC);
+        oprot.writeI32(struct.time_created);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
+        oprot.writeI32(struct.is_edit);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class create_or_edit_anthology_argsTupleSchemeFactory implements SchemeFactory {
+      public create_or_edit_anthology_argsTupleScheme getScheme() {
+        return new create_or_edit_anthology_argsTupleScheme();
+      }
+    }
+
+    private static class create_or_edit_anthology_argsTupleScheme extends TupleScheme<create_or_edit_anthology_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, create_or_edit_anthology_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetAnthology_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetTitle()) {
+          optionals.set(1);
+        }
+        if (struct.isSetTitle_id()) {
+          optionals.set(2);
+        }
+        if (struct.isSetSummary()) {
+          optionals.set(3);
+        }
+        if (struct.isSetFeature_image()) {
+          optionals.set(4);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(5);
+        }
+        if (struct.isSetGenres()) {
+          optionals.set(6);
+        }
+        if (struct.isSetLanguage()) {
+          optionals.set(7);
+        }
+        if (struct.isSetTime_created()) {
+          optionals.set(8);
+        }
+        if (struct.isSetIs_edit()) {
+          optionals.set(9);
+        }
+        oprot.writeBitSet(optionals, 10);
+        if (struct.isSetAnthology_id()) {
+          oprot.writeString(struct.anthology_id);
+        }
+        if (struct.isSetTitle()) {
+          oprot.writeString(struct.title);
+        }
+        if (struct.isSetTitle_id()) {
+          oprot.writeString(struct.title_id);
+        }
+        if (struct.isSetSummary()) {
+          oprot.writeString(struct.summary);
+        }
+        if (struct.isSetFeature_image()) {
+          oprot.writeString(struct.feature_image);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+        if (struct.isSetGenres()) {
+          oprot.writeString(struct.genres);
+        }
+        if (struct.isSetLanguage()) {
+          oprot.writeString(struct.language);
+        }
+        if (struct.isSetTime_created()) {
+          oprot.writeI32(struct.time_created);
+        }
+        if (struct.isSetIs_edit()) {
+          oprot.writeI32(struct.is_edit);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_anthology_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(10);
+        if (incoming.get(0)) {
+          struct.anthology_id = iprot.readString();
+          struct.setAnthology_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.title = iprot.readString();
+          struct.setTitleIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.title_id = iprot.readString();
+          struct.setTitle_idIsSet(true);
+        }
+        if (incoming.get(3)) {
+          struct.summary = iprot.readString();
+          struct.setSummaryIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.feature_image = iprot.readString();
+          struct.setFeature_imageIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+        if (incoming.get(6)) {
+          struct.genres = iprot.readString();
+          struct.setGenresIsSet(true);
+        }
+        if (incoming.get(7)) {
+          struct.language = iprot.readString();
+          struct.setLanguageIsSet(true);
+        }
+        if (incoming.get(8)) {
+          struct.time_created = iprot.readI32();
+          struct.setTime_createdIsSet(true);
+        }
+        if (incoming.get(9)) {
+          struct.is_edit = iprot.readI32();
+          struct.setIs_editIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class create_or_edit_anthology_result implements org.apache.thrift.TBase<create_or_edit_anthology_result, create_or_edit_anthology_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_anthology_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new create_or_edit_anthology_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new create_or_edit_anthology_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_anthology_result.class, metaDataMap);
+    }
+
+    public create_or_edit_anthology_result() {
+    }
+
+    public create_or_edit_anthology_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public create_or_edit_anthology_result(create_or_edit_anthology_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public create_or_edit_anthology_result deepCopy() {
+      return new create_or_edit_anthology_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public create_or_edit_anthology_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof create_or_edit_anthology_result)
+        return this.equals((create_or_edit_anthology_result)that);
+      return false;
+    }
+
+    public boolean equals(create_or_edit_anthology_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(create_or_edit_anthology_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      create_or_edit_anthology_result typedOther = (create_or_edit_anthology_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("create_or_edit_anthology_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class create_or_edit_anthology_resultStandardSchemeFactory implements SchemeFactory {
+      public create_or_edit_anthology_resultStandardScheme getScheme() {
+        return new create_or_edit_anthology_resultStandardScheme();
+      }
+    }
+
+    private static class create_or_edit_anthology_resultStandardScheme extends StandardScheme<create_or_edit_anthology_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, create_or_edit_anthology_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, create_or_edit_anthology_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class create_or_edit_anthology_resultTupleSchemeFactory implements SchemeFactory {
+      public create_or_edit_anthology_resultTupleScheme getScheme() {
+        return new create_or_edit_anthology_resultTupleScheme();
+      }
+    }
+
+    private static class create_or_edit_anthology_resultTupleScheme extends TupleScheme<create_or_edit_anthology_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, create_or_edit_anthology_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_anthology_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class tag_a_post_args implements org.apache.thrift.TBase<tag_a_post_args, tag_a_post_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("tag_a_post_args");
+
+    private static final org.apache.thrift.protocol.TField ANTHOLOGY_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("anthology_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField TYPE_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("type_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)3);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)4);
+    private static final org.apache.thrift.protocol.TField TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("time", org.apache.thrift.protocol.TType.I32, (short)5);
+    private static final org.apache.thrift.protocol.TField IS_TAG_FIELD_DESC = new org.apache.thrift.protocol.TField("is_tag", org.apache.thrift.protocol.TType.I32, (short)6);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new tag_a_post_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new tag_a_post_argsTupleSchemeFactory());
+    }
+
+    public String anthology_id; // required
+    public String type_id; // required
+    public String type; // required
+    public String user_id; // required
+    public int time; // required
+    public int is_tag; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      ANTHOLOGY_ID((short)1, "anthology_id"),
+      TYPE_ID((short)2, "type_id"),
+      TYPE((short)3, "type"),
+      USER_ID((short)4, "user_id"),
+      TIME((short)5, "time"),
+      IS_TAG((short)6, "is_tag");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // ANTHOLOGY_ID
+            return ANTHOLOGY_ID;
+          case 2: // TYPE_ID
+            return TYPE_ID;
+          case 3: // TYPE
+            return TYPE;
+          case 4: // USER_ID
+            return USER_ID;
+          case 5: // TIME
+            return TIME;
+          case 6: // IS_TAG
+            return IS_TAG;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __TIME_ISSET_ID = 0;
+    private static final int __IS_TAG_ISSET_ID = 1;
+    private BitSet __isset_bit_vector = new BitSet(2);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ANTHOLOGY_ID, new org.apache.thrift.meta_data.FieldMetaData("anthology_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TYPE_ID, new org.apache.thrift.meta_data.FieldMetaData("type_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TYPE, new org.apache.thrift.meta_data.FieldMetaData("type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.TIME, new org.apache.thrift.meta_data.FieldMetaData("time", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.IS_TAG, new org.apache.thrift.meta_data.FieldMetaData("is_tag", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(tag_a_post_args.class, metaDataMap);
+    }
+
+    public tag_a_post_args() {
+    }
+
+    public tag_a_post_args(
+      String anthology_id,
+      String type_id,
+      String type,
+      String user_id,
+      int time,
+      int is_tag)
+    {
+      this();
+      this.anthology_id = anthology_id;
+      this.type_id = type_id;
+      this.type = type;
+      this.user_id = user_id;
+      this.time = time;
+      setTimeIsSet(true);
+      this.is_tag = is_tag;
+      setIs_tagIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public tag_a_post_args(tag_a_post_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetAnthology_id()) {
+        this.anthology_id = other.anthology_id;
+      }
+      if (other.isSetType_id()) {
+        this.type_id = other.type_id;
+      }
+      if (other.isSetType()) {
+        this.type = other.type;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+      this.time = other.time;
+      this.is_tag = other.is_tag;
+    }
+
+    public tag_a_post_args deepCopy() {
+      return new tag_a_post_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.anthology_id = null;
+      this.type_id = null;
+      this.type = null;
+      this.user_id = null;
+      setTimeIsSet(false);
+      this.time = 0;
+      setIs_tagIsSet(false);
+      this.is_tag = 0;
+    }
+
+    public String getAnthology_id() {
+      return this.anthology_id;
+    }
+
+    public tag_a_post_args setAnthology_id(String anthology_id) {
+      this.anthology_id = anthology_id;
+      return this;
+    }
+
+    public void unsetAnthology_id() {
+      this.anthology_id = null;
+    }
+
+    /** Returns true if field anthology_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetAnthology_id() {
+      return this.anthology_id != null;
+    }
+
+    public void setAnthology_idIsSet(boolean value) {
+      if (!value) {
+        this.anthology_id = null;
+      }
+    }
+
+    public String getType_id() {
+      return this.type_id;
+    }
+
+    public tag_a_post_args setType_id(String type_id) {
+      this.type_id = type_id;
+      return this;
+    }
+
+    public void unsetType_id() {
+      this.type_id = null;
+    }
+
+    /** Returns true if field type_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetType_id() {
+      return this.type_id != null;
+    }
+
+    public void setType_idIsSet(boolean value) {
+      if (!value) {
+        this.type_id = null;
+      }
+    }
+
+    public String getType() {
+      return this.type;
+    }
+
+    public tag_a_post_args setType(String type) {
+      this.type = type;
+      return this;
+    }
+
+    public void unsetType() {
+      this.type = null;
+    }
+
+    /** Returns true if field type is set (has been assigned a value) and false otherwise */
+    public boolean isSetType() {
+      return this.type != null;
+    }
+
+    public void setTypeIsSet(boolean value) {
+      if (!value) {
+        this.type = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public tag_a_post_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public int getTime() {
+      return this.time;
+    }
+
+    public tag_a_post_args setTime(int time) {
+      this.time = time;
+      setTimeIsSet(true);
+      return this;
+    }
+
+    public void unsetTime() {
+      __isset_bit_vector.clear(__TIME_ISSET_ID);
+    }
+
+    /** Returns true if field time is set (has been assigned a value) and false otherwise */
+    public boolean isSetTime() {
+      return __isset_bit_vector.get(__TIME_ISSET_ID);
+    }
+
+    public void setTimeIsSet(boolean value) {
+      __isset_bit_vector.set(__TIME_ISSET_ID, value);
+    }
+
+    public int getIs_tag() {
+      return this.is_tag;
+    }
+
+    public tag_a_post_args setIs_tag(int is_tag) {
+      this.is_tag = is_tag;
+      setIs_tagIsSet(true);
+      return this;
+    }
+
+    public void unsetIs_tag() {
+      __isset_bit_vector.clear(__IS_TAG_ISSET_ID);
+    }
+
+    /** Returns true if field is_tag is set (has been assigned a value) and false otherwise */
+    public boolean isSetIs_tag() {
+      return __isset_bit_vector.get(__IS_TAG_ISSET_ID);
+    }
+
+    public void setIs_tagIsSet(boolean value) {
+      __isset_bit_vector.set(__IS_TAG_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        if (value == null) {
+          unsetAnthology_id();
+        } else {
+          setAnthology_id((String)value);
+        }
+        break;
+
+      case TYPE_ID:
+        if (value == null) {
+          unsetType_id();
+        } else {
+          setType_id((String)value);
+        }
+        break;
+
+      case TYPE:
+        if (value == null) {
+          unsetType();
+        } else {
+          setType((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      case TIME:
+        if (value == null) {
+          unsetTime();
+        } else {
+          setTime((Integer)value);
+        }
+        break;
+
+      case IS_TAG:
+        if (value == null) {
+          unsetIs_tag();
+        } else {
+          setIs_tag((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return getAnthology_id();
+
+      case TYPE_ID:
+        return getType_id();
+
+      case TYPE:
+        return getType();
+
+      case USER_ID:
+        return getUser_id();
+
+      case TIME:
+        return Integer.valueOf(getTime());
+
+      case IS_TAG:
+        return Integer.valueOf(getIs_tag());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return isSetAnthology_id();
+      case TYPE_ID:
+        return isSetType_id();
+      case TYPE:
+        return isSetType();
+      case USER_ID:
+        return isSetUser_id();
+      case TIME:
+        return isSetTime();
+      case IS_TAG:
+        return isSetIs_tag();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof tag_a_post_args)
+        return this.equals((tag_a_post_args)that);
+      return false;
+    }
+
+    public boolean equals(tag_a_post_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_anthology_id = true && this.isSetAnthology_id();
+      boolean that_present_anthology_id = true && that.isSetAnthology_id();
+      if (this_present_anthology_id || that_present_anthology_id) {
+        if (!(this_present_anthology_id && that_present_anthology_id))
+          return false;
+        if (!this.anthology_id.equals(that.anthology_id))
+          return false;
+      }
+
+      boolean this_present_type_id = true && this.isSetType_id();
+      boolean that_present_type_id = true && that.isSetType_id();
+      if (this_present_type_id || that_present_type_id) {
+        if (!(this_present_type_id && that_present_type_id))
+          return false;
+        if (!this.type_id.equals(that.type_id))
+          return false;
+      }
+
+      boolean this_present_type = true && this.isSetType();
+      boolean that_present_type = true && that.isSetType();
+      if (this_present_type || that_present_type) {
+        if (!(this_present_type && that_present_type))
+          return false;
+        if (!this.type.equals(that.type))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      boolean this_present_time = true;
+      boolean that_present_time = true;
+      if (this_present_time || that_present_time) {
+        if (!(this_present_time && that_present_time))
+          return false;
+        if (this.time != that.time)
+          return false;
+      }
+
+      boolean this_present_is_tag = true;
+      boolean that_present_is_tag = true;
+      if (this_present_is_tag || that_present_is_tag) {
+        if (!(this_present_is_tag && that_present_is_tag))
+          return false;
+        if (this.is_tag != that.is_tag)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(tag_a_post_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      tag_a_post_args typedOther = (tag_a_post_args)other;
+
+      lastComparison = Boolean.valueOf(isSetAnthology_id()).compareTo(typedOther.isSetAnthology_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAnthology_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.anthology_id, typedOther.anthology_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetType_id()).compareTo(typedOther.isSetType_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetType_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.type_id, typedOther.type_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetType()).compareTo(typedOther.isSetType());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetType()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.type, typedOther.type);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetTime()).compareTo(typedOther.isSetTime());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetTime()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.time, typedOther.time);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIs_tag()).compareTo(typedOther.isSetIs_tag());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIs_tag()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.is_tag, typedOther.is_tag);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("tag_a_post_args(");
+      boolean first = true;
+
+      sb.append("anthology_id:");
+      if (this.anthology_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.anthology_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("type_id:");
+      if (this.type_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.type_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("type:");
+      if (this.type == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.type);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("time:");
+      sb.append(this.time);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("is_tag:");
+      sb.append(this.is_tag);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class tag_a_post_argsStandardSchemeFactory implements SchemeFactory {
+      public tag_a_post_argsStandardScheme getScheme() {
+        return new tag_a_post_argsStandardScheme();
+      }
+    }
+
+    private static class tag_a_post_argsStandardScheme extends StandardScheme<tag_a_post_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, tag_a_post_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // ANTHOLOGY_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.anthology_id = iprot.readString();
+                struct.setAnthology_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // TYPE_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.type_id = iprot.readString();
+                struct.setType_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // TYPE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.type = iprot.readString();
+                struct.setTypeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 4: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 5: // TIME
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.time = iprot.readI32();
+                struct.setTimeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 6: // IS_TAG
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.is_tag = iprot.readI32();
+                struct.setIs_tagIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, tag_a_post_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.anthology_id != null) {
+          oprot.writeFieldBegin(ANTHOLOGY_ID_FIELD_DESC);
+          oprot.writeString(struct.anthology_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.type_id != null) {
+          oprot.writeFieldBegin(TYPE_ID_FIELD_DESC);
+          oprot.writeString(struct.type_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.type != null) {
+          oprot.writeFieldBegin(TYPE_FIELD_DESC);
+          oprot.writeString(struct.type);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(TIME_FIELD_DESC);
+        oprot.writeI32(struct.time);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(IS_TAG_FIELD_DESC);
+        oprot.writeI32(struct.is_tag);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class tag_a_post_argsTupleSchemeFactory implements SchemeFactory {
+      public tag_a_post_argsTupleScheme getScheme() {
+        return new tag_a_post_argsTupleScheme();
+      }
+    }
+
+    private static class tag_a_post_argsTupleScheme extends TupleScheme<tag_a_post_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, tag_a_post_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetAnthology_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetType_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetType()) {
+          optionals.set(2);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(3);
+        }
+        if (struct.isSetTime()) {
+          optionals.set(4);
+        }
+        if (struct.isSetIs_tag()) {
+          optionals.set(5);
+        }
+        oprot.writeBitSet(optionals, 6);
+        if (struct.isSetAnthology_id()) {
+          oprot.writeString(struct.anthology_id);
+        }
+        if (struct.isSetType_id()) {
+          oprot.writeString(struct.type_id);
+        }
+        if (struct.isSetType()) {
+          oprot.writeString(struct.type);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+        if (struct.isSetTime()) {
+          oprot.writeI32(struct.time);
+        }
+        if (struct.isSetIs_tag()) {
+          oprot.writeI32(struct.is_tag);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, tag_a_post_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(6);
+        if (incoming.get(0)) {
+          struct.anthology_id = iprot.readString();
+          struct.setAnthology_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.type_id = iprot.readString();
+          struct.setType_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.type = iprot.readString();
+          struct.setTypeIsSet(true);
+        }
+        if (incoming.get(3)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.time = iprot.readI32();
+          struct.setTimeIsSet(true);
+        }
+        if (incoming.get(5)) {
+          struct.is_tag = iprot.readI32();
+          struct.setIs_tagIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class tag_a_post_result implements org.apache.thrift.TBase<tag_a_post_result, tag_a_post_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("tag_a_post_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new tag_a_post_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new tag_a_post_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(tag_a_post_result.class, metaDataMap);
+    }
+
+    public tag_a_post_result() {
+    }
+
+    public tag_a_post_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public tag_a_post_result(tag_a_post_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public tag_a_post_result deepCopy() {
+      return new tag_a_post_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public tag_a_post_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof tag_a_post_result)
+        return this.equals((tag_a_post_result)that);
+      return false;
+    }
+
+    public boolean equals(tag_a_post_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(tag_a_post_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      tag_a_post_result typedOther = (tag_a_post_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("tag_a_post_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class tag_a_post_resultStandardSchemeFactory implements SchemeFactory {
+      public tag_a_post_resultStandardScheme getScheme() {
+        return new tag_a_post_resultStandardScheme();
+      }
+    }
+
+    private static class tag_a_post_resultStandardScheme extends StandardScheme<tag_a_post_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, tag_a_post_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, tag_a_post_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class tag_a_post_resultTupleSchemeFactory implements SchemeFactory {
+      public tag_a_post_resultTupleScheme getScheme() {
+        return new tag_a_post_resultTupleScheme();
+      }
+    }
+
+    private static class tag_a_post_resultTupleScheme extends TupleScheme<tag_a_post_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, tag_a_post_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, tag_a_post_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class delete_anthology_args implements org.apache.thrift.TBase<delete_anthology_args, delete_anthology_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("delete_anthology_args");
+
+    private static final org.apache.thrift.protocol.TField ANTHOLOGY_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("anthology_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new delete_anthology_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new delete_anthology_argsTupleSchemeFactory());
+    }
+
+    public String anthology_id; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      ANTHOLOGY_ID((short)1, "anthology_id");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // ANTHOLOGY_ID
+            return ANTHOLOGY_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.ANTHOLOGY_ID, new org.apache.thrift.meta_data.FieldMetaData("anthology_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(delete_anthology_args.class, metaDataMap);
+    }
+
+    public delete_anthology_args() {
+    }
+
+    public delete_anthology_args(
+      String anthology_id)
+    {
+      this();
+      this.anthology_id = anthology_id;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public delete_anthology_args(delete_anthology_args other) {
+      if (other.isSetAnthology_id()) {
+        this.anthology_id = other.anthology_id;
+      }
+    }
+
+    public delete_anthology_args deepCopy() {
+      return new delete_anthology_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.anthology_id = null;
+    }
+
+    public String getAnthology_id() {
+      return this.anthology_id;
+    }
+
+    public delete_anthology_args setAnthology_id(String anthology_id) {
+      this.anthology_id = anthology_id;
+      return this;
+    }
+
+    public void unsetAnthology_id() {
+      this.anthology_id = null;
+    }
+
+    /** Returns true if field anthology_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetAnthology_id() {
+      return this.anthology_id != null;
+    }
+
+    public void setAnthology_idIsSet(boolean value) {
+      if (!value) {
+        this.anthology_id = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        if (value == null) {
+          unsetAnthology_id();
+        } else {
+          setAnthology_id((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return getAnthology_id();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case ANTHOLOGY_ID:
+        return isSetAnthology_id();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof delete_anthology_args)
+        return this.equals((delete_anthology_args)that);
+      return false;
+    }
+
+    public boolean equals(delete_anthology_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_anthology_id = true && this.isSetAnthology_id();
+      boolean that_present_anthology_id = true && that.isSetAnthology_id();
+      if (this_present_anthology_id || that_present_anthology_id) {
+        if (!(this_present_anthology_id && that_present_anthology_id))
+          return false;
+        if (!this.anthology_id.equals(that.anthology_id))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(delete_anthology_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      delete_anthology_args typedOther = (delete_anthology_args)other;
+
+      lastComparison = Boolean.valueOf(isSetAnthology_id()).compareTo(typedOther.isSetAnthology_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetAnthology_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.anthology_id, typedOther.anthology_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("delete_anthology_args(");
+      boolean first = true;
+
+      sb.append("anthology_id:");
+      if (this.anthology_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.anthology_id);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class delete_anthology_argsStandardSchemeFactory implements SchemeFactory {
+      public delete_anthology_argsStandardScheme getScheme() {
+        return new delete_anthology_argsStandardScheme();
+      }
+    }
+
+    private static class delete_anthology_argsStandardScheme extends StandardScheme<delete_anthology_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, delete_anthology_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // ANTHOLOGY_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.anthology_id = iprot.readString();
+                struct.setAnthology_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, delete_anthology_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.anthology_id != null) {
+          oprot.writeFieldBegin(ANTHOLOGY_ID_FIELD_DESC);
+          oprot.writeString(struct.anthology_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class delete_anthology_argsTupleSchemeFactory implements SchemeFactory {
+      public delete_anthology_argsTupleScheme getScheme() {
+        return new delete_anthology_argsTupleScheme();
+      }
+    }
+
+    private static class delete_anthology_argsTupleScheme extends TupleScheme<delete_anthology_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, delete_anthology_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetAnthology_id()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetAnthology_id()) {
+          oprot.writeString(struct.anthology_id);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, delete_anthology_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.anthology_id = iprot.readString();
+          struct.setAnthology_idIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class delete_anthology_result implements org.apache.thrift.TBase<delete_anthology_result, delete_anthology_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("delete_anthology_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new delete_anthology_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new delete_anthology_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(delete_anthology_result.class, metaDataMap);
+    }
+
+    public delete_anthology_result() {
+    }
+
+    public delete_anthology_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public delete_anthology_result(delete_anthology_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public delete_anthology_result deepCopy() {
+      return new delete_anthology_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public delete_anthology_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof delete_anthology_result)
+        return this.equals((delete_anthology_result)that);
+      return false;
+    }
+
+    public boolean equals(delete_anthology_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(delete_anthology_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      delete_anthology_result typedOther = (delete_anthology_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("delete_anthology_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class delete_anthology_resultStandardSchemeFactory implements SchemeFactory {
+      public delete_anthology_resultStandardScheme getScheme() {
+        return new delete_anthology_resultStandardScheme();
+      }
+    }
+
+    private static class delete_anthology_resultStandardScheme extends StandardScheme<delete_anthology_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, delete_anthology_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, delete_anthology_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class delete_anthology_resultTupleSchemeFactory implements SchemeFactory {
+      public delete_anthology_resultTupleScheme getScheme() {
+        return new delete_anthology_resultTupleScheme();
+      }
+    }
+
+    private static class delete_anthology_resultTupleScheme extends TupleScheme<delete_anthology_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, delete_anthology_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, delete_anthology_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
