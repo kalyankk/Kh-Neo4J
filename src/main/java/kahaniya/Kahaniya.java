@@ -8607,6 +8607,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				i++;
 				suggested_chapters.addLast(s_chapter);
 			}
+			
 			//based on author, skip this if author and viewr is same (i.e., no need to send his own writings as suggestions)
 			//skip user viewed chapter
 			if(i<count && !author.equals(user) && author.hasProperty(IS_DELETED) && author.getProperty(IS_DELETED).toString().equals("1"))
@@ -8648,6 +8649,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 						
 						i++;
 						suggested_chapters.addLast(s_chapter);
+						break;
 					}
 				}
 
