@@ -4020,16 +4020,16 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(user_id == ""){
 				switch(feedType) {
 		         case "TA" :
-		        	 return get_popular_authors(filter, prev_cnt, count);		            
+		        	 return get_popular_authors(filter, prev_cnt, count).toString();		            
 		         case "TC" :
-		        	 return get_popular_stories(filter, prev_cnt, count);
+		        	 return get_popular_stories(filter, prev_cnt, count).toString();
 		         case "TS" :
-		        	 return get_popular_serieses(filter, prev_cnt, count);
+		        	 return get_popular_serieses(filter, prev_cnt, count).toString();
 		         case "TAN" :
-		        	 return get_popular_anthologies(filter, prev_cnt, count);
+		        	 return get_popular_anthologies(filter, prev_cnt, count).toString();
 		         case "TG" :
-		        	 return get_genre_feed(filter, prev_cnt, count);
-		         default :
+		        	 return get_genre_feed(filter, prev_cnt, count).toString();
+		         default :		        	 
 		        	 return get_anonymous_feed(filter);
 		        	 }
 			}
@@ -4071,13 +4071,25 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
+			JSONObject obj = new JSONObject();
+			int c = 6;
+			obj.put("popular_authors", get_popular_authors(filter, 0, c));
+			obj.put("popular_stories",get_popular_stories(filter, 0, c));
+			obj.put("popular_serieses",get_popular_serieses(filter, 0, c));
+			obj.put("popular_anthologies",get_popular_anthologies(filter, 0, c));
 			
-			jsonArray.put(get_popular_authors(filter, 0, 6));
-			jsonArray.put(get_popular_stories(filter, 0, 6));
-			jsonArray.put(get_popular_serieses(filter, 0, 6));
-			jsonArray.put(get_popular_anthologies(filter, 0, 6));
-			jsonArray.put(get_genre_feed(filter, 0, 6));
+			JSONObject filterJSON = new JSONObject(filter);
+       	 	filterJSON.remove("genre");
+       	 	filterJSON.put("genre","romance");
+			obj.put("roamnce_feed",get_genre_feed(filter, 0, c));
+			filterJSON.remove("genre");
+       	 	filterJSON.put("genre","children");
+       	 	obj.put("children_feed",get_genre_feed(filter, 0, c));
+       	 	filterJSON.remove("genre");
+    	 	filterJSON.put("genre","fiction");
+    	 	obj.put("fiction_feed",get_genre_feed(filter, 0, c));
 			
+			jsonArray.put(obj);
 			tx.success();
 
 		}
@@ -4100,7 +4112,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 
-	private String get_genre_feed(String filter, int prev_cnt, int count){
+	private JSONArray get_genre_feed(String filter, int prev_cnt, int count){
 		JSONArray jsonArray = new JSONArray();		
 		try(Transaction tx = graphDb.beginTx())
 		{
@@ -4241,10 +4253,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
-		return jsonArray.toString();
+		return jsonArray;
 	}
 	
-	private String get_popular_anthologies(String filter, int prev_cnt, int count)
+	private JSONArray get_popular_anthologies(String filter, int prev_cnt, int count)
 	{
 
 		JSONArray jsonArray = new JSONArray();		
@@ -4304,11 +4316,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
-		return jsonArray.toString();
+		return jsonArray;
 	}
 
 	
-	private String get_popular_stories(String filter, int prev_cnt, int count) {
+	private JSONArray get_popular_stories(String filter, int prev_cnt, int count) {
 		JSONArray jsonArray = new JSONArray();
 		try (Transaction tx = graphDb.beginTx()) {
 			aquireWriteLock(tx);
@@ -4367,10 +4379,10 @@ public class Kahaniya implements KahaniyaService.Iface{
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
-		return jsonArray.toString();
+		return jsonArray;
 	}
 	
-	private String get_popular_serieses(String filter, int prev_cnt, int count) {
+	private JSONArray get_popular_serieses(String filter, int prev_cnt, int count) {
 		// no need to apply filter
 		JSONArray jsonArray = new JSONArray();
 		try (Transaction tx = graphDb.beginTx()) {
@@ -4459,7 +4471,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			ex.printStackTrace();
 			jsonArray = new JSONArray();
 		}
-		return jsonArray.toString();
+		return jsonArray;
 	}
 
 	private String get_for_you_feed(String filter, int prev_cnt, int count, String user_id)
@@ -5855,7 +5867,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		return jsonArray.toString();
 	}
 	
-	private String get_popular_authors(String filter, int prev_cnt, int count)
+	private JSONArray get_popular_authors(String filter, int prev_cnt, int count)
 	{
 		JSONArray jsonArray = new JSONArray();
 		try(Transaction tx = graphDb.beginTx())
@@ -5957,7 +5969,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 
 		
-		return jsonArray.toString();
+		return jsonArray;
 	}
 
 	
