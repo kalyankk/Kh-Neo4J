@@ -151,6 +151,8 @@ public class KahaniyaService {
 
     public String pin_a_post(String post_type, String lang, String post_id, int time) throws org.apache.thrift.TException;
 
+    public String edit_user_bio(String user_id, String bio) throws org.apache.thrift.TException;
+
   }
 
   public interface AsyncIface {
@@ -274,6 +276,8 @@ public class KahaniyaService {
     public void delete_anthology(String anthology_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.delete_anthology_call> resultHandler) throws org.apache.thrift.TException;
 
     public void pin_a_post(String post_type, String lang, String post_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.pin_a_post_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void edit_user_bio(String user_id, String bio, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.edit_user_bio_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -1836,6 +1840,30 @@ public class KahaniyaService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "pin_a_post failed: unknown result");
+    }
+
+    public String edit_user_bio(String user_id, String bio) throws org.apache.thrift.TException
+    {
+      send_edit_user_bio(user_id, bio);
+      return recv_edit_user_bio();
+    }
+
+    public void send_edit_user_bio(String user_id, String bio) throws org.apache.thrift.TException
+    {
+      edit_user_bio_args args = new edit_user_bio_args();
+      args.setUser_id(user_id);
+      args.setBio(bio);
+      sendBase("edit_user_bio", args);
+    }
+
+    public String recv_edit_user_bio() throws org.apache.thrift.TException
+    {
+      edit_user_bio_result result = new edit_user_bio_result();
+      receiveBase(result, "edit_user_bio");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "edit_user_bio failed: unknown result");
     }
 
   }
@@ -4259,6 +4287,41 @@ public class KahaniyaService {
       }
     }
 
+    public void edit_user_bio(String user_id, String bio, org.apache.thrift.async.AsyncMethodCallback<edit_user_bio_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      edit_user_bio_call method_call = new edit_user_bio_call(user_id, bio, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class edit_user_bio_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String user_id;
+      private String bio;
+      public edit_user_bio_call(String user_id, String bio, org.apache.thrift.async.AsyncMethodCallback<edit_user_bio_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.user_id = user_id;
+        this.bio = bio;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("edit_user_bio", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        edit_user_bio_args args = new edit_user_bio_args();
+        args.setUser_id(user_id);
+        args.setBio(bio);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_edit_user_bio();
+      }
+    }
+
   }
 
   public static class Processor<I extends Iface> extends org.apache.thrift.TBaseProcessor<I> implements org.apache.thrift.TProcessor {
@@ -4332,6 +4395,7 @@ public class KahaniyaService {
       processMap.put("tag_a_post", new tag_a_post());
       processMap.put("delete_anthology", new delete_anthology());
       processMap.put("pin_a_post", new pin_a_post());
+      processMap.put("edit_user_bio", new edit_user_bio());
       return processMap;
     }
 
@@ -5291,6 +5355,22 @@ public class KahaniyaService {
       protected pin_a_post_result getResult(I iface, pin_a_post_args args) throws org.apache.thrift.TException {
         pin_a_post_result result = new pin_a_post_result();
         result.success = iface.pin_a_post(args.post_type, args.lang, args.post_id, args.time);
+        return result;
+      }
+    }
+
+    private static class edit_user_bio<I extends Iface> extends org.apache.thrift.ProcessFunction<I, edit_user_bio_args> {
+      public edit_user_bio() {
+        super("edit_user_bio");
+      }
+
+      protected edit_user_bio_args getEmptyArgsInstance() {
+        return new edit_user_bio_args();
+      }
+
+      protected edit_user_bio_result getResult(I iface, edit_user_bio_args args) throws org.apache.thrift.TException {
+        edit_user_bio_result result = new edit_user_bio_result();
+        result.success = iface.edit_user_bio(args.user_id, args.bio);
         return result;
       }
     }
@@ -63508,6 +63588,812 @@ public class KahaniyaService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, pin_a_post_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class edit_user_bio_args implements org.apache.thrift.TBase<edit_user_bio_args, edit_user_bio_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("edit_user_bio_args");
+
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField BIO_FIELD_DESC = new org.apache.thrift.protocol.TField("bio", org.apache.thrift.protocol.TType.STRING, (short)2);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new edit_user_bio_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new edit_user_bio_argsTupleSchemeFactory());
+    }
+
+    public String user_id; // required
+    public String bio; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      USER_ID((short)1, "user_id"),
+      BIO((short)2, "bio");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // USER_ID
+            return USER_ID;
+          case 2: // BIO
+            return BIO;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.BIO, new org.apache.thrift.meta_data.FieldMetaData("bio", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(edit_user_bio_args.class, metaDataMap);
+    }
+
+    public edit_user_bio_args() {
+    }
+
+    public edit_user_bio_args(
+      String user_id,
+      String bio)
+    {
+      this();
+      this.user_id = user_id;
+      this.bio = bio;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public edit_user_bio_args(edit_user_bio_args other) {
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+      if (other.isSetBio()) {
+        this.bio = other.bio;
+      }
+    }
+
+    public edit_user_bio_args deepCopy() {
+      return new edit_user_bio_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.user_id = null;
+      this.bio = null;
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public edit_user_bio_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public String getBio() {
+      return this.bio;
+    }
+
+    public edit_user_bio_args setBio(String bio) {
+      this.bio = bio;
+      return this;
+    }
+
+    public void unsetBio() {
+      this.bio = null;
+    }
+
+    /** Returns true if field bio is set (has been assigned a value) and false otherwise */
+    public boolean isSetBio() {
+      return this.bio != null;
+    }
+
+    public void setBioIsSet(boolean value) {
+      if (!value) {
+        this.bio = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      case BIO:
+        if (value == null) {
+          unsetBio();
+        } else {
+          setBio((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case USER_ID:
+        return getUser_id();
+
+      case BIO:
+        return getBio();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case USER_ID:
+        return isSetUser_id();
+      case BIO:
+        return isSetBio();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof edit_user_bio_args)
+        return this.equals((edit_user_bio_args)that);
+      return false;
+    }
+
+    public boolean equals(edit_user_bio_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      boolean this_present_bio = true && this.isSetBio();
+      boolean that_present_bio = true && that.isSetBio();
+      if (this_present_bio || that_present_bio) {
+        if (!(this_present_bio && that_present_bio))
+          return false;
+        if (!this.bio.equals(that.bio))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(edit_user_bio_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      edit_user_bio_args typedOther = (edit_user_bio_args)other;
+
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetBio()).compareTo(typedOther.isSetBio());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetBio()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.bio, typedOther.bio);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("edit_user_bio_args(");
+      boolean first = true;
+
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("bio:");
+      if (this.bio == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.bio);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class edit_user_bio_argsStandardSchemeFactory implements SchemeFactory {
+      public edit_user_bio_argsStandardScheme getScheme() {
+        return new edit_user_bio_argsStandardScheme();
+      }
+    }
+
+    private static class edit_user_bio_argsStandardScheme extends StandardScheme<edit_user_bio_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, edit_user_bio_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // BIO
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.bio = iprot.readString();
+                struct.setBioIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, edit_user_bio_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.bio != null) {
+          oprot.writeFieldBegin(BIO_FIELD_DESC);
+          oprot.writeString(struct.bio);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class edit_user_bio_argsTupleSchemeFactory implements SchemeFactory {
+      public edit_user_bio_argsTupleScheme getScheme() {
+        return new edit_user_bio_argsTupleScheme();
+      }
+    }
+
+    private static class edit_user_bio_argsTupleScheme extends TupleScheme<edit_user_bio_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, edit_user_bio_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetUser_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetBio()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+        if (struct.isSetBio()) {
+          oprot.writeString(struct.bio);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, edit_user_bio_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.bio = iprot.readString();
+          struct.setBioIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class edit_user_bio_result implements org.apache.thrift.TBase<edit_user_bio_result, edit_user_bio_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("edit_user_bio_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new edit_user_bio_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new edit_user_bio_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(edit_user_bio_result.class, metaDataMap);
+    }
+
+    public edit_user_bio_result() {
+    }
+
+    public edit_user_bio_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public edit_user_bio_result(edit_user_bio_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public edit_user_bio_result deepCopy() {
+      return new edit_user_bio_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public edit_user_bio_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof edit_user_bio_result)
+        return this.equals((edit_user_bio_result)that);
+      return false;
+    }
+
+    public boolean equals(edit_user_bio_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(edit_user_bio_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      edit_user_bio_result typedOther = (edit_user_bio_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("edit_user_bio_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class edit_user_bio_resultStandardSchemeFactory implements SchemeFactory {
+      public edit_user_bio_resultStandardScheme getScheme() {
+        return new edit_user_bio_resultStandardScheme();
+      }
+    }
+
+    private static class edit_user_bio_resultStandardScheme extends StandardScheme<edit_user_bio_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, edit_user_bio_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, edit_user_bio_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class edit_user_bio_resultTupleSchemeFactory implements SchemeFactory {
+      public edit_user_bio_resultTupleScheme getScheme() {
+        return new edit_user_bio_resultTupleScheme();
+      }
+    }
+
+    private static class edit_user_bio_resultTupleScheme extends TupleScheme<edit_user_bio_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, edit_user_bio_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, edit_user_bio_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {

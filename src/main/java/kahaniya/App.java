@@ -4,7 +4,7 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("14th Dec, 2016 - 07:10 P.M");
+		System.out.println("19th Dec, 2016 - 1:31 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
@@ -20,6 +20,8 @@ public class App
     public static void test( Kahaniya k)
     {
     	try{
+    		
+//    		System.out.println(k.get_feed("BST", "", "{'language':'telugu'}", 0, 6, "", "", "", "", ""));
 //    		System.out.println(k.create_language("LANG19"));
 //    		System.out.println(k.create_or_edit_anthology("anth38", "my antho38", "my-antho38", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
 //    		System.out.println(k.create_or_edit_anthology("anth39", "my antho39", "my-antho39", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
