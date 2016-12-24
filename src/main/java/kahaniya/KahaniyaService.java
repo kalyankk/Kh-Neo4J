@@ -149,9 +149,11 @@ public class KahaniyaService {
 
     public String delete_anthology(String anthology_id) throws org.apache.thrift.TException;
 
-    public String pin_a_post(String post_type, String lang, String post_id, int time) throws org.apache.thrift.TException;
+    public String pin_a_post(String post_type, String lang, String post_id, int time, int is_edit) throws org.apache.thrift.TException;
 
     public String edit_user_bio(String user_id, String bio) throws org.apache.thrift.TException;
+
+    public String get_pins(String post_type, String lang) throws org.apache.thrift.TException;
 
   }
 
@@ -275,9 +277,11 @@ public class KahaniyaService {
 
     public void delete_anthology(String anthology_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.delete_anthology_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void pin_a_post(String post_type, String lang, String post_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.pin_a_post_call> resultHandler) throws org.apache.thrift.TException;
+    public void pin_a_post(String post_type, String lang, String post_id, int time, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.pin_a_post_call> resultHandler) throws org.apache.thrift.TException;
 
     public void edit_user_bio(String user_id, String bio, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.edit_user_bio_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void get_pins(String post_type, String lang, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_pins_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -1816,19 +1820,20 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "delete_anthology failed: unknown result");
     }
 
-    public String pin_a_post(String post_type, String lang, String post_id, int time) throws org.apache.thrift.TException
+    public String pin_a_post(String post_type, String lang, String post_id, int time, int is_edit) throws org.apache.thrift.TException
     {
-      send_pin_a_post(post_type, lang, post_id, time);
+      send_pin_a_post(post_type, lang, post_id, time, is_edit);
       return recv_pin_a_post();
     }
 
-    public void send_pin_a_post(String post_type, String lang, String post_id, int time) throws org.apache.thrift.TException
+    public void send_pin_a_post(String post_type, String lang, String post_id, int time, int is_edit) throws org.apache.thrift.TException
     {
       pin_a_post_args args = new pin_a_post_args();
       args.setPost_type(post_type);
       args.setLang(lang);
       args.setPost_id(post_id);
       args.setTime(time);
+      args.setIs_edit(is_edit);
       sendBase("pin_a_post", args);
     }
 
@@ -1864,6 +1869,30 @@ public class KahaniyaService {
         return result.success;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "edit_user_bio failed: unknown result");
+    }
+
+    public String get_pins(String post_type, String lang) throws org.apache.thrift.TException
+    {
+      send_get_pins(post_type, lang);
+      return recv_get_pins();
+    }
+
+    public void send_get_pins(String post_type, String lang) throws org.apache.thrift.TException
+    {
+      get_pins_args args = new get_pins_args();
+      args.setPost_type(post_type);
+      args.setLang(lang);
+      sendBase("get_pins", args);
+    }
+
+    public String recv_get_pins() throws org.apache.thrift.TException
+    {
+      get_pins_result result = new get_pins_result();
+      receiveBase(result, "get_pins");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "get_pins failed: unknown result");
     }
 
   }
@@ -4246,9 +4275,9 @@ public class KahaniyaService {
       }
     }
 
-    public void pin_a_post(String post_type, String lang, String post_id, int time, org.apache.thrift.async.AsyncMethodCallback<pin_a_post_call> resultHandler) throws org.apache.thrift.TException {
+    public void pin_a_post(String post_type, String lang, String post_id, int time, int is_edit, org.apache.thrift.async.AsyncMethodCallback<pin_a_post_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      pin_a_post_call method_call = new pin_a_post_call(post_type, lang, post_id, time, resultHandler, this, ___protocolFactory, ___transport);
+      pin_a_post_call method_call = new pin_a_post_call(post_type, lang, post_id, time, is_edit, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -4258,12 +4287,14 @@ public class KahaniyaService {
       private String lang;
       private String post_id;
       private int time;
-      public pin_a_post_call(String post_type, String lang, String post_id, int time, org.apache.thrift.async.AsyncMethodCallback<pin_a_post_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private int is_edit;
+      public pin_a_post_call(String post_type, String lang, String post_id, int time, int is_edit, org.apache.thrift.async.AsyncMethodCallback<pin_a_post_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.post_type = post_type;
         this.lang = lang;
         this.post_id = post_id;
         this.time = time;
+        this.is_edit = is_edit;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -4273,6 +4304,7 @@ public class KahaniyaService {
         args.setLang(lang);
         args.setPost_id(post_id);
         args.setTime(time);
+        args.setIs_edit(is_edit);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -4319,6 +4351,41 @@ public class KahaniyaService {
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
         return (new Client(prot)).recv_edit_user_bio();
+      }
+    }
+
+    public void get_pins(String post_type, String lang, org.apache.thrift.async.AsyncMethodCallback<get_pins_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      get_pins_call method_call = new get_pins_call(post_type, lang, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class get_pins_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String post_type;
+      private String lang;
+      public get_pins_call(String post_type, String lang, org.apache.thrift.async.AsyncMethodCallback<get_pins_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.post_type = post_type;
+        this.lang = lang;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("get_pins", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        get_pins_args args = new get_pins_args();
+        args.setPost_type(post_type);
+        args.setLang(lang);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_get_pins();
       }
     }
 
@@ -4396,6 +4463,7 @@ public class KahaniyaService {
       processMap.put("delete_anthology", new delete_anthology());
       processMap.put("pin_a_post", new pin_a_post());
       processMap.put("edit_user_bio", new edit_user_bio());
+      processMap.put("get_pins", new get_pins());
       return processMap;
     }
 
@@ -5354,7 +5422,7 @@ public class KahaniyaService {
 
       protected pin_a_post_result getResult(I iface, pin_a_post_args args) throws org.apache.thrift.TException {
         pin_a_post_result result = new pin_a_post_result();
-        result.success = iface.pin_a_post(args.post_type, args.lang, args.post_id, args.time);
+        result.success = iface.pin_a_post(args.post_type, args.lang, args.post_id, args.time, args.is_edit);
         return result;
       }
     }
@@ -5371,6 +5439,22 @@ public class KahaniyaService {
       protected edit_user_bio_result getResult(I iface, edit_user_bio_args args) throws org.apache.thrift.TException {
         edit_user_bio_result result = new edit_user_bio_result();
         result.success = iface.edit_user_bio(args.user_id, args.bio);
+        return result;
+      }
+    }
+
+    private static class get_pins<I extends Iface> extends org.apache.thrift.ProcessFunction<I, get_pins_args> {
+      public get_pins() {
+        super("get_pins");
+      }
+
+      protected get_pins_args getEmptyArgsInstance() {
+        return new get_pins_args();
+      }
+
+      protected get_pins_result getResult(I iface, get_pins_args args) throws org.apache.thrift.TException {
+        get_pins_result result = new get_pins_result();
+        result.success = iface.get_pins(args.post_type, args.lang);
         return result;
       }
     }
@@ -62601,6 +62685,7 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField LANG_FIELD_DESC = new org.apache.thrift.protocol.TField("lang", org.apache.thrift.protocol.TType.STRING, (short)2);
     private static final org.apache.thrift.protocol.TField POST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("post_id", org.apache.thrift.protocol.TType.STRING, (short)3);
     private static final org.apache.thrift.protocol.TField TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("time", org.apache.thrift.protocol.TType.I32, (short)4);
+    private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)5);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -62612,13 +62697,15 @@ public class KahaniyaService {
     public String lang; // required
     public String post_id; // required
     public int time; // required
+    public int is_edit; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
       POST_TYPE((short)1, "post_type"),
       LANG((short)2, "lang"),
       POST_ID((short)3, "post_id"),
-      TIME((short)4, "time");
+      TIME((short)4, "time"),
+      IS_EDIT((short)5, "is_edit");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -62641,6 +62728,8 @@ public class KahaniyaService {
             return POST_ID;
           case 4: // TIME
             return TIME;
+          case 5: // IS_EDIT
+            return IS_EDIT;
           default:
             return null;
         }
@@ -62682,7 +62771,8 @@ public class KahaniyaService {
 
     // isset id assignments
     private static final int __TIME_ISSET_ID = 0;
-    private BitSet __isset_bit_vector = new BitSet(1);
+    private static final int __IS_EDIT_ISSET_ID = 1;
+    private BitSet __isset_bit_vector = new BitSet(2);
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -62693,6 +62783,8 @@ public class KahaniyaService {
       tmpMap.put(_Fields.POST_ID, new org.apache.thrift.meta_data.FieldMetaData("post_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       tmpMap.put(_Fields.TIME, new org.apache.thrift.meta_data.FieldMetaData("time", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(pin_a_post_args.class, metaDataMap);
@@ -62705,7 +62797,8 @@ public class KahaniyaService {
       String post_type,
       String lang,
       String post_id,
-      int time)
+      int time,
+      int is_edit)
     {
       this();
       this.post_type = post_type;
@@ -62713,6 +62806,8 @@ public class KahaniyaService {
       this.post_id = post_id;
       this.time = time;
       setTimeIsSet(true);
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
     }
 
     /**
@@ -62731,6 +62826,7 @@ public class KahaniyaService {
         this.post_id = other.post_id;
       }
       this.time = other.time;
+      this.is_edit = other.is_edit;
     }
 
     public pin_a_post_args deepCopy() {
@@ -62744,6 +62840,8 @@ public class KahaniyaService {
       this.post_id = null;
       setTimeIsSet(false);
       this.time = 0;
+      setIs_editIsSet(false);
+      this.is_edit = 0;
     }
 
     public String getPost_type() {
@@ -62841,6 +62939,29 @@ public class KahaniyaService {
       __isset_bit_vector.set(__TIME_ISSET_ID, value);
     }
 
+    public int getIs_edit() {
+      return this.is_edit;
+    }
+
+    public pin_a_post_args setIs_edit(int is_edit) {
+      this.is_edit = is_edit;
+      setIs_editIsSet(true);
+      return this;
+    }
+
+    public void unsetIs_edit() {
+      __isset_bit_vector.clear(__IS_EDIT_ISSET_ID);
+    }
+
+    /** Returns true if field is_edit is set (has been assigned a value) and false otherwise */
+    public boolean isSetIs_edit() {
+      return __isset_bit_vector.get(__IS_EDIT_ISSET_ID);
+    }
+
+    public void setIs_editIsSet(boolean value) {
+      __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case POST_TYPE:
@@ -62875,6 +62996,14 @@ public class KahaniyaService {
         }
         break;
 
+      case IS_EDIT:
+        if (value == null) {
+          unsetIs_edit();
+        } else {
+          setIs_edit((Integer)value);
+        }
+        break;
+
       }
     }
 
@@ -62891,6 +63020,9 @@ public class KahaniyaService {
 
       case TIME:
         return Integer.valueOf(getTime());
+
+      case IS_EDIT:
+        return Integer.valueOf(getIs_edit());
 
       }
       throw new IllegalStateException();
@@ -62911,6 +63043,8 @@ public class KahaniyaService {
         return isSetPost_id();
       case TIME:
         return isSetTime();
+      case IS_EDIT:
+        return isSetIs_edit();
       }
       throw new IllegalStateException();
     }
@@ -62961,6 +63095,15 @@ public class KahaniyaService {
         if (!(this_present_time && that_present_time))
           return false;
         if (this.time != that.time)
+          return false;
+      }
+
+      boolean this_present_is_edit = true;
+      boolean that_present_is_edit = true;
+      if (this_present_is_edit || that_present_is_edit) {
+        if (!(this_present_is_edit && that_present_is_edit))
+          return false;
+        if (this.is_edit != that.is_edit)
           return false;
       }
 
@@ -63020,6 +63163,16 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetIs_edit()).compareTo(typedOther.isSetIs_edit());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIs_edit()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.is_edit, typedOther.is_edit);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -63066,6 +63219,10 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("time:");
       sb.append(this.time);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("is_edit:");
+      sb.append(this.is_edit);
       first = false;
       sb.append(")");
       return sb.toString();
@@ -63143,6 +63300,14 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 5: // IS_EDIT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.is_edit = iprot.readI32();
+                struct.setIs_editIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -63176,6 +63341,9 @@ public class KahaniyaService {
         oprot.writeFieldBegin(TIME_FIELD_DESC);
         oprot.writeI32(struct.time);
         oprot.writeFieldEnd();
+        oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
+        oprot.writeI32(struct.is_edit);
+        oprot.writeFieldEnd();
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -63206,7 +63374,10 @@ public class KahaniyaService {
         if (struct.isSetTime()) {
           optionals.set(3);
         }
-        oprot.writeBitSet(optionals, 4);
+        if (struct.isSetIs_edit()) {
+          optionals.set(4);
+        }
+        oprot.writeBitSet(optionals, 5);
         if (struct.isSetPost_type()) {
           oprot.writeString(struct.post_type);
         }
@@ -63219,12 +63390,15 @@ public class KahaniyaService {
         if (struct.isSetTime()) {
           oprot.writeI32(struct.time);
         }
+        if (struct.isSetIs_edit()) {
+          oprot.writeI32(struct.is_edit);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, pin_a_post_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(4);
+        BitSet incoming = iprot.readBitSet(5);
         if (incoming.get(0)) {
           struct.post_type = iprot.readString();
           struct.setPost_typeIsSet(true);
@@ -63240,6 +63414,10 @@ public class KahaniyaService {
         if (incoming.get(3)) {
           struct.time = iprot.readI32();
           struct.setTimeIsSet(true);
+        }
+        if (incoming.get(4)) {
+          struct.is_edit = iprot.readI32();
+          struct.setIs_editIsSet(true);
         }
       }
     }
@@ -64394,6 +64572,812 @@ public class KahaniyaService {
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, edit_user_bio_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class get_pins_args implements org.apache.thrift.TBase<get_pins_args, get_pins_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("get_pins_args");
+
+    private static final org.apache.thrift.protocol.TField POST_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("post_type", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField LANG_FIELD_DESC = new org.apache.thrift.protocol.TField("lang", org.apache.thrift.protocol.TType.STRING, (short)2);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new get_pins_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new get_pins_argsTupleSchemeFactory());
+    }
+
+    public String post_type; // required
+    public String lang; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      POST_TYPE((short)1, "post_type"),
+      LANG((short)2, "lang");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // POST_TYPE
+            return POST_TYPE;
+          case 2: // LANG
+            return LANG;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.POST_TYPE, new org.apache.thrift.meta_data.FieldMetaData("post_type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.LANG, new org.apache.thrift.meta_data.FieldMetaData("lang", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(get_pins_args.class, metaDataMap);
+    }
+
+    public get_pins_args() {
+    }
+
+    public get_pins_args(
+      String post_type,
+      String lang)
+    {
+      this();
+      this.post_type = post_type;
+      this.lang = lang;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public get_pins_args(get_pins_args other) {
+      if (other.isSetPost_type()) {
+        this.post_type = other.post_type;
+      }
+      if (other.isSetLang()) {
+        this.lang = other.lang;
+      }
+    }
+
+    public get_pins_args deepCopy() {
+      return new get_pins_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.post_type = null;
+      this.lang = null;
+    }
+
+    public String getPost_type() {
+      return this.post_type;
+    }
+
+    public get_pins_args setPost_type(String post_type) {
+      this.post_type = post_type;
+      return this;
+    }
+
+    public void unsetPost_type() {
+      this.post_type = null;
+    }
+
+    /** Returns true if field post_type is set (has been assigned a value) and false otherwise */
+    public boolean isSetPost_type() {
+      return this.post_type != null;
+    }
+
+    public void setPost_typeIsSet(boolean value) {
+      if (!value) {
+        this.post_type = null;
+      }
+    }
+
+    public String getLang() {
+      return this.lang;
+    }
+
+    public get_pins_args setLang(String lang) {
+      this.lang = lang;
+      return this;
+    }
+
+    public void unsetLang() {
+      this.lang = null;
+    }
+
+    /** Returns true if field lang is set (has been assigned a value) and false otherwise */
+    public boolean isSetLang() {
+      return this.lang != null;
+    }
+
+    public void setLangIsSet(boolean value) {
+      if (!value) {
+        this.lang = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case POST_TYPE:
+        if (value == null) {
+          unsetPost_type();
+        } else {
+          setPost_type((String)value);
+        }
+        break;
+
+      case LANG:
+        if (value == null) {
+          unsetLang();
+        } else {
+          setLang((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case POST_TYPE:
+        return getPost_type();
+
+      case LANG:
+        return getLang();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case POST_TYPE:
+        return isSetPost_type();
+      case LANG:
+        return isSetLang();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof get_pins_args)
+        return this.equals((get_pins_args)that);
+      return false;
+    }
+
+    public boolean equals(get_pins_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_post_type = true && this.isSetPost_type();
+      boolean that_present_post_type = true && that.isSetPost_type();
+      if (this_present_post_type || that_present_post_type) {
+        if (!(this_present_post_type && that_present_post_type))
+          return false;
+        if (!this.post_type.equals(that.post_type))
+          return false;
+      }
+
+      boolean this_present_lang = true && this.isSetLang();
+      boolean that_present_lang = true && that.isSetLang();
+      if (this_present_lang || that_present_lang) {
+        if (!(this_present_lang && that_present_lang))
+          return false;
+        if (!this.lang.equals(that.lang))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(get_pins_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_pins_args typedOther = (get_pins_args)other;
+
+      lastComparison = Boolean.valueOf(isSetPost_type()).compareTo(typedOther.isSetPost_type());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPost_type()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.post_type, typedOther.post_type);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetLang()).compareTo(typedOther.isSetLang());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetLang()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.lang, typedOther.lang);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("get_pins_args(");
+      boolean first = true;
+
+      sb.append("post_type:");
+      if (this.post_type == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.post_type);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("lang:");
+      if (this.lang == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.lang);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class get_pins_argsStandardSchemeFactory implements SchemeFactory {
+      public get_pins_argsStandardScheme getScheme() {
+        return new get_pins_argsStandardScheme();
+      }
+    }
+
+    private static class get_pins_argsStandardScheme extends StandardScheme<get_pins_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, get_pins_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // POST_TYPE
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.post_type = iprot.readString();
+                struct.setPost_typeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // LANG
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.lang = iprot.readString();
+                struct.setLangIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, get_pins_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.post_type != null) {
+          oprot.writeFieldBegin(POST_TYPE_FIELD_DESC);
+          oprot.writeString(struct.post_type);
+          oprot.writeFieldEnd();
+        }
+        if (struct.lang != null) {
+          oprot.writeFieldBegin(LANG_FIELD_DESC);
+          oprot.writeString(struct.lang);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class get_pins_argsTupleSchemeFactory implements SchemeFactory {
+      public get_pins_argsTupleScheme getScheme() {
+        return new get_pins_argsTupleScheme();
+      }
+    }
+
+    private static class get_pins_argsTupleScheme extends TupleScheme<get_pins_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, get_pins_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetPost_type()) {
+          optionals.set(0);
+        }
+        if (struct.isSetLang()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetPost_type()) {
+          oprot.writeString(struct.post_type);
+        }
+        if (struct.isSetLang()) {
+          oprot.writeString(struct.lang);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, get_pins_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.post_type = iprot.readString();
+          struct.setPost_typeIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.lang = iprot.readString();
+          struct.setLangIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class get_pins_result implements org.apache.thrift.TBase<get_pins_result, get_pins_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("get_pins_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new get_pins_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new get_pins_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(get_pins_result.class, metaDataMap);
+    }
+
+    public get_pins_result() {
+    }
+
+    public get_pins_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public get_pins_result(get_pins_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public get_pins_result deepCopy() {
+      return new get_pins_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public get_pins_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof get_pins_result)
+        return this.equals((get_pins_result)that);
+      return false;
+    }
+
+    public boolean equals(get_pins_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(get_pins_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      get_pins_result typedOther = (get_pins_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("get_pins_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class get_pins_resultStandardSchemeFactory implements SchemeFactory {
+      public get_pins_resultStandardScheme getScheme() {
+        return new get_pins_resultStandardScheme();
+      }
+    }
+
+    private static class get_pins_resultStandardScheme extends StandardScheme<get_pins_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, get_pins_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, get_pins_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class get_pins_resultTupleSchemeFactory implements SchemeFactory {
+      public get_pins_resultTupleScheme getScheme() {
+        return new get_pins_resultTupleScheme();
+      }
+    }
+
+    private static class get_pins_resultTupleScheme extends TupleScheme<get_pins_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, get_pins_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, get_pins_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
