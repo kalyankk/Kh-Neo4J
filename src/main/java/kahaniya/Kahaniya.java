@@ -4487,7 +4487,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 						
 			if(size >= 5)				
 			{			
-				System.out.println("IF");
 				inTrending.put("tp", 3);
 				inTrending.put("data", get_trending_feed(filter, 0, c, user_id));
 				inTrending.put("ftp", "T");
@@ -4503,7 +4502,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 				inAuthors.put("ftp", "A");
 			}
 			else{
-				System.out.println("Else");
 				inTrending.put("tp", 3);
 				inTrending.put("data", get_popular_stories(filter, 0, c));
 				inTrending.put("ftp", "TC");
