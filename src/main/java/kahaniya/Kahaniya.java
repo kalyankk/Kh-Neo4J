@@ -160,6 +160,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	public static final String SERIES_DD_IMG = "series_dd_img";
 	public static final String SERIES_DD_SUMMARY = "series_dd_summary";
 	public static final String SERIES_TYPE = "series_type";
+	public static final String SERIES_PRICE = "series_price";
 	
 	//contest node related keys
 	public static final String CONTEST_ID = "contest_id";
@@ -499,7 +500,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 	private Node Series(String series_id, String title, String title_id,
 			String tag_line, String feature_image, String keywords,
 			String copyrights, String dd_img, String dd_summary,
-			int series_type, int time_created) {
+			int series_type, int time_created, int series_price) {
 		Node node = graphDb.createNode();
 		node.setProperty(SERIES_ID, series_id);
 		node.setProperty(SERIES_TITLE, title);
@@ -513,6 +514,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		node.setProperty(SERIES_TYPE, series_type);
 		node.setProperty(NODE_TYPE, SERIES_NODE);
 		node.setProperty(TIME_CREATED, time_created);
+		node.setProperty(SERIES_PRICE, series_price);
 		
 		return node;
 	}
@@ -807,6 +809,33 @@ public class Kahaniya implements KahaniyaService.Iface{
 		}
 		return writingStyleIndex.get(WRITING_STYLE_NAME, name.toLowerCase()).getSingle();
 	}
+	
+	public void add_default_price_to_series() 
+	{
+		try (Transaction tx = graphDb.beginTx())
+		{
+			Index<Node> seriesNodeIndex = graphDb.index().forNodes( SERIES_ID_INDEX );
+						
+			ResourceIterator<Node> seriesItr = seriesNodeIndex.query(SERIES_ID, "*").iterator();
+			
+			while(seriesItr.hasNext())
+			{
+				Node series = seriesItr.next();
+				
+				if(!series.hasProperty(SERIES_PRICE))
+					series.setProperty(SERIES_PRICE, 0);
+			}
+			
+			tx.success();
+		}
+		catch(Exception e){
+			System.out.println(new Date().toString());
+			System.out.println("Exception @ add_default_price_to_series()");
+			System.out.println("Failed to add default price to series : " + e.getMessage());}
+		finally{}
+	}
+
+
 	
 /*	public void add_default_status_to_series() 
 	{
@@ -2856,12 +2885,12 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
 			String dd_summary, int series_type, int time_created, 
-			int is_edit, String writing_style, String contestId)
+			int is_edit, String writing_style, String contestId, int series_price)
 			throws TException {
 		if(is_edit == 0)
-			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, writing_style, contestId);
+			return create_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, writing_style, contestId, series_price);
 		else if(is_edit == 1)
-			return edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, contestId);
+			return edit_series(series_id, user_id, title, title_id, tag_line, feature_image, genre, language, keywords, copyrights, dd_img, dd_summary, series_type, time_created, contestId, series_price);
 		else return "false";
 	}
 	
@@ -2870,7 +2899,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
 			String dd_summary, int series_type, int time_created,
-			String writing_style, String contestId){
+			String writing_style, String contestId, int series_price){
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -2947,7 +2976,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			if(genre_lang_node == null)
 				throw new KahaniyaCustomException("Genre + Language doesnot exists for the name : " + genre+" "+language);
 			
-			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created);  // Creating a new series node
+			Node series_node = Series(series_id, title, title_id, tag_line, feature_image, keywords, copyrights, dd_img, dd_summary, series_type, time_created, series_price);  // Creating a new series node
 			if(series_node == null)
 				throw new KahaniyaCustomException("Something went wrong, while creating series ");
 
@@ -3025,7 +3054,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			String feature_image, String genre, String language,
 			String keywords, String copyrights, String dd_img,
 			String dd_summary, int series_type, int time_edited,
-			String contestId){
+			String contestId, int series_price){
 
 		String res;		
 		try(Transaction tx = graphDb.beginTx())
@@ -3131,6 +3160,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			series_node.setProperty(SERIES_DD_IMG, dd_img);
 			series_node.setProperty(SERIES_DD_SUMMARY, dd_summary);
 			series_node.setProperty(SERIES_TYPE, series_type);
+			series_node.setProperty(SERIES_PRICE, series_price);
 			
 			//update indexing for the edited series node
 			seriesType_index.remove(series_node);
@@ -4404,6 +4434,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		        	 }
 			}
 			else {
+				System.out.println("in User_feed section");
 				switch(feedType) {
 		         case "CR" :
 		        	 return get_reading_feed(filter, prev_cnt, count, s_user_id).toString();
@@ -4552,7 +4583,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 		try(Transaction tx = graphDb.beginTx())
 		{
 			aquireWriteLock(tx);
-
+			System.out.println("in Rec Authors section");
 			if(user_id == null || user_id.length() == 0)
 				throw new KahaniyaCustomException("Empty value receieved for the parameter user_id");
 			
@@ -4560,70 +4591,101 @@ public class Kahaniya implements KahaniyaService.Iface{
 			Node user = user_index.get(USER_ID, user_id).getSingle();
 			if(user == null )
 				throw new KahaniyaCustomException("User doesnot exists with the given id");
-			
-//			int i = 0;			
-			Iterator<Relationship> followingUsersRel = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
-			
-			LinkedList<Relationship> discovery_rels = new LinkedList<Relationship>();
-			LinkedList<Node> totalChapters = new LinkedList<Node>();
-
 			LinkedList<Node> followUsers = new LinkedList<Node>();
 			
-			
-			while(followingUsersRel.hasNext())				
-			{
-				Node following_user = followingUsersRel.next().getOtherNode(user);
-				Iterator<Relationship> followers = following_user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
-				while(followers.hasNext())
-				{
-					Relationship rel = followers.next();
-					if(!rel.getEndNode().equals(user))
-					{
-						Node f_user = rel.getEndNode();
-						if(!followUsers.contains(f_user))
-						{
-							followUsers.addLast(f_user);
-							//get latest user from followers list
-							Iterator<Relationship> itr = f_user.getRelationships(USER_FOLLOW_USER, Direction.INCOMING).iterator();
-							LinkedList<Relationship> list = new LinkedList<Relationship>();
-							while(itr.hasNext())
-							{
-								Relationship t_rel = itr.next();
-								if(isRelationExistsBetween(USER_FOLLOW_USER, user, t_rel.getStartNode()))
-									list.addLast(t_rel);
-							}
-							Collections.sort(list, TimeCreatedComparatorForRelationships);
-							if(!isRelationExistsBetween(USER_FOLLOW_USER, user, rel.getEndNode())
-									&& list.size() > 0 && !totalChapters.contains(rel.getEndNode()))
-							{
-								discovery_rels.addLast(list.getFirst());
-								totalChapters.add(rel.getEndNode());
-							}
-						}
-					}
-				}			
-
-			}
-			
-//			if(discovery_rels.isEmpty())
-//				return get_popular_authors(filter, 0, 6);	
-			
-			Collections.sort(discovery_rels, TimeCreatedComparatorForRelationships);
+			Iterator<Relationship> usrViewedChaptersRelsItr = user.getRelationships(USER_VIEWED_A_CHAPTER).iterator();
+			LinkedList<Relationship> usrViewedChaptersRelsList = new LinkedList<Relationship>();
+						
+			while(usrViewedChaptersRelsItr.hasNext())
+				usrViewedChaptersRelsList.addLast(usrViewedChaptersRelsItr.next());
+			Collections.sort(usrViewedChaptersRelsList, TimeCreatedComparatorForRelationships);
 			
 			int c = 0;
-			for(Relationship rel : discovery_rels)
+			for(Relationship rel : usrViewedChaptersRelsList)
 			{
-				
-				if(c < prev_cnt)
-				{
-					c ++;
-					continue;
+				Node author = rel.getEndNode().getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode();
+				if(!isRelationExistsBetween(USER_FOLLOW_USER, user, author) && !followUsers.contains(author) && !user.equals(author)){
+					
+					if(c >= prev_cnt + count) // break the loop, if we got enough / required nodes to return
+						break;
+					
+					if(c < prev_cnt)
+					{
+						c++;
+						continue;
+					}
+					c++;
+					followUsers.addLast(author);
 				}
-				if(c >= count + prev_cnt)
-					break;
-				jsonArray.put(getJSONForDiscoveryRel(rel, user));
-				c++;
 			}
+		
+						
+			// TO DO: Updating this call
+			
+
+//			Iterator<Relationship> followingUsersRel = user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+//			
+//			LinkedList<Relationship> discovery_rels = new LinkedList<Relationship>();
+//			LinkedList<Node> totalChapters = new LinkedList<Node>();
+//											
+//			
+//			while(followingUsersRel.hasNext())				
+//			{
+//				Node following_user = followingUsersRel.next().getOtherNode(user);
+//				Iterator<Relationship> followers = following_user.getRelationships(USER_FOLLOW_USER, Direction.OUTGOING).iterator();
+//				while(followers.hasNext())
+//				{
+//					Relationship rel = followers.next();
+//					if(!rel.getEndNode().equals(user))
+//					{
+//						Node f_user = rel.getEndNode();
+//						if(!followUsers.contains(f_user))
+//						{
+//							followUsers.addLast(f_user);
+//							//get latest user from followers list
+//							Iterator<Relationship> itr = f_user.getRelationships(USER_FOLLOW_USER, Direction.INCOMING).iterator();
+//							LinkedList<Relationship> list = new LinkedList<Relationship>();
+//							while(itr.hasNext())
+//							{
+//								Relationship t_rel = itr.next();
+//								if(isRelationExistsBetween(USER_FOLLOW_USER, user, t_rel.getStartNode()))
+//									list.addLast(t_rel);
+//							}
+//							Collections.sort(list, TimeCreatedComparatorForRelationships);
+//							if(!isRelationExistsBetween(USER_FOLLOW_USER, user, rel.getEndNode())
+//									&& list.size() > 0 && !totalChapters.contains(rel.getEndNode()))
+//							{
+//								discovery_rels.addLast(list.getFirst());
+//								totalChapters.add(rel.getEndNode());
+//							}
+//						}
+//					}
+//				}			
+//
+//			}
+//			
+////			if(discovery_rels.isEmpty())
+////				return get_popular_authors(filter, 0, 6);	
+//			
+//			Collections.sort(discovery_rels, TimeCreatedComparatorForRelationships);
+//			
+//			for(Relationship rel : discovery_rels)
+//			{
+//				
+//				if(c < prev_cnt)
+//				{
+//					c ++;
+//					continue;
+//				}
+//				if(c >= count + prev_cnt)
+//					break;
+//				jsonArray.put(getJSONForDiscoveryRel(rel, user));
+//				c++;
+//			}
+			
+			for(Node f_user : followUsers)
+				jsonArray.put(getJSONForUser(f_user,null));
+			
 			tx.success();
 		}
 		catch(KahaniyaCustomException ex)
@@ -4659,6 +4721,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			
 			Index<Node> user_index = graphDb.index().forNodes(USER_ID_INDEX);
 			Node user = user_index.get(USER_ID, user_id).getSingle();
+			
 			if(user == null )
 				throw new KahaniyaCustomException("User doesnot exists with the given id");
 				
@@ -4680,8 +4743,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					Relationship rel = reviews.next();
 					if(rel.getEndNode().hasRelationship(REVIEW_BELONGS_TO_SERIES))
 					{
-						Node r_series = rel.getEndNode().getSingleRelationship(REVIEW_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();
-						if(!reviewedSeries.contains(r_series))
+						Node r_series = rel.getEndNode().getSingleRelationship(REVIEW_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode();						if(!reviewedSeries.contains(r_series) && !totalChapters.contains(r_series))
 						{
 							reviewedSeries.addLast(r_series);
 							//get later user from followers list
@@ -4698,7 +4760,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 									&& list.size() > 0 && !totalChapters.contains(rel.getEndNode()) && !isRelationExistsBetween(USER_STARTED_SERIES, user,  rel.getEndNode()))
 							{							
 								discovery_rels.addLast(list.getFirst());
-								totalChapters.add(rel.getEndNode());
+								totalChapters.add(list.getFirst().getEndNode());
 							}
 						}
 					}
@@ -4708,7 +4770,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				{
 					Relationship rel = sub_series.next();
 					Node s_series = rel.getEndNode();
-					if(!subscribedSeries.contains(s_series))
+					if(!subscribedSeries.contains(s_series) && !totalChapters.contains(s_series))
 					{
 						subscribedSeries.addLast(s_series);
 						//get latest user from followers list
@@ -4722,9 +4784,9 @@ public class Kahaniya implements KahaniyaService.Iface{
 						}
 						Collections.sort(list, TimeCreatedComparatorForRelationships);
 						if(!isRelationExistsBetween(USER_SUBSCRIBED_TO_SERIES, user, rel.getEndNode())
-								&& list.size() > 0 && !totalChapters.contains(rel.getEndNode())&& !isRelationExistsBetween(USER_STARTED_SERIES, user, rel.getEndNode())){
+								&& list.size() > 0 && !isRelationExistsBetween(USER_STARTED_SERIES, user, rel.getEndNode())){
 							discovery_rels.addLast(list.getFirst());
-							totalChapters.add(rel.getEndNode());
+							totalChapters.add(list.getFirst().getEndNode());
 						}
 					}
 				}
@@ -4852,7 +4914,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 							continue;
 							
 						Node pur_chapter = rel.getEndNode();
-						if(!purchasedChapters.contains(pur_chapter))
+						if(!purchasedChapters.contains(pur_chapter) && !totalChapters.contains(pur_chapter))
 						{
 							purchasedChapters.addLast(pur_chapter);
 							//get latest user from followers list
@@ -4865,7 +4927,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 									list.addLast(t_rel);
 							}
 							Collections.sort(list, TimeCreatedComparatorForRelationships);
-							if(list.size() > 0 && !totalChapters.contains(rel.getEndNode())&& !isRelationExistsBetween(USER_WRITTEN_A_CHAPTER, user, rel.getEndNode())){
+							if(list.size() > 0 && !isRelationExistsBetween(USER_WRITTEN_A_CHAPTER, user, rel.getEndNode())){
 								discovery_rels.addLast(list.getFirst());
 								totalChapters.add(rel.getEndNode());
 							}							
@@ -4877,7 +4939,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Relationship rel = rated_chapters.next();
 						Node rated_chapter = rel.getEndNode();
-						if(!ratedChapters.contains(rated_chapter))
+						if(!ratedChapters.contains(rated_chapter) && !totalChapters.contains(rated_chapter))
 						{
 							ratedChapters.addLast(rated_chapter);
 							//get latest user from followers list
@@ -4902,7 +4964,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Relationship rel = read_chapters.next();
 						Node read_chapter = rel.getEndNode();
-						if(!readChapters.contains(read_chapter))
+						if(!readChapters.contains(read_chapter) && !totalChapters.contains(read_chapter))
 						{
 							readChapters.addLast(read_chapter);
 							//get latest user from followers list
@@ -4929,7 +4991,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 						if(rel.getEndNode().hasRelationship(COMMENT_WRITTEN_ON_CHAPTER) )
 						{
 							Node c_chapter = rel.getEndNode().getSingleRelationship(COMMENT_WRITTEN_ON_CHAPTER, Direction.OUTGOING).getEndNode();
-							if(!commentedChapters.contains(c_chapter))
+							if(!commentedChapters.contains(c_chapter) && !totalChapters.contains(c_chapter))
 							{
 								commentedChapters.addLast(c_chapter);
 								//get latest user from followers list
@@ -4955,7 +5017,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					{
 						Relationship rel = authors_chapters.next();
 						Node authors_chapter = rel.getEndNode();
-						if(!authorChapters.contains(authors_chapter) && !isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, authors_chapter))
+						if(!authorChapters.contains(authors_chapter) && !totalChapters.contains(authors_chapter) && !isRelationExistsBetween(USER_VIEWED_A_CHAPTER, user, authors_chapter))
 						{
 							authorChapters.addLast(authors_chapter);
 							//get latest user from followers list

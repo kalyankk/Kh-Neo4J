@@ -4,11 +4,11 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("23th Dec, 2016 - 06:31 P.M");
+		System.out.println("6th Jan, 2017 - 12:21 P.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
-//		kahaniya.add_default_status_to_series();
+		kahaniya.add_default_price_to_series();
 //		kahaniya.add_chapter_words_count_property();
 //		kahaniya.add_additional_properties();
 //		kahaniya.add_chapter_contest_status_properties();
@@ -26,7 +26,7 @@ public class App
 //    		System.out.println("Authors"+k.get_pins("A", "telugu"));
 //    		System.out.println("Series"+k.get_pins("S", "telugu"));
 //    		System.out.println(k.edit_user_languages("n-one", "telugu"));
-//    		System.out.println(k.get_feed("SEC", "", "{'language':'telugu'}", 0, 6, "90bbcbaa5a3f549b121ae64c2f109098", "", "", "", ""));
+//    		System.out.println(k.get_feed("SEC", "A", "{'language':'telugu'}", 0, 6, "90bbcbaa5a3f549b121ae64c2f109098", "", "", "", ""));
 //    		System.out.println(k.create_language("LANG19"));
 //    		System.out.println(k.create_or_edit_anthology("anth38", "my antho38", "my-antho38", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
 //    		System.out.println(k.create_or_edit_anthology("anth39", "my antho39", "my-antho39", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
