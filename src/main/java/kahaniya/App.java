@@ -4,11 +4,11 @@ public class App
 {
     public static void main( String[] args )
     {
-		System.out.println("6th Jan, 2017 - 12:21 P.M");
+		System.out.println("2nd may, 2017 - 11:51 A.M");
 		
 		Kahaniya kahaniya = new Kahaniya();
 		kahaniya.add_neo4j_lock_nodes();
-		kahaniya.add_default_price_to_series();
+		kahaniya.add_default_views_to_nanostory();
 //		kahaniya.add_chapter_words_count_property();
 //		kahaniya.add_additional_properties();
 //		kahaniya.add_chapter_contest_status_properties();
@@ -21,6 +21,13 @@ public class App
     {
     	try{
     		
+//    		System.out.println(k.search("antho", 0, "", 0, 5));
+//    		System.out.println(k.create_or_edit_nanostory("mynanostory5", "Just For Fun ", "90bbcbaa5a3f549b121ae64c2f109098", "ROMANCE", "telugu", "", 1231212, 0));
+    		
+//    		System.out.println(k.recored_chapter_view("e0cbe3e521e44ea04fb4f74f2b93408e", "c7b112fd54ef1e383e4f5aa9073e7b48", "", 23423423, 120));
+//    		System.out.println(k.get_feed("SEC", "ALL", "{'language':'telugu'}", 0, 10, "", "ROAMNCE", "", "", ""));
+    		
+//    				anthology("anth38", "my antho38", "my-antho38", "summary", "feature_image", "n-one", "GEN3", "LANG19", 1231212, 0));
 //    		System.out.println(k.pin_a_post("C", "telugu", "c6d27a9a4dd0ca7c7743dc66b1cda6f9", 1480662568, 1));
 //    		System.out.println("Chapters"+k.get_pins("C", "telugu"));
 //    		System.out.println("Authors"+k.get_pins("A", "telugu"));
