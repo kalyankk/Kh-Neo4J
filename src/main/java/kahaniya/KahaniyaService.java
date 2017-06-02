@@ -79,9 +79,17 @@ public class KahaniyaService {
 
     public String update_chapter_contest_status(String chapter_id, String contest_id, int status) throws org.apache.thrift.TException;
 
+    public String update_series_contest_status(String series_id, String contest_id, int status) throws org.apache.thrift.TException;
+
+    public String update_nanostory_contest_status(String nanostory_id, String contest_id, int status) throws org.apache.thrift.TException;
+
     public String record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws org.apache.thrift.TException;
 
-    public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit) throws org.apache.thrift.TException;
+    public String record_contest_judge_rating_on_series(String contest_id, String series_id, String user_id) throws org.apache.thrift.TException;
+
+    public String record_contest_judge_rating_on_nanostory(String contest_id, String nanostory_id, String user_id) throws org.apache.thrift.TException;
+
+    public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit) throws org.apache.thrift.TException;
 
     public String subscribe_series(String series_id, String user_id, int time) throws org.apache.thrift.TException;
 
@@ -161,7 +169,7 @@ public class KahaniyaService {
 
     public String get_pins(String post_type, String lang) throws org.apache.thrift.TException;
 
-    public String create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit) throws org.apache.thrift.TException;
+    public String create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id) throws org.apache.thrift.TException;
 
     public String like_or_dislike_nanostory(String nanostory_id, String user_id, int time, int state) throws org.apache.thrift.TException;
 
@@ -219,9 +227,17 @@ public class KahaniyaService {
 
     public void update_chapter_contest_status(String chapter_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_chapter_contest_status_call> resultHandler) throws org.apache.thrift.TException;
 
+    public void update_series_contest_status(String series_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_series_contest_status_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void update_nanostory_contest_status(String nanostory_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.update_nanostory_contest_status_call> resultHandler) throws org.apache.thrift.TException;
+
     public void record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.record_contest_judge_rating_on_chapter_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException;
+    public void record_contest_judge_rating_on_series(String contest_id, String series_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.record_contest_judge_rating_on_series_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void record_contest_judge_rating_on_nanostory(String contest_id, String nanostory_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.record_contest_judge_rating_on_nanostory_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException;
 
     public void subscribe_series(String series_id, String user_id, int time, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.subscribe_series_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -301,7 +317,7 @@ public class KahaniyaService {
 
     public void get_pins(String post_type, String lang, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.get_pins_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_nanostory_call> resultHandler) throws org.apache.thrift.TException;
+    public void create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.create_or_edit_nanostory_call> resultHandler) throws org.apache.thrift.TException;
 
     public void like_or_dislike_nanostory(String nanostory_id, String user_id, int time, int state, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.like_or_dislike_nanostory_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -941,6 +957,56 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_chapter_contest_status failed: unknown result");
     }
 
+    public String update_series_contest_status(String series_id, String contest_id, int status) throws org.apache.thrift.TException
+    {
+      send_update_series_contest_status(series_id, contest_id, status);
+      return recv_update_series_contest_status();
+    }
+
+    public void send_update_series_contest_status(String series_id, String contest_id, int status) throws org.apache.thrift.TException
+    {
+      update_series_contest_status_args args = new update_series_contest_status_args();
+      args.setSeries_id(series_id);
+      args.setContest_id(contest_id);
+      args.setStatus(status);
+      sendBase("update_series_contest_status", args);
+    }
+
+    public String recv_update_series_contest_status() throws org.apache.thrift.TException
+    {
+      update_series_contest_status_result result = new update_series_contest_status_result();
+      receiveBase(result, "update_series_contest_status");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_series_contest_status failed: unknown result");
+    }
+
+    public String update_nanostory_contest_status(String nanostory_id, String contest_id, int status) throws org.apache.thrift.TException
+    {
+      send_update_nanostory_contest_status(nanostory_id, contest_id, status);
+      return recv_update_nanostory_contest_status();
+    }
+
+    public void send_update_nanostory_contest_status(String nanostory_id, String contest_id, int status) throws org.apache.thrift.TException
+    {
+      update_nanostory_contest_status_args args = new update_nanostory_contest_status_args();
+      args.setNanostory_id(nanostory_id);
+      args.setContest_id(contest_id);
+      args.setStatus(status);
+      sendBase("update_nanostory_contest_status", args);
+    }
+
+    public String recv_update_nanostory_contest_status() throws org.apache.thrift.TException
+    {
+      update_nanostory_contest_status_result result = new update_nanostory_contest_status_result();
+      receiveBase(result, "update_nanostory_contest_status");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "update_nanostory_contest_status failed: unknown result");
+    }
+
     public String record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id) throws org.apache.thrift.TException
     {
       send_record_contest_judge_rating_on_chapter(contest_id, chapter_id, user_id);
@@ -966,13 +1032,63 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "record_contest_judge_rating_on_chapter failed: unknown result");
     }
 
-    public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit) throws org.apache.thrift.TException
+    public String record_contest_judge_rating_on_series(String contest_id, String series_id, String user_id) throws org.apache.thrift.TException
     {
-      send_create_or_edit_contest(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, is_edit);
+      send_record_contest_judge_rating_on_series(contest_id, series_id, user_id);
+      return recv_record_contest_judge_rating_on_series();
+    }
+
+    public void send_record_contest_judge_rating_on_series(String contest_id, String series_id, String user_id) throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_series_args args = new record_contest_judge_rating_on_series_args();
+      args.setContest_id(contest_id);
+      args.setSeries_id(series_id);
+      args.setUser_id(user_id);
+      sendBase("record_contest_judge_rating_on_series", args);
+    }
+
+    public String recv_record_contest_judge_rating_on_series() throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_series_result result = new record_contest_judge_rating_on_series_result();
+      receiveBase(result, "record_contest_judge_rating_on_series");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "record_contest_judge_rating_on_series failed: unknown result");
+    }
+
+    public String record_contest_judge_rating_on_nanostory(String contest_id, String nanostory_id, String user_id) throws org.apache.thrift.TException
+    {
+      send_record_contest_judge_rating_on_nanostory(contest_id, nanostory_id, user_id);
+      return recv_record_contest_judge_rating_on_nanostory();
+    }
+
+    public void send_record_contest_judge_rating_on_nanostory(String contest_id, String nanostory_id, String user_id) throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_nanostory_args args = new record_contest_judge_rating_on_nanostory_args();
+      args.setContest_id(contest_id);
+      args.setNanostory_id(nanostory_id);
+      args.setUser_id(user_id);
+      sendBase("record_contest_judge_rating_on_nanostory", args);
+    }
+
+    public String recv_record_contest_judge_rating_on_nanostory() throws org.apache.thrift.TException
+    {
+      record_contest_judge_rating_on_nanostory_result result = new record_contest_judge_rating_on_nanostory_result();
+      receiveBase(result, "record_contest_judge_rating_on_nanostory");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "record_contest_judge_rating_on_nanostory failed: unknown result");
+    }
+
+    public String create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit) throws org.apache.thrift.TException
+    {
+      send_create_or_edit_contest(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, contest_type, is_open, is_edit);
       return recv_create_or_edit_contest();
     }
 
-    public void send_create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit) throws org.apache.thrift.TException
+    public void send_create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit) throws org.apache.thrift.TException
     {
       create_or_edit_contest_args args = new create_or_edit_contest_args();
       args.setContest_id(contest_id);
@@ -992,6 +1108,8 @@ public class KahaniyaService {
       args.setPrice(price);
       args.setMode(mode);
       args.setTime_created(time_created);
+      args.setContest_type(contest_type);
+      args.setIs_open(is_open);
       args.setIs_edit(is_edit);
       sendBase("create_or_edit_contest", args);
     }
@@ -1997,13 +2115,13 @@ public class KahaniyaService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "get_pins failed: unknown result");
     }
 
-    public String create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit) throws org.apache.thrift.TException
+    public String create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id) throws org.apache.thrift.TException
     {
-      send_create_or_edit_nanostory(nanostory_id, user_id, content, genres, language, feature_image, time_created, is_edit);
+      send_create_or_edit_nanostory(nanostory_id, user_id, content, genres, language, feature_image, time_created, is_edit, contest_id);
       return recv_create_or_edit_nanostory();
     }
 
-    public void send_create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit) throws org.apache.thrift.TException
+    public void send_create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id) throws org.apache.thrift.TException
     {
       create_or_edit_nanostory_args args = new create_or_edit_nanostory_args();
       args.setNanostory_id(nanostory_id);
@@ -2014,6 +2132,7 @@ public class KahaniyaService {
       args.setFeature_image(feature_image);
       args.setTime_created(time_created);
       args.setIs_edit(is_edit);
+      args.setContest_id(contest_id);
       sendBase("create_or_edit_nanostory", args);
     }
 
@@ -3043,6 +3162,82 @@ public class KahaniyaService {
       }
     }
 
+    public void update_series_contest_status(String series_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<update_series_contest_status_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      update_series_contest_status_call method_call = new update_series_contest_status_call(series_id, contest_id, status, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class update_series_contest_status_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String series_id;
+      private String contest_id;
+      private int status;
+      public update_series_contest_status_call(String series_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<update_series_contest_status_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.series_id = series_id;
+        this.contest_id = contest_id;
+        this.status = status;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("update_series_contest_status", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        update_series_contest_status_args args = new update_series_contest_status_args();
+        args.setSeries_id(series_id);
+        args.setContest_id(contest_id);
+        args.setStatus(status);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_update_series_contest_status();
+      }
+    }
+
+    public void update_nanostory_contest_status(String nanostory_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<update_nanostory_contest_status_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      update_nanostory_contest_status_call method_call = new update_nanostory_contest_status_call(nanostory_id, contest_id, status, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class update_nanostory_contest_status_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String nanostory_id;
+      private String contest_id;
+      private int status;
+      public update_nanostory_contest_status_call(String nanostory_id, String contest_id, int status, org.apache.thrift.async.AsyncMethodCallback<update_nanostory_contest_status_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.nanostory_id = nanostory_id;
+        this.contest_id = contest_id;
+        this.status = status;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("update_nanostory_contest_status", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        update_nanostory_contest_status_args args = new update_nanostory_contest_status_args();
+        args.setNanostory_id(nanostory_id);
+        args.setContest_id(contest_id);
+        args.setStatus(status);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_update_nanostory_contest_status();
+      }
+    }
+
     public void record_contest_judge_rating_on_chapter(String contest_id, String chapter_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_chapter_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       record_contest_judge_rating_on_chapter_call method_call = new record_contest_judge_rating_on_chapter_call(contest_id, chapter_id, user_id, resultHandler, this, ___protocolFactory, ___transport);
@@ -3081,9 +3276,85 @@ public class KahaniyaService {
       }
     }
 
-    public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException {
+    public void record_contest_judge_rating_on_series(String contest_id, String series_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_series_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      create_or_edit_contest_call method_call = new create_or_edit_contest_call(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, is_edit, resultHandler, this, ___protocolFactory, ___transport);
+      record_contest_judge_rating_on_series_call method_call = new record_contest_judge_rating_on_series_call(contest_id, series_id, user_id, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class record_contest_judge_rating_on_series_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String contest_id;
+      private String series_id;
+      private String user_id;
+      public record_contest_judge_rating_on_series_call(String contest_id, String series_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_series_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.contest_id = contest_id;
+        this.series_id = series_id;
+        this.user_id = user_id;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("record_contest_judge_rating_on_series", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        record_contest_judge_rating_on_series_args args = new record_contest_judge_rating_on_series_args();
+        args.setContest_id(contest_id);
+        args.setSeries_id(series_id);
+        args.setUser_id(user_id);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_record_contest_judge_rating_on_series();
+      }
+    }
+
+    public void record_contest_judge_rating_on_nanostory(String contest_id, String nanostory_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_nanostory_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      record_contest_judge_rating_on_nanostory_call method_call = new record_contest_judge_rating_on_nanostory_call(contest_id, nanostory_id, user_id, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class record_contest_judge_rating_on_nanostory_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private String contest_id;
+      private String nanostory_id;
+      private String user_id;
+      public record_contest_judge_rating_on_nanostory_call(String contest_id, String nanostory_id, String user_id, org.apache.thrift.async.AsyncMethodCallback<record_contest_judge_rating_on_nanostory_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.contest_id = contest_id;
+        this.nanostory_id = nanostory_id;
+        this.user_id = user_id;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("record_contest_judge_rating_on_nanostory", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        record_contest_judge_rating_on_nanostory_args args = new record_contest_judge_rating_on_nanostory_args();
+        args.setContest_id(contest_id);
+        args.setNanostory_id(nanostory_id);
+        args.setUser_id(user_id);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public String getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_record_contest_judge_rating_on_nanostory();
+      }
+    }
+
+    public void create_or_edit_contest(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_contest_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      create_or_edit_contest_call method_call = new create_or_edit_contest_call(contest_id, user_id, title, title_id, summary, description, feat_image, writing_style, award_info, theme_info, partners_info, start_date, end_date, language, price, mode, time_created, contest_type, is_open, is_edit, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -3106,8 +3377,10 @@ public class KahaniyaService {
       private int price;
       private int mode;
       private int time_created;
+      private int contest_type;
+      private int is_open;
       private int is_edit;
-      public create_or_edit_contest_call(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_contest_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public create_or_edit_contest_call(String contest_id, String user_id, String title, String title_id, String summary, String description, String feat_image, String writing_style, String award_info, String theme_info, String partners_info, int start_date, int end_date, String language, int price, int mode, int time_created, int contest_type, int is_open, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_contest_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.contest_id = contest_id;
         this.user_id = user_id;
@@ -3126,6 +3399,8 @@ public class KahaniyaService {
         this.price = price;
         this.mode = mode;
         this.time_created = time_created;
+        this.contest_type = contest_type;
+        this.is_open = is_open;
         this.is_edit = is_edit;
       }
 
@@ -3149,6 +3424,8 @@ public class KahaniyaService {
         args.setPrice(price);
         args.setMode(mode);
         args.setTime_created(time_created);
+        args.setContest_type(contest_type);
+        args.setIs_open(is_open);
         args.setIs_edit(is_edit);
         args.write(prot);
         prot.writeMessageEnd();
@@ -4694,9 +4971,9 @@ public class KahaniyaService {
       }
     }
 
-    public void create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_nanostory_call> resultHandler) throws org.apache.thrift.TException {
+    public void create_or_edit_nanostory(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_nanostory_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      create_or_edit_nanostory_call method_call = new create_or_edit_nanostory_call(nanostory_id, user_id, content, genres, language, feature_image, time_created, is_edit, resultHandler, this, ___protocolFactory, ___transport);
+      create_or_edit_nanostory_call method_call = new create_or_edit_nanostory_call(nanostory_id, user_id, content, genres, language, feature_image, time_created, is_edit, contest_id, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
@@ -4710,7 +4987,8 @@ public class KahaniyaService {
       private String feature_image;
       private int time_created;
       private int is_edit;
-      public create_or_edit_nanostory_call(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_nanostory_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      private String contest_id;
+      public create_or_edit_nanostory_call(String nanostory_id, String user_id, String content, String genres, String language, String feature_image, int time_created, int is_edit, String contest_id, org.apache.thrift.async.AsyncMethodCallback<create_or_edit_nanostory_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.nanostory_id = nanostory_id;
         this.user_id = user_id;
@@ -4720,6 +4998,7 @@ public class KahaniyaService {
         this.feature_image = feature_image;
         this.time_created = time_created;
         this.is_edit = is_edit;
+        this.contest_id = contest_id;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
@@ -4733,6 +5012,7 @@ public class KahaniyaService {
         args.setFeature_image(feature_image);
         args.setTime_created(time_created);
         args.setIs_edit(is_edit);
+        args.setContest_id(contest_id);
         args.write(prot);
         prot.writeMessageEnd();
       }
@@ -4860,7 +5140,11 @@ public class KahaniyaService {
       processMap.put("create_or_edit_review", new create_or_edit_review());
       processMap.put("create_or_edit_chapter", new create_or_edit_chapter());
       processMap.put("update_chapter_contest_status", new update_chapter_contest_status());
+      processMap.put("update_series_contest_status", new update_series_contest_status());
+      processMap.put("update_nanostory_contest_status", new update_nanostory_contest_status());
       processMap.put("record_contest_judge_rating_on_chapter", new record_contest_judge_rating_on_chapter());
+      processMap.put("record_contest_judge_rating_on_series", new record_contest_judge_rating_on_series());
+      processMap.put("record_contest_judge_rating_on_nanostory", new record_contest_judge_rating_on_nanostory());
       processMap.put("create_or_edit_contest", new create_or_edit_contest());
       processMap.put("subscribe_series", new subscribe_series());
       processMap.put("skip_subscribe_series", new skip_subscribe_series());
@@ -5291,6 +5575,38 @@ public class KahaniyaService {
       }
     }
 
+    private static class update_series_contest_status<I extends Iface> extends org.apache.thrift.ProcessFunction<I, update_series_contest_status_args> {
+      public update_series_contest_status() {
+        super("update_series_contest_status");
+      }
+
+      protected update_series_contest_status_args getEmptyArgsInstance() {
+        return new update_series_contest_status_args();
+      }
+
+      protected update_series_contest_status_result getResult(I iface, update_series_contest_status_args args) throws org.apache.thrift.TException {
+        update_series_contest_status_result result = new update_series_contest_status_result();
+        result.success = iface.update_series_contest_status(args.series_id, args.contest_id, args.status);
+        return result;
+      }
+    }
+
+    private static class update_nanostory_contest_status<I extends Iface> extends org.apache.thrift.ProcessFunction<I, update_nanostory_contest_status_args> {
+      public update_nanostory_contest_status() {
+        super("update_nanostory_contest_status");
+      }
+
+      protected update_nanostory_contest_status_args getEmptyArgsInstance() {
+        return new update_nanostory_contest_status_args();
+      }
+
+      protected update_nanostory_contest_status_result getResult(I iface, update_nanostory_contest_status_args args) throws org.apache.thrift.TException {
+        update_nanostory_contest_status_result result = new update_nanostory_contest_status_result();
+        result.success = iface.update_nanostory_contest_status(args.nanostory_id, args.contest_id, args.status);
+        return result;
+      }
+    }
+
     private static class record_contest_judge_rating_on_chapter<I extends Iface> extends org.apache.thrift.ProcessFunction<I, record_contest_judge_rating_on_chapter_args> {
       public record_contest_judge_rating_on_chapter() {
         super("record_contest_judge_rating_on_chapter");
@@ -5307,6 +5623,38 @@ public class KahaniyaService {
       }
     }
 
+    private static class record_contest_judge_rating_on_series<I extends Iface> extends org.apache.thrift.ProcessFunction<I, record_contest_judge_rating_on_series_args> {
+      public record_contest_judge_rating_on_series() {
+        super("record_contest_judge_rating_on_series");
+      }
+
+      protected record_contest_judge_rating_on_series_args getEmptyArgsInstance() {
+        return new record_contest_judge_rating_on_series_args();
+      }
+
+      protected record_contest_judge_rating_on_series_result getResult(I iface, record_contest_judge_rating_on_series_args args) throws org.apache.thrift.TException {
+        record_contest_judge_rating_on_series_result result = new record_contest_judge_rating_on_series_result();
+        result.success = iface.record_contest_judge_rating_on_series(args.contest_id, args.series_id, args.user_id);
+        return result;
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory<I extends Iface> extends org.apache.thrift.ProcessFunction<I, record_contest_judge_rating_on_nanostory_args> {
+      public record_contest_judge_rating_on_nanostory() {
+        super("record_contest_judge_rating_on_nanostory");
+      }
+
+      protected record_contest_judge_rating_on_nanostory_args getEmptyArgsInstance() {
+        return new record_contest_judge_rating_on_nanostory_args();
+      }
+
+      protected record_contest_judge_rating_on_nanostory_result getResult(I iface, record_contest_judge_rating_on_nanostory_args args) throws org.apache.thrift.TException {
+        record_contest_judge_rating_on_nanostory_result result = new record_contest_judge_rating_on_nanostory_result();
+        result.success = iface.record_contest_judge_rating_on_nanostory(args.contest_id, args.nanostory_id, args.user_id);
+        return result;
+      }
+    }
+
     private static class create_or_edit_contest<I extends Iface> extends org.apache.thrift.ProcessFunction<I, create_or_edit_contest_args> {
       public create_or_edit_contest() {
         super("create_or_edit_contest");
@@ -5318,7 +5666,7 @@ public class KahaniyaService {
 
       protected create_or_edit_contest_result getResult(I iface, create_or_edit_contest_args args) throws org.apache.thrift.TException {
         create_or_edit_contest_result result = new create_or_edit_contest_result();
-        result.success = iface.create_or_edit_contest(args.contest_id, args.user_id, args.title, args.title_id, args.summary, args.description, args.feat_image, args.writing_style, args.award_info, args.theme_info, args.partners_info, args.start_date, args.end_date, args.language, args.price, args.mode, args.time_created, args.is_edit);
+        result.success = iface.create_or_edit_contest(args.contest_id, args.user_id, args.title, args.title_id, args.summary, args.description, args.feat_image, args.writing_style, args.award_info, args.theme_info, args.partners_info, args.start_date, args.end_date, args.language, args.price, args.mode, args.time_created, args.contest_type, args.is_open, args.is_edit);
         return result;
       }
     }
@@ -5958,7 +6306,7 @@ public class KahaniyaService {
 
       protected create_or_edit_nanostory_result getResult(I iface, create_or_edit_nanostory_args args) throws org.apache.thrift.TException {
         create_or_edit_nanostory_result result = new create_or_edit_nanostory_result();
-        result.success = iface.create_or_edit_nanostory(args.nanostory_id, args.user_id, args.content, args.genres, args.language, args.feature_image, args.time_created, args.is_edit);
+        result.success = iface.create_or_edit_nanostory(args.nanostory_id, args.user_id, args.content, args.genres, args.language, args.feature_image, args.time_created, args.is_edit, args.contest_id);
         return result;
       }
     }
@@ -28848,6 +29196,1816 @@ public class KahaniyaService {
 
   }
 
+  public static class update_series_contest_status_args implements org.apache.thrift.TBase<update_series_contest_status_args, update_series_contest_status_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_series_contest_status_args");
+
+    private static final org.apache.thrift.protocol.TField SERIES_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("series_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField STATUS_FIELD_DESC = new org.apache.thrift.protocol.TField("status", org.apache.thrift.protocol.TType.I32, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_series_contest_status_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_series_contest_status_argsTupleSchemeFactory());
+    }
+
+    public String series_id; // required
+    public String contest_id; // required
+    public int status; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SERIES_ID((short)1, "series_id"),
+      CONTEST_ID((short)2, "contest_id"),
+      STATUS((short)3, "status");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // SERIES_ID
+            return SERIES_ID;
+          case 2: // CONTEST_ID
+            return CONTEST_ID;
+          case 3: // STATUS
+            return STATUS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __STATUS_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SERIES_ID, new org.apache.thrift.meta_data.FieldMetaData("series_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.STATUS, new org.apache.thrift.meta_data.FieldMetaData("status", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_series_contest_status_args.class, metaDataMap);
+    }
+
+    public update_series_contest_status_args() {
+    }
+
+    public update_series_contest_status_args(
+      String series_id,
+      String contest_id,
+      int status)
+    {
+      this();
+      this.series_id = series_id;
+      this.contest_id = contest_id;
+      this.status = status;
+      setStatusIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_series_contest_status_args(update_series_contest_status_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetSeries_id()) {
+        this.series_id = other.series_id;
+      }
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
+      this.status = other.status;
+    }
+
+    public update_series_contest_status_args deepCopy() {
+      return new update_series_contest_status_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.series_id = null;
+      this.contest_id = null;
+      setStatusIsSet(false);
+      this.status = 0;
+    }
+
+    public String getSeries_id() {
+      return this.series_id;
+    }
+
+    public update_series_contest_status_args setSeries_id(String series_id) {
+      this.series_id = series_id;
+      return this;
+    }
+
+    public void unsetSeries_id() {
+      this.series_id = null;
+    }
+
+    /** Returns true if field series_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetSeries_id() {
+      return this.series_id != null;
+    }
+
+    public void setSeries_idIsSet(boolean value) {
+      if (!value) {
+        this.series_id = null;
+      }
+    }
+
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public update_series_contest_status_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
+    public int getStatus() {
+      return this.status;
+    }
+
+    public update_series_contest_status_args setStatus(int status) {
+      this.status = status;
+      setStatusIsSet(true);
+      return this;
+    }
+
+    public void unsetStatus() {
+      __isset_bit_vector.clear(__STATUS_ISSET_ID);
+    }
+
+    /** Returns true if field status is set (has been assigned a value) and false otherwise */
+    public boolean isSetStatus() {
+      return __isset_bit_vector.get(__STATUS_ISSET_ID);
+    }
+
+    public void setStatusIsSet(boolean value) {
+      __isset_bit_vector.set(__STATUS_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SERIES_ID:
+        if (value == null) {
+          unsetSeries_id();
+        } else {
+          setSeries_id((String)value);
+        }
+        break;
+
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
+      case STATUS:
+        if (value == null) {
+          unsetStatus();
+        } else {
+          setStatus((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SERIES_ID:
+        return getSeries_id();
+
+      case CONTEST_ID:
+        return getContest_id();
+
+      case STATUS:
+        return Integer.valueOf(getStatus());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SERIES_ID:
+        return isSetSeries_id();
+      case CONTEST_ID:
+        return isSetContest_id();
+      case STATUS:
+        return isSetStatus();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_series_contest_status_args)
+        return this.equals((update_series_contest_status_args)that);
+      return false;
+    }
+
+    public boolean equals(update_series_contest_status_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_series_id = true && this.isSetSeries_id();
+      boolean that_present_series_id = true && that.isSetSeries_id();
+      if (this_present_series_id || that_present_series_id) {
+        if (!(this_present_series_id && that_present_series_id))
+          return false;
+        if (!this.series_id.equals(that.series_id))
+          return false;
+      }
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
+          return false;
+      }
+
+      boolean this_present_status = true;
+      boolean that_present_status = true;
+      if (this_present_status || that_present_status) {
+        if (!(this_present_status && that_present_status))
+          return false;
+        if (this.status != that.status)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_series_contest_status_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_series_contest_status_args typedOther = (update_series_contest_status_args)other;
+
+      lastComparison = Boolean.valueOf(isSetSeries_id()).compareTo(typedOther.isSetSeries_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSeries_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.series_id, typedOther.series_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStatus()).compareTo(typedOther.isSetStatus());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStatus()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.status, typedOther.status);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_series_contest_status_args(");
+      boolean first = true;
+
+      sb.append("series_id:");
+      if (this.series_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.series_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("status:");
+      sb.append(this.status);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_series_contest_status_argsStandardSchemeFactory implements SchemeFactory {
+      public update_series_contest_status_argsStandardScheme getScheme() {
+        return new update_series_contest_status_argsStandardScheme();
+      }
+    }
+
+    private static class update_series_contest_status_argsStandardScheme extends StandardScheme<update_series_contest_status_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_series_contest_status_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // SERIES_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.series_id = iprot.readString();
+                struct.setSeries_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // STATUS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.status = iprot.readI32();
+                struct.setStatusIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_series_contest_status_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.series_id != null) {
+          oprot.writeFieldBegin(SERIES_ID_FIELD_DESC);
+          oprot.writeString(struct.series_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(STATUS_FIELD_DESC);
+        oprot.writeI32(struct.status);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_series_contest_status_argsTupleSchemeFactory implements SchemeFactory {
+      public update_series_contest_status_argsTupleScheme getScheme() {
+        return new update_series_contest_status_argsTupleScheme();
+      }
+    }
+
+    private static class update_series_contest_status_argsTupleScheme extends TupleScheme<update_series_contest_status_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_series_contest_status_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSeries_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetContest_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetStatus()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetSeries_id()) {
+          oprot.writeString(struct.series_id);
+        }
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
+        if (struct.isSetStatus()) {
+          oprot.writeI32(struct.status);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_series_contest_status_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.series_id = iprot.readString();
+          struct.setSeries_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.status = iprot.readI32();
+          struct.setStatusIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class update_series_contest_status_result implements org.apache.thrift.TBase<update_series_contest_status_result, update_series_contest_status_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_series_contest_status_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_series_contest_status_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_series_contest_status_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_series_contest_status_result.class, metaDataMap);
+    }
+
+    public update_series_contest_status_result() {
+    }
+
+    public update_series_contest_status_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_series_contest_status_result(update_series_contest_status_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public update_series_contest_status_result deepCopy() {
+      return new update_series_contest_status_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public update_series_contest_status_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_series_contest_status_result)
+        return this.equals((update_series_contest_status_result)that);
+      return false;
+    }
+
+    public boolean equals(update_series_contest_status_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_series_contest_status_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_series_contest_status_result typedOther = (update_series_contest_status_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_series_contest_status_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_series_contest_status_resultStandardSchemeFactory implements SchemeFactory {
+      public update_series_contest_status_resultStandardScheme getScheme() {
+        return new update_series_contest_status_resultStandardScheme();
+      }
+    }
+
+    private static class update_series_contest_status_resultStandardScheme extends StandardScheme<update_series_contest_status_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_series_contest_status_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_series_contest_status_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_series_contest_status_resultTupleSchemeFactory implements SchemeFactory {
+      public update_series_contest_status_resultTupleScheme getScheme() {
+        return new update_series_contest_status_resultTupleScheme();
+      }
+    }
+
+    private static class update_series_contest_status_resultTupleScheme extends TupleScheme<update_series_contest_status_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_series_contest_status_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_series_contest_status_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class update_nanostory_contest_status_args implements org.apache.thrift.TBase<update_nanostory_contest_status_args, update_nanostory_contest_status_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_nanostory_contest_status_args");
+
+    private static final org.apache.thrift.protocol.TField NANOSTORY_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("nanostory_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField STATUS_FIELD_DESC = new org.apache.thrift.protocol.TField("status", org.apache.thrift.protocol.TType.I32, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_nanostory_contest_status_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_nanostory_contest_status_argsTupleSchemeFactory());
+    }
+
+    public String nanostory_id; // required
+    public String contest_id; // required
+    public int status; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      NANOSTORY_ID((short)1, "nanostory_id"),
+      CONTEST_ID((short)2, "contest_id"),
+      STATUS((short)3, "status");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // NANOSTORY_ID
+            return NANOSTORY_ID;
+          case 2: // CONTEST_ID
+            return CONTEST_ID;
+          case 3: // STATUS
+            return STATUS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __STATUS_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.NANOSTORY_ID, new org.apache.thrift.meta_data.FieldMetaData("nanostory_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.STATUS, new org.apache.thrift.meta_data.FieldMetaData("status", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_nanostory_contest_status_args.class, metaDataMap);
+    }
+
+    public update_nanostory_contest_status_args() {
+    }
+
+    public update_nanostory_contest_status_args(
+      String nanostory_id,
+      String contest_id,
+      int status)
+    {
+      this();
+      this.nanostory_id = nanostory_id;
+      this.contest_id = contest_id;
+      this.status = status;
+      setStatusIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_nanostory_contest_status_args(update_nanostory_contest_status_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      if (other.isSetNanostory_id()) {
+        this.nanostory_id = other.nanostory_id;
+      }
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
+      this.status = other.status;
+    }
+
+    public update_nanostory_contest_status_args deepCopy() {
+      return new update_nanostory_contest_status_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.nanostory_id = null;
+      this.contest_id = null;
+      setStatusIsSet(false);
+      this.status = 0;
+    }
+
+    public String getNanostory_id() {
+      return this.nanostory_id;
+    }
+
+    public update_nanostory_contest_status_args setNanostory_id(String nanostory_id) {
+      this.nanostory_id = nanostory_id;
+      return this;
+    }
+
+    public void unsetNanostory_id() {
+      this.nanostory_id = null;
+    }
+
+    /** Returns true if field nanostory_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetNanostory_id() {
+      return this.nanostory_id != null;
+    }
+
+    public void setNanostory_idIsSet(boolean value) {
+      if (!value) {
+        this.nanostory_id = null;
+      }
+    }
+
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public update_nanostory_contest_status_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
+    public int getStatus() {
+      return this.status;
+    }
+
+    public update_nanostory_contest_status_args setStatus(int status) {
+      this.status = status;
+      setStatusIsSet(true);
+      return this;
+    }
+
+    public void unsetStatus() {
+      __isset_bit_vector.clear(__STATUS_ISSET_ID);
+    }
+
+    /** Returns true if field status is set (has been assigned a value) and false otherwise */
+    public boolean isSetStatus() {
+      return __isset_bit_vector.get(__STATUS_ISSET_ID);
+    }
+
+    public void setStatusIsSet(boolean value) {
+      __isset_bit_vector.set(__STATUS_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case NANOSTORY_ID:
+        if (value == null) {
+          unsetNanostory_id();
+        } else {
+          setNanostory_id((String)value);
+        }
+        break;
+
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
+      case STATUS:
+        if (value == null) {
+          unsetStatus();
+        } else {
+          setStatus((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case NANOSTORY_ID:
+        return getNanostory_id();
+
+      case CONTEST_ID:
+        return getContest_id();
+
+      case STATUS:
+        return Integer.valueOf(getStatus());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case NANOSTORY_ID:
+        return isSetNanostory_id();
+      case CONTEST_ID:
+        return isSetContest_id();
+      case STATUS:
+        return isSetStatus();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_nanostory_contest_status_args)
+        return this.equals((update_nanostory_contest_status_args)that);
+      return false;
+    }
+
+    public boolean equals(update_nanostory_contest_status_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_nanostory_id = true && this.isSetNanostory_id();
+      boolean that_present_nanostory_id = true && that.isSetNanostory_id();
+      if (this_present_nanostory_id || that_present_nanostory_id) {
+        if (!(this_present_nanostory_id && that_present_nanostory_id))
+          return false;
+        if (!this.nanostory_id.equals(that.nanostory_id))
+          return false;
+      }
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
+          return false;
+      }
+
+      boolean this_present_status = true;
+      boolean that_present_status = true;
+      if (this_present_status || that_present_status) {
+        if (!(this_present_status && that_present_status))
+          return false;
+        if (this.status != that.status)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_nanostory_contest_status_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_nanostory_contest_status_args typedOther = (update_nanostory_contest_status_args)other;
+
+      lastComparison = Boolean.valueOf(isSetNanostory_id()).compareTo(typedOther.isSetNanostory_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetNanostory_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.nanostory_id, typedOther.nanostory_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetStatus()).compareTo(typedOther.isSetStatus());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetStatus()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.status, typedOther.status);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_nanostory_contest_status_args(");
+      boolean first = true;
+
+      sb.append("nanostory_id:");
+      if (this.nanostory_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.nanostory_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("status:");
+      sb.append(this.status);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_nanostory_contest_status_argsStandardSchemeFactory implements SchemeFactory {
+      public update_nanostory_contest_status_argsStandardScheme getScheme() {
+        return new update_nanostory_contest_status_argsStandardScheme();
+      }
+    }
+
+    private static class update_nanostory_contest_status_argsStandardScheme extends StandardScheme<update_nanostory_contest_status_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_nanostory_contest_status_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // NANOSTORY_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.nanostory_id = iprot.readString();
+                struct.setNanostory_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // STATUS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.status = iprot.readI32();
+                struct.setStatusIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_nanostory_contest_status_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.nanostory_id != null) {
+          oprot.writeFieldBegin(NANOSTORY_ID_FIELD_DESC);
+          oprot.writeString(struct.nanostory_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldBegin(STATUS_FIELD_DESC);
+        oprot.writeI32(struct.status);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_nanostory_contest_status_argsTupleSchemeFactory implements SchemeFactory {
+      public update_nanostory_contest_status_argsTupleScheme getScheme() {
+        return new update_nanostory_contest_status_argsTupleScheme();
+      }
+    }
+
+    private static class update_nanostory_contest_status_argsTupleScheme extends TupleScheme<update_nanostory_contest_status_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_nanostory_contest_status_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetNanostory_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetContest_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetStatus()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetNanostory_id()) {
+          oprot.writeString(struct.nanostory_id);
+        }
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
+        if (struct.isSetStatus()) {
+          oprot.writeI32(struct.status);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_nanostory_contest_status_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.nanostory_id = iprot.readString();
+          struct.setNanostory_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.status = iprot.readI32();
+          struct.setStatusIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class update_nanostory_contest_status_result implements org.apache.thrift.TBase<update_nanostory_contest_status_result, update_nanostory_contest_status_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("update_nanostory_contest_status_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new update_nanostory_contest_status_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new update_nanostory_contest_status_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(update_nanostory_contest_status_result.class, metaDataMap);
+    }
+
+    public update_nanostory_contest_status_result() {
+    }
+
+    public update_nanostory_contest_status_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public update_nanostory_contest_status_result(update_nanostory_contest_status_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public update_nanostory_contest_status_result deepCopy() {
+      return new update_nanostory_contest_status_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public update_nanostory_contest_status_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof update_nanostory_contest_status_result)
+        return this.equals((update_nanostory_contest_status_result)that);
+      return false;
+    }
+
+    public boolean equals(update_nanostory_contest_status_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(update_nanostory_contest_status_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      update_nanostory_contest_status_result typedOther = (update_nanostory_contest_status_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("update_nanostory_contest_status_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class update_nanostory_contest_status_resultStandardSchemeFactory implements SchemeFactory {
+      public update_nanostory_contest_status_resultStandardScheme getScheme() {
+        return new update_nanostory_contest_status_resultStandardScheme();
+      }
+    }
+
+    private static class update_nanostory_contest_status_resultStandardScheme extends StandardScheme<update_nanostory_contest_status_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, update_nanostory_contest_status_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, update_nanostory_contest_status_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class update_nanostory_contest_status_resultTupleSchemeFactory implements SchemeFactory {
+      public update_nanostory_contest_status_resultTupleScheme getScheme() {
+        return new update_nanostory_contest_status_resultTupleScheme();
+      }
+    }
+
+    private static class update_nanostory_contest_status_resultTupleScheme extends TupleScheme<update_nanostory_contest_status_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, update_nanostory_contest_status_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, update_nanostory_contest_status_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
   public static class record_contest_judge_rating_on_chapter_args implements org.apache.thrift.TBase<record_contest_judge_rating_on_chapter_args, record_contest_judge_rating_on_chapter_args._Fields>, java.io.Serializable, Cloneable   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_chapter_args");
 
@@ -29754,6 +31912,1818 @@ public class KahaniyaService {
 
   }
 
+  public static class record_contest_judge_rating_on_series_args implements org.apache.thrift.TBase<record_contest_judge_rating_on_series_args, record_contest_judge_rating_on_series_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_series_args");
+
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField SERIES_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("series_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_series_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_series_argsTupleSchemeFactory());
+    }
+
+    public String contest_id; // required
+    public String series_id; // required
+    public String user_id; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      CONTEST_ID((short)1, "contest_id"),
+      SERIES_ID((short)2, "series_id"),
+      USER_ID((short)3, "user_id");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // CONTEST_ID
+            return CONTEST_ID;
+          case 2: // SERIES_ID
+            return SERIES_ID;
+          case 3: // USER_ID
+            return USER_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.SERIES_ID, new org.apache.thrift.meta_data.FieldMetaData("series_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_series_args.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_series_args() {
+    }
+
+    public record_contest_judge_rating_on_series_args(
+      String contest_id,
+      String series_id,
+      String user_id)
+    {
+      this();
+      this.contest_id = contest_id;
+      this.series_id = series_id;
+      this.user_id = user_id;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_series_args(record_contest_judge_rating_on_series_args other) {
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
+      if (other.isSetSeries_id()) {
+        this.series_id = other.series_id;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+    }
+
+    public record_contest_judge_rating_on_series_args deepCopy() {
+      return new record_contest_judge_rating_on_series_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.contest_id = null;
+      this.series_id = null;
+      this.user_id = null;
+    }
+
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public record_contest_judge_rating_on_series_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
+    public String getSeries_id() {
+      return this.series_id;
+    }
+
+    public record_contest_judge_rating_on_series_args setSeries_id(String series_id) {
+      this.series_id = series_id;
+      return this;
+    }
+
+    public void unsetSeries_id() {
+      this.series_id = null;
+    }
+
+    /** Returns true if field series_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetSeries_id() {
+      return this.series_id != null;
+    }
+
+    public void setSeries_idIsSet(boolean value) {
+      if (!value) {
+        this.series_id = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public record_contest_judge_rating_on_series_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
+      case SERIES_ID:
+        if (value == null) {
+          unsetSeries_id();
+        } else {
+          setSeries_id((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CONTEST_ID:
+        return getContest_id();
+
+      case SERIES_ID:
+        return getSeries_id();
+
+      case USER_ID:
+        return getUser_id();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case CONTEST_ID:
+        return isSetContest_id();
+      case SERIES_ID:
+        return isSetSeries_id();
+      case USER_ID:
+        return isSetUser_id();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_series_args)
+        return this.equals((record_contest_judge_rating_on_series_args)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_series_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
+          return false;
+      }
+
+      boolean this_present_series_id = true && this.isSetSeries_id();
+      boolean that_present_series_id = true && that.isSetSeries_id();
+      if (this_present_series_id || that_present_series_id) {
+        if (!(this_present_series_id && that_present_series_id))
+          return false;
+        if (!this.series_id.equals(that.series_id))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_series_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_series_args typedOther = (record_contest_judge_rating_on_series_args)other;
+
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetSeries_id()).compareTo(typedOther.isSetSeries_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSeries_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.series_id, typedOther.series_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_series_args(");
+      boolean first = true;
+
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("series_id:");
+      if (this.series_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.series_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_argsStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_series_argsStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_series_argsStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_argsStandardScheme extends StandardScheme<record_contest_judge_rating_on_series_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_series_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // SERIES_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.series_id = iprot.readString();
+                struct.setSeries_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_series_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.series_id != null) {
+          oprot.writeFieldBegin(SERIES_ID_FIELD_DESC);
+          oprot.writeString(struct.series_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_series_argsTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_series_argsTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_series_argsTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_argsTupleScheme extends TupleScheme<record_contest_judge_rating_on_series_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_series_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetContest_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetSeries_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
+        if (struct.isSetSeries_id()) {
+          oprot.writeString(struct.series_id);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_series_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.series_id = iprot.readString();
+          struct.setSeries_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class record_contest_judge_rating_on_series_result implements org.apache.thrift.TBase<record_contest_judge_rating_on_series_result, record_contest_judge_rating_on_series_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_series_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_series_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_series_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_series_result.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_series_result() {
+    }
+
+    public record_contest_judge_rating_on_series_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_series_result(record_contest_judge_rating_on_series_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public record_contest_judge_rating_on_series_result deepCopy() {
+      return new record_contest_judge_rating_on_series_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public record_contest_judge_rating_on_series_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_series_result)
+        return this.equals((record_contest_judge_rating_on_series_result)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_series_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_series_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_series_result typedOther = (record_contest_judge_rating_on_series_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_series_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_resultStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_series_resultStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_series_resultStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_resultStandardScheme extends StandardScheme<record_contest_judge_rating_on_series_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_series_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_series_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_series_resultTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_series_resultTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_series_resultTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_series_resultTupleScheme extends TupleScheme<record_contest_judge_rating_on_series_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_series_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_series_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class record_contest_judge_rating_on_nanostory_args implements org.apache.thrift.TBase<record_contest_judge_rating_on_nanostory_args, record_contest_judge_rating_on_nanostory_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_nanostory_args");
+
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField NANOSTORY_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("nanostory_id", org.apache.thrift.protocol.TType.STRING, (short)2);
+    private static final org.apache.thrift.protocol.TField USER_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("user_id", org.apache.thrift.protocol.TType.STRING, (short)3);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_nanostory_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_nanostory_argsTupleSchemeFactory());
+    }
+
+    public String contest_id; // required
+    public String nanostory_id; // required
+    public String user_id; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      CONTEST_ID((short)1, "contest_id"),
+      NANOSTORY_ID((short)2, "nanostory_id"),
+      USER_ID((short)3, "user_id");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // CONTEST_ID
+            return CONTEST_ID;
+          case 2: // NANOSTORY_ID
+            return NANOSTORY_ID;
+          case 3: // USER_ID
+            return USER_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.NANOSTORY_ID, new org.apache.thrift.meta_data.FieldMetaData("nanostory_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      tmpMap.put(_Fields.USER_ID, new org.apache.thrift.meta_data.FieldMetaData("user_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_nanostory_args.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_nanostory_args() {
+    }
+
+    public record_contest_judge_rating_on_nanostory_args(
+      String contest_id,
+      String nanostory_id,
+      String user_id)
+    {
+      this();
+      this.contest_id = contest_id;
+      this.nanostory_id = nanostory_id;
+      this.user_id = user_id;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_nanostory_args(record_contest_judge_rating_on_nanostory_args other) {
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
+      if (other.isSetNanostory_id()) {
+        this.nanostory_id = other.nanostory_id;
+      }
+      if (other.isSetUser_id()) {
+        this.user_id = other.user_id;
+      }
+    }
+
+    public record_contest_judge_rating_on_nanostory_args deepCopy() {
+      return new record_contest_judge_rating_on_nanostory_args(this);
+    }
+
+    @Override
+    public void clear() {
+      this.contest_id = null;
+      this.nanostory_id = null;
+      this.user_id = null;
+    }
+
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public record_contest_judge_rating_on_nanostory_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
+    public String getNanostory_id() {
+      return this.nanostory_id;
+    }
+
+    public record_contest_judge_rating_on_nanostory_args setNanostory_id(String nanostory_id) {
+      this.nanostory_id = nanostory_id;
+      return this;
+    }
+
+    public void unsetNanostory_id() {
+      this.nanostory_id = null;
+    }
+
+    /** Returns true if field nanostory_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetNanostory_id() {
+      return this.nanostory_id != null;
+    }
+
+    public void setNanostory_idIsSet(boolean value) {
+      if (!value) {
+        this.nanostory_id = null;
+      }
+    }
+
+    public String getUser_id() {
+      return this.user_id;
+    }
+
+    public record_contest_judge_rating_on_nanostory_args setUser_id(String user_id) {
+      this.user_id = user_id;
+      return this;
+    }
+
+    public void unsetUser_id() {
+      this.user_id = null;
+    }
+
+    /** Returns true if field user_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetUser_id() {
+      return this.user_id != null;
+    }
+
+    public void setUser_idIsSet(boolean value) {
+      if (!value) {
+        this.user_id = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
+      case NANOSTORY_ID:
+        if (value == null) {
+          unsetNanostory_id();
+        } else {
+          setNanostory_id((String)value);
+        }
+        break;
+
+      case USER_ID:
+        if (value == null) {
+          unsetUser_id();
+        } else {
+          setUser_id((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case CONTEST_ID:
+        return getContest_id();
+
+      case NANOSTORY_ID:
+        return getNanostory_id();
+
+      case USER_ID:
+        return getUser_id();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case CONTEST_ID:
+        return isSetContest_id();
+      case NANOSTORY_ID:
+        return isSetNanostory_id();
+      case USER_ID:
+        return isSetUser_id();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_nanostory_args)
+        return this.equals((record_contest_judge_rating_on_nanostory_args)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_nanostory_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
+          return false;
+      }
+
+      boolean this_present_nanostory_id = true && this.isSetNanostory_id();
+      boolean that_present_nanostory_id = true && that.isSetNanostory_id();
+      if (this_present_nanostory_id || that_present_nanostory_id) {
+        if (!(this_present_nanostory_id && that_present_nanostory_id))
+          return false;
+        if (!this.nanostory_id.equals(that.nanostory_id))
+          return false;
+      }
+
+      boolean this_present_user_id = true && this.isSetUser_id();
+      boolean that_present_user_id = true && that.isSetUser_id();
+      if (this_present_user_id || that_present_user_id) {
+        if (!(this_present_user_id && that_present_user_id))
+          return false;
+        if (!this.user_id.equals(that.user_id))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_nanostory_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_nanostory_args typedOther = (record_contest_judge_rating_on_nanostory_args)other;
+
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetNanostory_id()).compareTo(typedOther.isSetNanostory_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetNanostory_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.nanostory_id, typedOther.nanostory_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetUser_id()).compareTo(typedOther.isSetUser_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetUser_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.user_id, typedOther.user_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_nanostory_args(");
+      boolean first = true;
+
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("nanostory_id:");
+      if (this.nanostory_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.nanostory_id);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("user_id:");
+      if (this.user_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.user_id);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_argsStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_nanostory_argsStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_nanostory_argsStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_argsStandardScheme extends StandardScheme<record_contest_judge_rating_on_nanostory_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_nanostory_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // NANOSTORY_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.nanostory_id = iprot.readString();
+                struct.setNanostory_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 3: // USER_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.user_id = iprot.readString();
+                struct.setUser_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_nanostory_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.nanostory_id != null) {
+          oprot.writeFieldBegin(NANOSTORY_ID_FIELD_DESC);
+          oprot.writeString(struct.nanostory_id);
+          oprot.writeFieldEnd();
+        }
+        if (struct.user_id != null) {
+          oprot.writeFieldBegin(USER_ID_FIELD_DESC);
+          oprot.writeString(struct.user_id);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_argsTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_nanostory_argsTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_nanostory_argsTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_argsTupleScheme extends TupleScheme<record_contest_judge_rating_on_nanostory_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_nanostory_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetContest_id()) {
+          optionals.set(0);
+        }
+        if (struct.isSetNanostory_id()) {
+          optionals.set(1);
+        }
+        if (struct.isSetUser_id()) {
+          optionals.set(2);
+        }
+        oprot.writeBitSet(optionals, 3);
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
+        if (struct.isSetNanostory_id()) {
+          oprot.writeString(struct.nanostory_id);
+        }
+        if (struct.isSetUser_id()) {
+          oprot.writeString(struct.user_id);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_nanostory_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(3);
+        if (incoming.get(0)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.nanostory_id = iprot.readString();
+          struct.setNanostory_idIsSet(true);
+        }
+        if (incoming.get(2)) {
+          struct.user_id = iprot.readString();
+          struct.setUser_idIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class record_contest_judge_rating_on_nanostory_result implements org.apache.thrift.TBase<record_contest_judge_rating_on_nanostory_result, record_contest_judge_rating_on_nanostory_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("record_contest_judge_rating_on_nanostory_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRING, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new record_contest_judge_rating_on_nanostory_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new record_contest_judge_rating_on_nanostory_resultTupleSchemeFactory());
+    }
+
+    public String success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(record_contest_judge_rating_on_nanostory_result.class, metaDataMap);
+    }
+
+    public record_contest_judge_rating_on_nanostory_result() {
+    }
+
+    public record_contest_judge_rating_on_nanostory_result(
+      String success)
+    {
+      this();
+      this.success = success;
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public record_contest_judge_rating_on_nanostory_result(record_contest_judge_rating_on_nanostory_result other) {
+      if (other.isSetSuccess()) {
+        this.success = other.success;
+      }
+    }
+
+    public record_contest_judge_rating_on_nanostory_result deepCopy() {
+      return new record_contest_judge_rating_on_nanostory_result(this);
+    }
+
+    @Override
+    public void clear() {
+      this.success = null;
+    }
+
+    public String getSuccess() {
+      return this.success;
+    }
+
+    public record_contest_judge_rating_on_nanostory_result setSuccess(String success) {
+      this.success = success;
+      return this;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return this.success != null;
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      if (!value) {
+        this.success = null;
+      }
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((String)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return getSuccess();
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof record_contest_judge_rating_on_nanostory_result)
+        return this.equals((record_contest_judge_rating_on_nanostory_result)that);
+      return false;
+    }
+
+    public boolean equals(record_contest_judge_rating_on_nanostory_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && this.isSetSuccess();
+      boolean that_present_success = true && that.isSetSuccess();
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(record_contest_judge_rating_on_nanostory_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      record_contest_judge_rating_on_nanostory_result typedOther = (record_contest_judge_rating_on_nanostory_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("record_contest_judge_rating_on_nanostory_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      if (this.success == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.success);
+      }
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_resultStandardSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_nanostory_resultStandardScheme getScheme() {
+        return new record_contest_judge_rating_on_nanostory_resultStandardScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_resultStandardScheme extends StandardScheme<record_contest_judge_rating_on_nanostory_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, record_contest_judge_rating_on_nanostory_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.success = iprot.readString();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, record_contest_judge_rating_on_nanostory_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        if (struct.success != null) {
+          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+          oprot.writeString(struct.success);
+          oprot.writeFieldEnd();
+        }
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_resultTupleSchemeFactory implements SchemeFactory {
+      public record_contest_judge_rating_on_nanostory_resultTupleScheme getScheme() {
+        return new record_contest_judge_rating_on_nanostory_resultTupleScheme();
+      }
+    }
+
+    private static class record_contest_judge_rating_on_nanostory_resultTupleScheme extends TupleScheme<record_contest_judge_rating_on_nanostory_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_nanostory_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeString(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, record_contest_judge_rating_on_nanostory_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readString();
+          struct.setSuccessIsSet(true);
+        }
+      }
+    }
+
+  }
+
   public static class create_or_edit_contest_args implements org.apache.thrift.TBase<create_or_edit_contest_args, create_or_edit_contest_args._Fields>, java.io.Serializable, Cloneable   {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("create_or_edit_contest_args");
 
@@ -29774,7 +33744,9 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField PRICE_FIELD_DESC = new org.apache.thrift.protocol.TField("price", org.apache.thrift.protocol.TType.I32, (short)15);
     private static final org.apache.thrift.protocol.TField MODE_FIELD_DESC = new org.apache.thrift.protocol.TField("mode", org.apache.thrift.protocol.TType.I32, (short)16);
     private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)17);
-    private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)18);
+    private static final org.apache.thrift.protocol.TField CONTEST_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_type", org.apache.thrift.protocol.TType.I32, (short)18);
+    private static final org.apache.thrift.protocol.TField IS_OPEN_FIELD_DESC = new org.apache.thrift.protocol.TField("is_open", org.apache.thrift.protocol.TType.I32, (short)19);
+    private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)20);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -29799,6 +33771,8 @@ public class KahaniyaService {
     public int price; // required
     public int mode; // required
     public int time_created; // required
+    public int contest_type; // required
+    public int is_open; // required
     public int is_edit; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
@@ -29820,7 +33794,9 @@ public class KahaniyaService {
       PRICE((short)15, "price"),
       MODE((short)16, "mode"),
       TIME_CREATED((short)17, "time_created"),
-      IS_EDIT((short)18, "is_edit");
+      CONTEST_TYPE((short)18, "contest_type"),
+      IS_OPEN((short)19, "is_open"),
+      IS_EDIT((short)20, "is_edit");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -29869,7 +33845,11 @@ public class KahaniyaService {
             return MODE;
           case 17: // TIME_CREATED
             return TIME_CREATED;
-          case 18: // IS_EDIT
+          case 18: // CONTEST_TYPE
+            return CONTEST_TYPE;
+          case 19: // IS_OPEN
+            return IS_OPEN;
+          case 20: // IS_EDIT
             return IS_EDIT;
           default:
             return null;
@@ -29916,8 +33896,10 @@ public class KahaniyaService {
     private static final int __PRICE_ISSET_ID = 2;
     private static final int __MODE_ISSET_ID = 3;
     private static final int __TIME_CREATED_ISSET_ID = 4;
-    private static final int __IS_EDIT_ISSET_ID = 5;
-    private BitSet __isset_bit_vector = new BitSet(6);
+    private static final int __CONTEST_TYPE_ISSET_ID = 5;
+    private static final int __IS_OPEN_ISSET_ID = 6;
+    private static final int __IS_EDIT_ISSET_ID = 7;
+    private BitSet __isset_bit_vector = new BitSet(8);
     public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -29955,6 +33937,10 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.TIME_CREATED, new org.apache.thrift.meta_data.FieldMetaData("time_created", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.CONTEST_TYPE, new org.apache.thrift.meta_data.FieldMetaData("contest_type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.IS_OPEN, new org.apache.thrift.meta_data.FieldMetaData("is_open", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -29982,6 +33968,8 @@ public class KahaniyaService {
       int price,
       int mode,
       int time_created,
+      int contest_type,
+      int is_open,
       int is_edit)
     {
       this();
@@ -30007,6 +33995,10 @@ public class KahaniyaService {
       setModeIsSet(true);
       this.time_created = time_created;
       setTime_createdIsSet(true);
+      this.contest_type = contest_type;
+      setContest_typeIsSet(true);
+      this.is_open = is_open;
+      setIs_openIsSet(true);
       this.is_edit = is_edit;
       setIs_editIsSet(true);
     }
@@ -30058,6 +34050,8 @@ public class KahaniyaService {
       this.price = other.price;
       this.mode = other.mode;
       this.time_created = other.time_created;
+      this.contest_type = other.contest_type;
+      this.is_open = other.is_open;
       this.is_edit = other.is_edit;
     }
 
@@ -30089,6 +34083,10 @@ public class KahaniyaService {
       this.mode = 0;
       setTime_createdIsSet(false);
       this.time_created = 0;
+      setContest_typeIsSet(false);
+      this.contest_type = 0;
+      setIs_openIsSet(false);
+      this.is_open = 0;
       setIs_editIsSet(false);
       this.is_edit = 0;
     }
@@ -30496,6 +34494,52 @@ public class KahaniyaService {
       __isset_bit_vector.set(__TIME_CREATED_ISSET_ID, value);
     }
 
+    public int getContest_type() {
+      return this.contest_type;
+    }
+
+    public create_or_edit_contest_args setContest_type(int contest_type) {
+      this.contest_type = contest_type;
+      setContest_typeIsSet(true);
+      return this;
+    }
+
+    public void unsetContest_type() {
+      __isset_bit_vector.clear(__CONTEST_TYPE_ISSET_ID);
+    }
+
+    /** Returns true if field contest_type is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_type() {
+      return __isset_bit_vector.get(__CONTEST_TYPE_ISSET_ID);
+    }
+
+    public void setContest_typeIsSet(boolean value) {
+      __isset_bit_vector.set(__CONTEST_TYPE_ISSET_ID, value);
+    }
+
+    public int getIs_open() {
+      return this.is_open;
+    }
+
+    public create_or_edit_contest_args setIs_open(int is_open) {
+      this.is_open = is_open;
+      setIs_openIsSet(true);
+      return this;
+    }
+
+    public void unsetIs_open() {
+      __isset_bit_vector.clear(__IS_OPEN_ISSET_ID);
+    }
+
+    /** Returns true if field is_open is set (has been assigned a value) and false otherwise */
+    public boolean isSetIs_open() {
+      return __isset_bit_vector.get(__IS_OPEN_ISSET_ID);
+    }
+
+    public void setIs_openIsSet(boolean value) {
+      __isset_bit_vector.set(__IS_OPEN_ISSET_ID, value);
+    }
+
     public int getIs_edit() {
       return this.is_edit;
     }
@@ -30657,6 +34701,22 @@ public class KahaniyaService {
         }
         break;
 
+      case CONTEST_TYPE:
+        if (value == null) {
+          unsetContest_type();
+        } else {
+          setContest_type((Integer)value);
+        }
+        break;
+
+      case IS_OPEN:
+        if (value == null) {
+          unsetIs_open();
+        } else {
+          setIs_open((Integer)value);
+        }
+        break;
+
       case IS_EDIT:
         if (value == null) {
           unsetIs_edit();
@@ -30721,6 +34781,12 @@ public class KahaniyaService {
       case TIME_CREATED:
         return Integer.valueOf(getTime_created());
 
+      case CONTEST_TYPE:
+        return Integer.valueOf(getContest_type());
+
+      case IS_OPEN:
+        return Integer.valueOf(getIs_open());
+
       case IS_EDIT:
         return Integer.valueOf(getIs_edit());
 
@@ -30769,6 +34835,10 @@ public class KahaniyaService {
         return isSetMode();
       case TIME_CREATED:
         return isSetTime_created();
+      case CONTEST_TYPE:
+        return isSetContest_type();
+      case IS_OPEN:
+        return isSetIs_open();
       case IS_EDIT:
         return isSetIs_edit();
       }
@@ -30938,6 +35008,24 @@ public class KahaniyaService {
         if (!(this_present_time_created && that_present_time_created))
           return false;
         if (this.time_created != that.time_created)
+          return false;
+      }
+
+      boolean this_present_contest_type = true;
+      boolean that_present_contest_type = true;
+      if (this_present_contest_type || that_present_contest_type) {
+        if (!(this_present_contest_type && that_present_contest_type))
+          return false;
+        if (this.contest_type != that.contest_type)
+          return false;
+      }
+
+      boolean this_present_is_open = true;
+      boolean that_present_is_open = true;
+      if (this_present_is_open || that_present_is_open) {
+        if (!(this_present_is_open && that_present_is_open))
+          return false;
+        if (this.is_open != that.is_open)
           return false;
       }
 
@@ -31136,6 +35224,26 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetContest_type()).compareTo(typedOther.isSetContest_type());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_type()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_type, typedOther.contest_type);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetIs_open()).compareTo(typedOther.isSetIs_open());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetIs_open()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.is_open, typedOther.is_open);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       lastComparison = Boolean.valueOf(isSetIs_edit()).compareTo(typedOther.isSetIs_edit());
       if (lastComparison != 0) {
         return lastComparison;
@@ -31280,6 +35388,14 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("time_created:");
       sb.append(this.time_created);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("contest_type:");
+      sb.append(this.contest_type);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("is_open:");
+      sb.append(this.is_open);
       first = false;
       if (!first) sb.append(", ");
       sb.append("is_edit:");
@@ -31465,7 +35581,23 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 18: // IS_EDIT
+            case 18: // CONTEST_TYPE
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.contest_type = iprot.readI32();
+                struct.setContest_typeIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 19: // IS_OPEN
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.is_open = iprot.readI32();
+                struct.setIs_openIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 20: // IS_EDIT
               if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
                 struct.is_edit = iprot.readI32();
                 struct.setIs_editIsSet(true);
@@ -31563,6 +35695,12 @@ public class KahaniyaService {
         oprot.writeFieldBegin(TIME_CREATED_FIELD_DESC);
         oprot.writeI32(struct.time_created);
         oprot.writeFieldEnd();
+        oprot.writeFieldBegin(CONTEST_TYPE_FIELD_DESC);
+        oprot.writeI32(struct.contest_type);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(IS_OPEN_FIELD_DESC);
+        oprot.writeI32(struct.is_open);
+        oprot.writeFieldEnd();
         oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
         oprot.writeI32(struct.is_edit);
         oprot.writeFieldEnd();
@@ -31635,10 +35773,16 @@ public class KahaniyaService {
         if (struct.isSetTime_created()) {
           optionals.set(16);
         }
-        if (struct.isSetIs_edit()) {
+        if (struct.isSetContest_type()) {
           optionals.set(17);
         }
-        oprot.writeBitSet(optionals, 18);
+        if (struct.isSetIs_open()) {
+          optionals.set(18);
+        }
+        if (struct.isSetIs_edit()) {
+          optionals.set(19);
+        }
+        oprot.writeBitSet(optionals, 20);
         if (struct.isSetContest_id()) {
           oprot.writeString(struct.contest_id);
         }
@@ -31690,6 +35834,12 @@ public class KahaniyaService {
         if (struct.isSetTime_created()) {
           oprot.writeI32(struct.time_created);
         }
+        if (struct.isSetContest_type()) {
+          oprot.writeI32(struct.contest_type);
+        }
+        if (struct.isSetIs_open()) {
+          oprot.writeI32(struct.is_open);
+        }
         if (struct.isSetIs_edit()) {
           oprot.writeI32(struct.is_edit);
         }
@@ -31698,7 +35848,7 @@ public class KahaniyaService {
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_contest_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(18);
+        BitSet incoming = iprot.readBitSet(20);
         if (incoming.get(0)) {
           struct.contest_id = iprot.readString();
           struct.setContest_idIsSet(true);
@@ -31768,6 +35918,14 @@ public class KahaniyaService {
           struct.setTime_createdIsSet(true);
         }
         if (incoming.get(17)) {
+          struct.contest_type = iprot.readI32();
+          struct.setContest_typeIsSet(true);
+        }
+        if (incoming.get(18)) {
+          struct.is_open = iprot.readI32();
+          struct.setIs_openIsSet(true);
+        }
+        if (incoming.get(19)) {
           struct.is_edit = iprot.readI32();
           struct.setIs_editIsSet(true);
         }
@@ -36340,6 +40498,8 @@ public class KahaniyaService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
@@ -68927,6 +73087,7 @@ public class KahaniyaService {
     private static final org.apache.thrift.protocol.TField FEATURE_IMAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("feature_image", org.apache.thrift.protocol.TType.STRING, (short)6);
     private static final org.apache.thrift.protocol.TField TIME_CREATED_FIELD_DESC = new org.apache.thrift.protocol.TField("time_created", org.apache.thrift.protocol.TType.I32, (short)7);
     private static final org.apache.thrift.protocol.TField IS_EDIT_FIELD_DESC = new org.apache.thrift.protocol.TField("is_edit", org.apache.thrift.protocol.TType.I32, (short)8);
+    private static final org.apache.thrift.protocol.TField CONTEST_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("contest_id", org.apache.thrift.protocol.TType.STRING, (short)9);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -68942,6 +73103,7 @@ public class KahaniyaService {
     public String feature_image; // required
     public int time_created; // required
     public int is_edit; // required
+    public String contest_id; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -68952,7 +73114,8 @@ public class KahaniyaService {
       LANGUAGE((short)5, "language"),
       FEATURE_IMAGE((short)6, "feature_image"),
       TIME_CREATED((short)7, "time_created"),
-      IS_EDIT((short)8, "is_edit");
+      IS_EDIT((short)8, "is_edit"),
+      CONTEST_ID((short)9, "contest_id");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -68983,6 +73146,8 @@ public class KahaniyaService {
             return TIME_CREATED;
           case 8: // IS_EDIT
             return IS_EDIT;
+          case 9: // CONTEST_ID
+            return CONTEST_ID;
           default:
             return null;
         }
@@ -69045,6 +73210,8 @@ public class KahaniyaService {
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       tmpMap.put(_Fields.IS_EDIT, new org.apache.thrift.meta_data.FieldMetaData("is_edit", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.CONTEST_ID, new org.apache.thrift.meta_data.FieldMetaData("contest_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(create_or_edit_nanostory_args.class, metaDataMap);
     }
@@ -69060,7 +73227,8 @@ public class KahaniyaService {
       String language,
       String feature_image,
       int time_created,
-      int is_edit)
+      int is_edit,
+      String contest_id)
     {
       this();
       this.nanostory_id = nanostory_id;
@@ -69073,6 +73241,7 @@ public class KahaniyaService {
       setTime_createdIsSet(true);
       this.is_edit = is_edit;
       setIs_editIsSet(true);
+      this.contest_id = contest_id;
     }
 
     /**
@@ -69101,6 +73270,9 @@ public class KahaniyaService {
       }
       this.time_created = other.time_created;
       this.is_edit = other.is_edit;
+      if (other.isSetContest_id()) {
+        this.contest_id = other.contest_id;
+      }
     }
 
     public create_or_edit_nanostory_args deepCopy() {
@@ -69119,6 +73291,7 @@ public class KahaniyaService {
       this.time_created = 0;
       setIs_editIsSet(false);
       this.is_edit = 0;
+      this.contest_id = null;
     }
 
     public String getNanostory_id() {
@@ -69311,6 +73484,30 @@ public class KahaniyaService {
       __isset_bit_vector.set(__IS_EDIT_ISSET_ID, value);
     }
 
+    public String getContest_id() {
+      return this.contest_id;
+    }
+
+    public create_or_edit_nanostory_args setContest_id(String contest_id) {
+      this.contest_id = contest_id;
+      return this;
+    }
+
+    public void unsetContest_id() {
+      this.contest_id = null;
+    }
+
+    /** Returns true if field contest_id is set (has been assigned a value) and false otherwise */
+    public boolean isSetContest_id() {
+      return this.contest_id != null;
+    }
+
+    public void setContest_idIsSet(boolean value) {
+      if (!value) {
+        this.contest_id = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case NANOSTORY_ID:
@@ -69377,6 +73574,14 @@ public class KahaniyaService {
         }
         break;
 
+      case CONTEST_ID:
+        if (value == null) {
+          unsetContest_id();
+        } else {
+          setContest_id((String)value);
+        }
+        break;
+
       }
     }
 
@@ -69406,6 +73611,9 @@ public class KahaniyaService {
       case IS_EDIT:
         return Integer.valueOf(getIs_edit());
 
+      case CONTEST_ID:
+        return getContest_id();
+
       }
       throw new IllegalStateException();
     }
@@ -69433,6 +73641,8 @@ public class KahaniyaService {
         return isSetTime_created();
       case IS_EDIT:
         return isSetIs_edit();
+      case CONTEST_ID:
+        return isSetContest_id();
       }
       throw new IllegalStateException();
     }
@@ -69519,6 +73729,15 @@ public class KahaniyaService {
         if (!(this_present_is_edit && that_present_is_edit))
           return false;
         if (this.is_edit != that.is_edit)
+          return false;
+      }
+
+      boolean this_present_contest_id = true && this.isSetContest_id();
+      boolean that_present_contest_id = true && that.isSetContest_id();
+      if (this_present_contest_id || that_present_contest_id) {
+        if (!(this_present_contest_id && that_present_contest_id))
+          return false;
+        if (!this.contest_id.equals(that.contest_id))
           return false;
       }
 
@@ -69618,6 +73837,16 @@ public class KahaniyaService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetContest_id()).compareTo(typedOther.isSetContest_id());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetContest_id()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.contest_id, typedOther.contest_id);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -69692,6 +73921,14 @@ public class KahaniyaService {
       if (!first) sb.append(", ");
       sb.append("is_edit:");
       sb.append(this.is_edit);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("contest_id:");
+      if (this.contest_id == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.contest_id);
+      }
       first = false;
       sb.append(")");
       return sb.toString();
@@ -69801,6 +74038,14 @@ public class KahaniyaService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 9: // CONTEST_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+                struct.contest_id = iprot.readString();
+                struct.setContest_idIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -69852,6 +74097,11 @@ public class KahaniyaService {
         oprot.writeFieldBegin(IS_EDIT_FIELD_DESC);
         oprot.writeI32(struct.is_edit);
         oprot.writeFieldEnd();
+        if (struct.contest_id != null) {
+          oprot.writeFieldBegin(CONTEST_ID_FIELD_DESC);
+          oprot.writeString(struct.contest_id);
+          oprot.writeFieldEnd();
+        }
         oprot.writeFieldStop();
         oprot.writeStructEnd();
       }
@@ -69894,7 +74144,10 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           optionals.set(7);
         }
-        oprot.writeBitSet(optionals, 8);
+        if (struct.isSetContest_id()) {
+          optionals.set(8);
+        }
+        oprot.writeBitSet(optionals, 9);
         if (struct.isSetNanostory_id()) {
           oprot.writeString(struct.nanostory_id);
         }
@@ -69919,12 +74172,15 @@ public class KahaniyaService {
         if (struct.isSetIs_edit()) {
           oprot.writeI32(struct.is_edit);
         }
+        if (struct.isSetContest_id()) {
+          oprot.writeString(struct.contest_id);
+        }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, create_or_edit_nanostory_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(8);
+        BitSet incoming = iprot.readBitSet(9);
         if (incoming.get(0)) {
           struct.nanostory_id = iprot.readString();
           struct.setNanostory_idIsSet(true);
@@ -69956,6 +74212,10 @@ public class KahaniyaService {
         if (incoming.get(7)) {
           struct.is_edit = iprot.readI32();
           struct.setIs_editIsSet(true);
+        }
+        if (incoming.get(8)) {
+          struct.contest_id = iprot.readString();
+          struct.setContest_idIsSet(true);
         }
       }
     }
@@ -72027,8 +76287,6 @@ public class KahaniyaService {
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
       try {
-        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
-        __isset_bit_vector = new BitSet(1);
         read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
       } catch (org.apache.thrift.TException te) {
         throw new java.io.IOException(te);
