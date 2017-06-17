@@ -954,7 +954,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 				search_index.remove(chapterNode);
 				search_index.add(chapterNode, SEARCH_CHAPTER, 
-						chapterNode.getProperty(CHAPTER_TITLE)+""+ chapterNode.getProperty(CHAPTER_TITLE_ID));
+						chapterNode.getProperty(CHAPTER_TITLE)+" "+ chapterNode.getProperty(CHAPTER_TITLE_ID));
 			}
 			
 			ResourceIterator<Node> seriesItr = seriesId_index.query(SERIES_ID, "*").iterator();
@@ -965,7 +965,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 				search_index.remove(seriesNode);
 				search_index.add(seriesNode, SEARCH_SERIES, 
-						seriesNode.getProperty(SERIES_TITLE)+""+ seriesNode.getProperty(SERIES_TITLE_ID));
+						seriesNode.getProperty(SERIES_TITLE)+" "+ seriesNode.getProperty(SERIES_TITLE_ID));
 			}
 			
 			ResourceIterator<Node> anthologyItr = anthologyId_index.query(ANTHOLOGY_ID, "*").iterator();
@@ -976,7 +976,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 				search_index.remove(anthologyNode);
 				search_index.add(anthologyNode, SEARCH_ANTHOLOGY, 
-						anthologyNode.getProperty(ANTHOLOGY_TITLE)+""+ anthologyNode.getProperty(ANTHOLOGY_TITLE_ID));
+						anthologyNode.getProperty(ANTHOLOGY_TITLE)+" "+ anthologyNode.getProperty(ANTHOLOGY_TITLE_ID));
 			}
 			
 			System.out.println("succesfullly updated search index");
@@ -2087,7 +2087,6 @@ public class Kahaniya implements KahaniyaService.Iface{
 
 			res = "true";
 			tx.success();
-
 		}
 		catch(KahaniyaCustomException ex)
 		{
@@ -4121,14 +4120,11 @@ public class Kahaniya implements KahaniyaService.Iface{
 						Relationship rel = createRelation(CHAPTER_BELONGS_TO_CONTEST, chapterNode, contestNode);					
 						rel.setProperty(CHAPTER_CONTEST_STATUS, 0);
 					}
-					
-					
 					chapterNode.setProperty(CHAPTER_TITLE, title);
 					chapterNode.setProperty(CHAPTER_TITLE_ID, title_id);
 					chapterNode.setProperty(CHAPTER_FEAT_IMAGE, feat_image);
 					chapterNode.setProperty(CHAPTER_FREE_OR_PAID, free_or_paid);
 					chapterNode.setProperty(CHAPTER_WORDS_COUNT, w_count);					
-					
 				}
 			}
 			res = "true";
@@ -5882,8 +5878,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 				JSONObject nanoStories = new JSONObject();
 				nanoStories.put("tp", 5);
 				nanoStories.put("data", get_nanostories("ALL", filter, prev_cnt, count, user_id, "", "", "",""));
-				nanoStories.put("ftp", "TNS");
-							
+				nanoStories.put("ftp", "TNS");							
 				
 				JSONObject inTrending = new JSONObject();
 				JSONObject inSerieses = new JSONObject();
@@ -5895,14 +5890,18 @@ public class Kahaniya implements KahaniyaService.Iface{
 				
 				while(followingUsersRel.hasNext())
 				{
+					System.out.println("in While Loop");
 					if(size >= 5)
 						break;
 					Relationship rel = followingUsersRel.next();
 					size++;
 				}
+				
+				System.out.println("Size of relationsship : "+size);
 							
 				if(size >= 5)				
 				{			
+					System.out.println("in condition size >=5"+ size);
 					inTrending.put("tp", 3);
 					inTrending.put("data", get_trending_feed(filter, 0, c, user_id));
 					inTrending.put("ftp", "T");
@@ -5918,6 +5917,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 					inAuthors.put("ftp", "A");
 				}
 				else{
+					System.out.println("in condition else"+ size);
 					inTrending.put("tp", 3);
 					inTrending.put("data", get_popular_stories(filter, 0, c));
 					inTrending.put("ftp", "TC");
@@ -5945,6 +5945,7 @@ public class Kahaniya implements KahaniyaService.Iface{
 			{
 				Iterator<Relationship> genres_itr = user.getRelationships(USER_INTERESTED_GENRE).iterator();
 				LinkedList<Node> genres = new LinkedList<Node>();
+								
 				while(genres_itr.hasNext())
 				{
 					genres.addLast(genres_itr.next().getEndNode());
@@ -13359,120 +13360,115 @@ public class Kahaniya implements KahaniyaService.Iface{
 			ResourceIterator<Node> nanostoryItr = null;
 			
 			if(tp == 0) //all
-			{
+			{				
 				userItr = search_index.query(SEARCH_USER, "*"+query.toLowerCase()+"*").iterator();
-				seriesItr = search_index.query(SEARCH_SERIES, "*"+query.toLowerCase()+"*").iterator();
-				chapterItr = search_index.query(SEARCH_CHAPTER, "*"+query.toLowerCase()+"*").iterator();
-				anthologyItr = search_index.query(SEARCH_ANTHOLOGY, "*"+query.toLowerCase()+"*").iterator();
-				nanostoryItr = search_index.query(SEARCH_NANOSTORY, "*"+query.toLowerCase()+"*").iterator();
-				int  i = 0;
+//				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				JSONArray usersArray = new JSONArray();
-				while(userItr.hasNext() && i < 6)
+				int c = 0;
+				while(c < prev_cnt && userItr.hasNext())
 				{
-					usersArray.put(getJSONForUser(userItr.next(),s_user));
-//					
-//					JSONObject obj = new JSONObject();
-//					Node user = userItr.next();
-//					obj.put("U_FullName", user.getProperty(FULL_NAME).toString());
-//					obj.put("U_Id", user.getProperty(USER_ID).toString());
-//					usersArray.put(obj);
-					i++;
+					c++;
+					userItr.next();
 				}
+				c = 0;
+				while(userItr.hasNext() && c < count)
+				{
+					c++;
+					usersArray.put(getJSONForUser(userItr.next(),s_user)); 
+				}
+				
 				JSONObject usersData = new JSONObject();
 				usersData.put("tp", 1);
 				usersData.put("data", usersArray);
 				usersData.put("ftp", "SA");
 				
-				i = 0;
+				seriesItr = search_index.query(SEARCH_SERIES, "*"+query.toLowerCase()+"*").iterator();
+//				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				JSONArray seriesArray = new JSONArray();
-				while(seriesItr.hasNext() && i < 6)
+				c = 0;
+				while(c < prev_cnt && seriesItr.hasNext())
 				{
-//					JSONObject obj1 = new JSONObject();
-//					Node series = seriesItr.next();
-//					
-					// no short stories
-					if(!seriesItr.next().getProperty(SERIES_TYPE).toString().equals("2"))
-						continue;
-					
-					seriesArray.put(getJSONForSeries(seriesItr.next(),s_user));
-					
-//					obj1.put("P_Title", series.getProperty(SERIES_TITLE).toString());
-//					obj1.put("P_Id", series.getProperty(SERIES_ID).toString());
-//					obj1.put("P_Title_ID", series.getProperty(SERIES_TITLE_ID).toString()); //lang & author and no short series
-//					obj1.put("P_Lang", series.getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
-//					obj1.put("P_Author_FullName", series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
-//					obj1.put("P_Author", series.getSingleRelationship(USER_STARTED_SERIES, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
-//					obj1.put("P_Feature_Image",series.getProperty(SERIES_FEAT_IMG));
-//					seriesArray.put(obj1);
-					i++;
+					c++;
+					seriesItr.next();
 				}
+				c = 0;
+				while(seriesItr.hasNext() && c < count)
+				{
+					Node series = seriesItr.next();
+					// no short stories
+					if(!series.getProperty(SERIES_TYPE).toString().equals("2"))
+						continue;
+					c++;
+					seriesArray.put(getJSONForSeries(series,s_user)); 
+				}
+
 				JSONObject seriesData = new JSONObject();
 				seriesData.put("tp", 2);
 				seriesData.put("data", seriesArray);
 				seriesData.put("ftp", "SS");
 
-				i = 0;
+								
+				chapterItr = search_index.query(SEARCH_CHAPTER, "*"+query.toLowerCase()+"*").iterator();
+//				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				JSONArray chapterArray = new JSONArray();
-				while(chapterItr.hasNext() && i < 6)
+				c = 0;
+				while(c < prev_cnt && chapterItr.hasNext())
 				{
-					chapterArray.put(getJSONForChapter(chapterItr.next(),s_user));
-					
-//					JSONObject obj2 = new JSONObject();
-//					Node chapter = chapterItr.next();
-//					obj2.put("P_Title", chapter.getProperty(CHAPTER_TITLE).toString()); // lang & autho
-//					obj2.put("P_Id", chapter.getProperty(CHAPTER_ID).toString());
-//					obj2.put("P_Title_ID", chapter.getProperty(CHAPTER_TITLE_ID).toString());
-//					obj2.put("S_Title_ID", chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getProperty(SERIES_TITLE_ID).toString());
-//					obj2.put("P_Lang", chapter.getSingleRelationship(CHAPTER_BELONGS_TO_SERIES, Direction.OUTGOING).getEndNode().getSingleRelationship(SERIES_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
-//					obj2.put("P_Author_FullName", chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
-//					obj2.put("P_Author", chapter.getSingleRelationship(USER_WRITTEN_A_CHAPTER, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
-//					obj2.put("P_Feature_Image",chapter.getProperty(CHAPTER_FEAT_IMAGE));
-//					chapterArray.put(obj2);
-					i++;
+					c++;
+					chapterItr.next();
 				}
+				c = 0;
+				while(chapterItr.hasNext() && c < count)
+				{
+					c++;
+					chapterArray.put(getJSONForChapter(chapterItr.next(),s_user)); 
+				}
+
+				
 				JSONObject chaptersData = new JSONObject();
 				chaptersData.put("tp", 3);
 				chaptersData.put("data", chapterArray);
 				chaptersData.put("ftp", "SC");
 				
-				i = 0;
+				anthologyItr = search_index.query(SEARCH_ANTHOLOGY, "*"+query.toLowerCase()+"*").iterator();
+//				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				JSONArray anthologyArray = new JSONArray();
-				while(anthologyItr.hasNext() && i < 6)
+
+				c = 0;
+				while(c < prev_cnt && anthologyItr.hasNext())
 				{
-					anthologyArray.put(getJSONForAnthologies(anthologyItr.next(),s_user));
-//					JSONObject obj2 = new JSONObject();
-//					Node anthology = anthologyItr.next();
-//					obj2.put("P_Title", anthology.getProperty(ANTHOLOGY_TITLE).toString()); // lang & autho
-//					obj2.put("P_Id", anthology.getProperty(ANTHOLOGY_ID).toString());
-//					obj2.put("P_Title_ID", anthology.getProperty(ANTHOLOGY_TITLE_ID).toString());
-//					obj2.put("P_Lang", anthology.getSingleRelationship(ANTHOLOGY_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
-//					obj2.put("P_Author_FullName", anthology.getSingleRelationship(USER_STARTED_ANTHOLOGY, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
-//					obj2.put("P_Author", anthology.getSingleRelationship(USER_STARTED_ANTHOLOGY, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
-//					obj2.put("P_Feature_Image",anthology.getProperty(ANTHOLOGY_FEAT_IMG));
-//					anthologyArray.put(obj2);
-					i++;
+					c++;
+					anthologyItr.next();
 				}
+				c = 0;
+				while(anthologyItr.hasNext() && c < count)
+				{
+					c++;
+					anthologyArray.put(getJSONForAnthologies(anthologyItr.next(),s_user)); 
+				}
+
 				JSONObject anthologyData = new JSONObject();
 				anthologyData.put("tp", 4);
 				anthologyData.put("data", anthologyArray);
 				anthologyData.put("ftp", "SAN");
-				
-				i = 0;
+
+				nanostoryItr = search_index.query(SEARCH_NANOSTORY, "*"+query.toLowerCase()+"*").iterator();
+//				Node s_user = user_index.get(USER_ID, user_id).getSingle();
 				JSONArray nanostoryArray = new JSONArray();
-				while(nanostoryItr.hasNext() && i < 6)
+				
+				c = 0;
+				while(c < prev_cnt && nanostoryItr.hasNext())
 				{
-					nanostoryArray.put(getJSONForNanostory(nanostoryItr.next(),s_user));
-					
-//					JSONObject obj2 = new JSONObject();
-//					Node nanostory = nanostoryItr.next();
-//					obj2.put("P_Id", nanostory.getProperty(NANOSTORY_ID).toString());
-//					obj2.put("P_Lang", nanostory.getSingleRelationship(NANOSTORY_BELONGS_TO_LANGUAGE, Direction.OUTGOING).getEndNode().getProperty(LANG_NAME).toString());
-//					obj2.put("P_Author_FullName", nanostory.getSingleRelationship(USER_WRITTEN_A_NANOSTORY, Direction.INCOMING).getStartNode().getProperty(FULL_NAME).toString());
-//					obj2.put("P_Author", nanostory.getSingleRelationship(USER_WRITTEN_A_NANOSTORY, Direction.INCOMING).getStartNode().getProperty(USER_ID).toString());
-//					obj2.put("P_Feature_Image",nanostory.getProperty(NANOSTORY_FEAT_IMG));
-//					nanostoryArray.put(obj2);
-					i++;
+					c++;
+					nanostoryItr.next();
 				}
+				c = 0;
+				while(nanostoryItr.hasNext() && c < count)
+				{
+					c++;
+					nanostoryArray.put(getJSONForNanostory(nanostoryItr.next(),s_user)); 
+				}
+
 				JSONObject nanostoryData = new JSONObject();
 				nanostoryData.put("tp", 5);
 				nanostoryData.put("data", nanostoryArray);
